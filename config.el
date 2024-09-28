@@ -75,6 +75,8 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+(setq calendar-week-start-day 1) ; 0 is Sunday, 1 is Monday
+
 ;; Org mode configuration
 (after! org
   (add-to-list 'org-modules 'ol-gnus)
