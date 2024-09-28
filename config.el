@@ -104,6 +104,16 @@
 
 ;; Ellama setup
 (after! ellama
+  (setopt ellama-keymap-prefix "C-c z")  ;; keymap for all ellama functions
+  (setopt ellama-language "English")
+  (require 'llm-openai)
+  (setopt ellama-provider
+	  (make-llm-ollama
+	   ;; this model should be pulled to use it
+	   ;; value should be the same as you print in terminal during pull
+	   :chat-model "qwen2.5:14b"
+	   :embedding-model "qwen2.5:14b"
+	   ))
   (setq llm-warn-on-nonfree nil
         ellama-providers
         '(("gpt4o" . (make-llm-openai

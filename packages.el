@@ -50,6 +50,3 @@
 ;; (unpin! t)
 
 (package! ellama)
-(package! llm)
-(unpin! llm)
-(unpin! lsp-mode)
