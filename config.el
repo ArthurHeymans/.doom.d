@@ -80,6 +80,8 @@
 ;; Org mode configuration
 (after! org
   (add-to-list 'org-modules 'ol-gnus)
+  (setq org-modern-label-border nil)
+  (global-org-modern-mode)
   (setq org-agenda-prefix-format
         '((agenda . " %i %-12c%?-2t %-12s %-6e")  ; Agenda items: icon, category, time, and extra info, estimate
           (todo . " %i %-12:c %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
@@ -94,6 +96,16 @@
                                 ("w" "Work entry" entry (file "work.org")
                                  "* TODO %?\n  %i\n  From: %a\n  %t" :empty-lines 1
                                  )))
+  (setq org-super-agenda-groups
+        '((:todo "STRT")
+          (:name "Important"
+           :priority "A")
+          (:name "Quick Picks"
+           :effort< "0:30")
+          (:priority<= "B"
+           :scheduled future
+           :order 1)
+          (:auto-category)))
   )
 
 ;; Use gnome GPG

@@ -50,3 +50,6 @@
 ;; (unpin! t)
 
 (package! ellama)
+
+(package! org-modern)
+(package! org-super-agenda)
