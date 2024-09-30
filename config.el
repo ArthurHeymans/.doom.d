@@ -87,6 +87,9 @@
           (todo . " %i %-12:c %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
           (tags . " %i %-12:c %-12:t %s")   ; Tagged items: icon, category, time (if any), and extra info
           (search . " %i %-12:c %s")))      ; Search results: icon, category, and extra info
+  (setq org-agenda-custom-commands '(("N" "TODOs without Deadlines or Schedules"
+                                      todo "TODO" ((org-agenda-skip-function '(org-agenda-skip-entry-if
+                                                                               'scheduled 'deadline))))))
   (setq org-capture-templates '(("f" "Fstart entry" entry (file "fstart.org")
                                  "* TODO %?\n  %i\n  From: %a\n  %t" :empty-lines 1
                                  )
