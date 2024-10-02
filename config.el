@@ -83,10 +83,10 @@
   (setq org-modern-label-border nil)
   (global-org-modern-mode)
   (setq org-agenda-prefix-format
-        '((agenda . " %i %-12c%?-2t %-12s %-6e")  ; Agenda items: icon, category, time, and extra info, estimate
-          (todo . " %i %-12:c %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
-          (tags . " %i %-12:c %-12:t %s")   ; Tagged items: icon, category, time (if any), and extra info
-          (search . " %i %-12:c %s")))      ; Search results: icon, category, and extra info
+        '((agenda . "   %i %-12c%?-2t %-12s %-6e")  ; Agenda items: icon, category, time, and extra info, estimate
+          (todo .   "   %i %-12:c %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
+          (tags .   "   %i %-12:c %-12:t %s")   ; Tagged items: icon, category, time (if any), and extra info
+          (search . "   %i %-12:c %s")))      ; Search results: icon, category, and extra info
   (setq org-agenda-custom-commands '(("N" "TODOs without Deadlines or Schedules"
                                       todo "TODO" ((org-agenda-skip-function '(org-agenda-skip-entry-if
                                                                                'scheduled 'deadline))))))
@@ -99,6 +99,7 @@
                                 ("w" "Work entry" entry (file "work.org")
                                  "* TODO %?\n  %i\n  From: %a\n  %t" :empty-lines 1
                                  )))
+  (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
   (setq org-super-agenda-groups
         '((:todo "STRT")
           (:name "Important"
@@ -109,6 +110,8 @@
            :scheduled future
            :order 1)
           (:auto-category)))
+  (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
+  (setq org-super-agenda-header-separator "\n---\n")
   )
 
 ;; Use gnome GPG
