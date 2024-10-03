@@ -80,8 +80,8 @@
 ;; Org mode configuration
 (after! org
   (add-to-list 'org-modules 'ol-gnus)
-  (setq org-modern-label-border nil)
-  (global-org-modern-mode)
+  ;; (setq org-modern-label-border nil)
+  ;; (global-org-modern-mode) I don't like it so much
   (setq org-agenda-prefix-format
         '((agenda . "   %i %-12c%?-2t %-12s %-6e")  ; Agenda items: icon, category, time, and extra info, estimate
           (todo .   "   %i %-12:c %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
@@ -112,6 +112,7 @@
           (:auto-category)))
   (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
   (setq org-super-agenda-header-separator "\n---\n")
+  (setq org-indent-indentation-per-level 4)
   )
 
 ;; Use gnome GPG
