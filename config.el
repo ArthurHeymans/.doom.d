@@ -126,9 +126,30 @@
           (:priority<= "B"
            :scheduled future
            :order 5)))
+  ;; Set a different color for super agenda headers & separator
   (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
   (setq org-super-agenda-header-separator "\n---\n")
+
+  ;; Indent each org mode level a bit more for a better overview
   (setq org-indent-indentation-per-level 4)
+
+  ;; Add REVIEW to doom emacs defaults
+  ;; Define the function to add a new keyword
+  (defun append-org-todo-keyword (new-keyword)
+    "Append a NEW-KEYWORD to the first sequence in `org-todo-keywords`."
+    (let ((current-keywords (car org-todo-keywords)))
+      (when (eq (car current-keywords) 'sequence)
+        (setq org-todo-keywords
+              (cons (append current-keywords (list new-keyword))
+                    (cdr org-todo-keywords))))))
+  ;; Call the (function )
+  (append-org-todo-keyword "REVIEW")
+  ;; Set a few custom faces
+  (setq org-todo-keyword-faces
+        (append org-todo-keyword-faces
+        '(("REVIEW" . (:foreground "light blue" :weight bold))
+          ("DONE" . (:foreground "green" :weight bold :strike-through t)))))
+
   )
 
 ;; Use gnome GPG
