@@ -116,16 +116,16 @@
            :name "In review: poke if needed"
            :order 2)
           (:todo "STRT"
-           :order 2)
+           :order 3)
           (:name "Important"
            :priority "A"
-           :order 3)
+           :order 4)
           (:name "Quick Picks"
            :effort< "0:30"
-           :order 4)
+           :order 5)
           (:priority<= "B"
            :scheduled future
-           :order 5)))
+           :order 6)))
   ;; Set a different color for super agenda headers & separator
   (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
   (setq org-super-agenda-header-separator "\n---\n")
