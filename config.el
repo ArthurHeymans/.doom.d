@@ -82,14 +82,20 @@
   (add-to-list 'org-modules 'ol-gnus)
   ;; (setq org-modern-label-border nil)
   ;; (global-org-modern-mode) I don't like it so much
+
+  ;; Agenda prefix
   (setq org-agenda-prefix-format
         '((agenda . "   %i %-12c%?-2t %-12s %-6e")  ; Agenda items: icon, category, time, and extra info, estimate
           (todo .   "   %i %-12:c %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
           (tags .   "   %i %-12:c %-12:t %s")   ; Tagged items: icon, category, time (if any), and extra info
           (search . "   %i %-12:c %s")))      ; Search results: icon, category, and extra info
+
+  ;; Agenda items that are not sceduled
   (setq org-agenda-custom-commands '(("N" "TODOs without Deadlines or Schedules"
                                       todo "TODO" ((org-agenda-skip-function '(org-agenda-skip-entry-if
                                                                                'scheduled 'deadline))))))
+
+  ;; Org capture templates
   (setq org-capture-templates '(("f" "Fstart entry" entry (file "fstart.org")
                                  "* TODO %?\n  %i\n  From: %a\n  %t" :empty-lines 1
                                  )
@@ -99,11 +105,16 @@
                                 ("w" "Work entry" entry (file "work.org")
                                  "* TODO %?\n  %i\n  From: %a\n  %t" :empty-lines 1
                                  )))
+
+  ;; Org super agenda setup
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
   (setq org-super-agenda-groups
         '((:todo "DONE"
            :name "DONE: good job!"
            :order 1)
+          (:todo "REVIEW"
+           :name "In review: poke if needed"
+           :order 2)
           (:todo "STRT"
            :order 2)
           (:name "Important"
