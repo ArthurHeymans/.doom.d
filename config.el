@@ -101,15 +101,20 @@
                                  )))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
   (setq org-super-agenda-groups
-        '((:todo "STRT")
+        '((:todo "DONE"
+           :name "DONE: good job!"
+           :order 1)
+          (:todo "STRT"
+           :order 2)
           (:name "Important"
-           :priority "A")
+           :priority "A"
+           :order 3)
           (:name "Quick Picks"
-           :effort< "0:30")
+           :effort< "0:30"
+           :order 4)
           (:priority<= "B"
            :scheduled future
-           :order 1)
-          (:auto-category)))
+           :order 5)))
   (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
   (setq org-super-agenda-header-separator "\n---\n")
   (setq org-indent-indentation-per-level 4)
