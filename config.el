@@ -93,7 +93,9 @@
   ;; Agenda items that are not sceduled
   (setq org-agenda-custom-commands '(("N" "TODOs without Deadlines or Schedules"
                                       todo "TODO" ((org-agenda-skip-function '(org-agenda-skip-entry-if
-                                                                               'scheduled 'deadline))))))
+                                                                               'scheduled 'deadline))))
+                                     ("R" "Finish review process"
+                                      todo "REVIEW")))
 
   ;; Org capture templates
   (setq org-capture-templates '(("f" "Fstart entry" entry (file "fstart.org")
