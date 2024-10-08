@@ -199,6 +199,16 @@
       '(not c-mode  ; Clang-format not good enoug
         ))
 
+(defun get-ollama-models ()
+  "Fetch the list of installed Ollama models."
+  (let* ((output (shell-command-to-string "ollama list"))
+         (lines (split-string output "\n" t))
+         models)
+    (dolist (line (cdr lines))  ; Skip the first line
+      (when (string-match "^\\([^[:space:]]+\\)" line)
+        (push (match-string 1 line) models)))
+    (nreverse models)))
+
 (use-package! gptel
   :config
   (setq! gptel-api-key (getenv "OPENAI_API_KEY")
@@ -216,7 +226,7 @@
   (gptel-make-ollama "Ollama"             ;Any name of your choosing
     :host "localhost:11434"               ;Where it's running
     :stream t                             ;Stream responses
-    :models '("qwen2.5-coder:latest"))          ;List of models
+    :models (get-ollama-models))          ;List of models
   (gptel-make-openai "llama-cpp"          ;Any name
     :stream t                             ;Stream responses
     :protocol "http"
