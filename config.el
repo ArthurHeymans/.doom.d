@@ -190,7 +190,8 @@
 
 ;; Show types in lsp-mode
 (after! lsp-mode
-  (setq lsp-inlay-hint-enable t)
+  (setq lsp-inlay-hint-enable t
+        lsp-file-watch-threshold 3000)
   )
 
 ;;  Don't autoformat on C
