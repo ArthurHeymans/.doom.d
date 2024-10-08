@@ -52,7 +52,8 @@
 (package! ellama)
 (package! gptel)
 (package! aider
-  :recipe (:host github :repo "tninja/aider.el" :files ("aider.el")))
+  :recipe (:host github :repo "tninja/aider.el" :files ("aider.el"))
+  :pin "fe6148c0648f07293a047d1c687944d33c40f4e4")
 
 (package! org-modern)
 (package! org-super-agenda)
