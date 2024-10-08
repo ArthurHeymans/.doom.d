@@ -219,3 +219,8 @@
     :host "localhost:8081"                ;Llama.cpp server location
     :models '("qwen2.5-coder"))                    ;Any names, doesn't matter for Llama
   )
+
+;; Add aider to path
+(let ((local-bin (expand-file-name "~/.local/bin")))
+  (setq exec-path (append exec-path (list local-bin)))
+  (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))

@@ -51,6 +51,8 @@
 
 (package! ellama)
 (package! gptel)
+(package! aider
+  :recipe (:host github :repo "tninja/aider.el" :files ("aider.el")))
 
 (package! org-modern)
 (package! org-super-agenda)
