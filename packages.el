@@ -50,6 +50,7 @@
 ;; (unpin! t)
 
 (package! ellama)
+(package! gptel)
 
 (package! org-modern)
 (package! org-super-agenda)

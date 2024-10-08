@@ -197,3 +197,25 @@
 (setq +format-on-save-enabled-modes
       '(not c-mode  ; Clang-format not good enoug
         ))
+
+(use-package! gptel
+  :config
+  (setq! gptel-api-key (getenv "OPENAI_API_KEY")
+         gptel-default-mode 'org-mode)
+  ;; DeepSeek offers an OpenAI compatible API
+  (gptel-make-openai "DeepSeek"       ;Any name you want
+    :host "api.deepseek.com"
+    :endpoint "/chat/completions"
+    :stream t
+    :key (getenv "DEEPSEEK_API_KEY")
+    :models '("deepseek-chat" "deepseek-coder"))
+  (gptel-make-ollama "Ollama"             ;Any name of your choosing
+    :host "localhost:11434"               ;Where it's running
+    :stream t                             ;Stream responses
+    :models '("qwen2.5-coder:latest"))          ;List of models
+  (gptel-make-openai "llama-cpp"          ;Any name
+    :stream t                             ;Stream responses
+    :protocol "http"
+    :host "localhost:8081"                ;Llama.cpp server location
+    :models '("qwen2.5-coder"))                    ;Any names, doesn't matter for Llama
+  )
