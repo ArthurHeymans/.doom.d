@@ -209,6 +209,9 @@
     :stream t
     :key (getenv "DEEPSEEK_API_KEY")
     :models '("deepseek-chat" "deepseek-coder"))
+  (gptel-make-anthropic "Claude"          ;Any name you want
+    :stream t                             ;Streaming responses
+    :key (getenv "ANTHROPIC_API_KEY"))
   (gptel-make-ollama "Ollama"             ;Any name of your choosing
     :host "localhost:11434"               ;Where it's running
     :stream t                             ;Stream responses
