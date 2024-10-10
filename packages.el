@@ -58,3 +58,7 @@
 (package! org-modern)
 (package! org-super-agenda)
 (package! kdeconnect)
+
+(package! kconfig-mode
+  :recipe (:host github :repo "delaanthonio/kconfig-mode")
+  :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
