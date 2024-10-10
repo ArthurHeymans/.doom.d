@@ -212,7 +212,8 @@
 (use-package! gptel
   :config
   (setq! gptel-api-key (getenv "OPENAI_API_KEY")
-         gptel-default-mode 'org-mode)
+         gptel-default-mode 'org-mode
+         gptel-model "gpt-4o")
   ;; DeepSeek offers an OpenAI compatible API
   (gptel-make-openai "DeepSeek"       ;Any name you want
     :host "api.deepseek.com"
