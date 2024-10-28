@@ -2,7 +2,9 @@
 
 (setq doom-theme 'tsdh-dark
       display-line-numbers-type t
-      calendar-week-start-day 1)
+      calendar-week-start-day 1
+      doom-font (font-spec :family "FiraCode Nerd Font" :size 15)
+      )
 
 (after! org
 
