@@ -235,7 +235,7 @@ Set up LLM packages
     :stream t
     :key (gptel-api-key-from-auth-source "openrouter.ai")
     :models '("anthropic/claude-3.5-sonnet"
-              "qwen/qwen-2.5-7b-instruct"))
+              "qwen/qwen-2.5-72b-instruct"))
   (gptel-make-anthropic "Claude"          ;Any name you want
     :stream t                             ;Streaming responses
     :key (gptel-api-key-from-auth-source "api.anthropic.com"))
