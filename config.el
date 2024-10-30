@@ -147,3 +147,5 @@
 (let ((local-bin (expand-file-name "~/.local/bin")))
   (setq exec-path (append exec-path (list local-bin)))
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
+
+(use-package! systemrdl-mode)

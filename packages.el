@@ -18,3 +18,7 @@
 (package! kconfig-mode
   :recipe (:host github :repo "delaanthonio/kconfig-mode")
   :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
+
+(package! systemrdl-mode
+  :recipe (:host github :repo "luisgutz/emacs-system-rdl")
+  :pin "b6889528a67cd169326422bfbdd6cdd031cbd09b")

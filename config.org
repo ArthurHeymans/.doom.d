@@ -253,3 +253,14 @@ Edit Kconfig like a pro
   :recipe (:host github :repo "delaanthonio/kconfig-mode")
   :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
 #+end_src
+* SystemRDL mode
+Syntax highlight for systemRDL
+#+begin_src elisp :tangle packages.el
+(package! systemrdl-mode
+  :recipe (:host github :repo "luisgutz/emacs-system-rdl")
+  :pin "b6889528a67cd169326422bfbdd6cdd031cbd09b")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! systemrdl-mode)
+#+end_src
