@@ -296,3 +296,7 @@ Syntax highlight for systemRDL
         :desc "Run consult-ripgrep"
         "gr" #'consult-ripgrep))
 #+end_src
+* Matrix
+#+begin_src elisp :tangle packages.el
+(package! ement)
+#+end_src
