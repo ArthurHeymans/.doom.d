@@ -170,6 +170,7 @@ Set up LLM packages
   (setopt ellama-keymap-prefix "C-c z")  ;; keymap for all ellama functions
   (setopt ellama-language "English")
   (require 'llm-openai)
+  (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
   (setopt ellama-provider
 	  (make-llm-ollama
 	   ;; this model should be pulled to use it
