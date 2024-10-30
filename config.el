@@ -39,23 +39,22 @@
 
 (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
 (setq org-super-agenda-groups
-      '((:todo "DONE"
-         :name "DONE: good job!"
-         :order 1)
-        (:todo "REVIEW"
-         :name "In review: poke if needed"
-         :order 2)
-        (:todo "STRT"
-         :order 3)
-        (:name "Important"
-         :priority "A"
-         :order 4)
-        (:name "Quick Picks"
-         :effort< "0:30"
-         :order 5)
-        (:priority<= "B"
-         :scheduled future
-         :order 6)))
+      '((:log t)  ; Automatically named "Log"
+        (:name "Schedule"
+         :time-grid t)
+        (:name "Today"
+         :scheduled today)
+        (:habit t)
+        (:name "Due today"
+         :deadline today)
+        (:name "Overdue"
+         :deadline past)
+        (:name "Due soon"
+         :deadline future)
+        (:name "Scheduled earlier"
+         :scheduled past)
+        )
+      )
 (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
 (setq org-super-agenda-header-separator "\n---\n")
 
