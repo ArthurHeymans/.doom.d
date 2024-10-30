@@ -88,26 +88,36 @@
   (setopt ellama-language "English")
   (require 'llm-openai)
   (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
-  (setopt ellama-provider
-	  (make-llm-ollama
-	   ;; this model should be pulled to use it
-	   ;; value should be the same as you print in terminal during pull
-	   :chat-model "qwen2.5:14b"
-	   :embedding-model "qwen2.5:14b"
-	   ))
   (setq llm-warn-on-nonfree nil
         ellama-providers
         '(("gpt4o" . (make-llm-openai
-                      :key (getenv "OPENAI_API_KEY")
+                      :key (auth-source-pick-first-password
+                            :host "api.openai.com"
+                            :user "apikey")
                       :chat-model "gpt-4o"
                       ))
+          ("qwen2.5 72B Instruct" . (make-llm-openai-compatible
+                              :key (auth-source-pick-first-password
+                                    :host "openrouter.ai"
+                                    :user "apikey")
+                              :url "https://openrouter.ai/api/v1"
+                              :chat-model "qwen/qwen-2.5-72b-instruct"))
+          ("Claude sonnet 3.5" . (make-llm-openai-compatible
+                              :key (auth-source-pick-first-password
+                                    :host "openrouter.ai"
+                                    :user "apikey")
+                              :url "https://openrouter.ai/api/v1"
+                              :chat-model "anthropic/claude-3.5-sonnet"))
           ("deepseek-chat" . (make-llm-openai-compatible
-                              :key (getenv "DEEPSEEK_API_KEY")
+                              :key (auth-source-pick-first-password
+                                    :host "api.deepseek.con"
+                                    :user "apikey")
                               :url "https://api.deepseek.com/"
                               :chat-model "deepseek-chat"))
           )
-        )
   )
+  (setopt ellama-provider (eval (cdr (assoc '"gpt4o" ellama-providers))))
+)
 
 (defun get-ollama-models ()
   "Fetch the list of installed Ollama models."
@@ -121,7 +131,7 @@
 
 (use-package! gptel
   :config
-  (setq! gptel-api-key (getenv "OPENAI_API_KEY")
+  (setq!
          gptel-default-mode 'org-mode
          gptel-model "gpt-4o")
   ;; DeepSeek offers an OpenAI compatible API
@@ -129,11 +139,18 @@
     :host "api.deepseek.com"
     :endpoint "/chat/completions"
     :stream t
-    :key (getenv "DEEPSEEK_API_KEY")
+    :key (gptel-api-key-from-auth-source "api.deepseek.com")
     :models '("deepseek-chat" "deepseek-coder"))
+  (gptel-make-openai "OpenRouter"               ;Any name you want
+    :host "openrouter.ai"
+    :endpoint "/api/v1/chat/completions"
+    :stream t
+    :key (gptel-api-key-from-auth-source "openrouter.ai")
+    :models '("anthropic/claude-3.5-sonnet"
+              "qwen/qwen-2.5-7b-instruct"))
   (gptel-make-anthropic "Claude"          ;Any name you want
     :stream t                             ;Streaming responses
-    :key (getenv "ANTHROPIC_API_KEY"))
+    :key (gptel-api-key-from-auth-source "api.anthropic.com"))
   (gptel-make-ollama "Ollama"             ;Any name of your choosing
     :host "localhost:11434"               ;Where it's running
     :stream t                             ;Stream responses
