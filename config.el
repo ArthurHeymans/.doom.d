@@ -108,6 +108,12 @@
                                     :user "apikey")
                               :url "https://openrouter.ai/api/v1"
                               :chat-model "anthropic/claude-3.5-sonnet"))
+          ("NVIDIA: Llama 3.1 Nemotron 70B Instruct" . (make-llm-openai-compatible
+                              :key (auth-source-pick-first-password
+                                    :host "openrouter.ai"
+                                    :user "apikey")
+                              :url "https://openrouter.ai/api/v1"
+                              :chat-model "nvidia/llama-3.1-nemotron-70b-instruct"))
           ("deepseek-chat" . (make-llm-openai-compatible
                               :key (auth-source-pick-first-password
                                     :host "api.deepseek.con"
@@ -146,7 +152,8 @@
     :stream t
     :key (gptel-api-key-from-auth-source "openrouter.ai")
     :models '("anthropic/claude-3.5-sonnet"
-              "qwen/qwen-2.5-7b-instruct"))
+              "qwen/qwen-2.5-72b-instruct"
+              "nvidia/llama-3.1-nemotron-70b-instruct"))
   (gptel-make-anthropic "Claude"          ;Any name you want
     :stream t                             ;Streaming responses
     :key (gptel-api-key-from-auth-source "api.anthropic.com"))
