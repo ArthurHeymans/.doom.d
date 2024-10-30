@@ -171,13 +171,6 @@ Set up LLM packages
   (setopt ellama-language "English")
   (require 'llm-openai)
   (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
-  (setopt ellama-provider
-	  (make-llm-ollama
-	   ;; this model should be pulled to use it
-	   ;; value should be the same as you print in terminal during pull
-	   :chat-model "qwen2.5:14b"
-	   :embedding-model "qwen2.5:14b"
-	   ))
   (setq llm-warn-on-nonfree nil
         ellama-providers
         '(("gpt4o" . (make-llm-openai
@@ -198,6 +191,7 @@ Set up LLM packages
                               :chat-model "deepseek-chat"))
           )
   )
+  (setopt ellama-provider (eval (cdr (assoc '"gpt4o" ellama-providers))))
 )
 #+end_src
 ** GPTEL
