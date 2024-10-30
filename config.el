@@ -129,8 +129,7 @@
         (push (match-string 1 line) models)))
     (nreverse models)))
 
-(use-package! gptel
-  :config
+(after! gptel
   (setq!
          gptel-default-mode 'org-mode
          gptel-model "gpt-4o")
