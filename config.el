@@ -5,6 +5,7 @@
       calendar-week-start-day 1
       doom-font (font-spec :family "FiraCode Nerd Font" :size 15)
       )
+(doom/set-frame-opacity 85)
 
 (after! org
 
