@@ -106,8 +106,11 @@
                       (alist-get 'id model)))
               models))))
 
-(after! ellama
+(use-package! ellama
+  :config
   (setopt ellama-keymap-prefix "C-c z")
+  )
+(after! ellama
   (setopt ellama-language "English")
   (require 'llm-openai)
   (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
@@ -127,7 +130,7 @@
                                     :user "apikey")
                               :url "https://api.deepseek.com/"
                               :chat-model "deepseek-chat"))))
-  (setopt ellama-provider (eval (cdr (assoc "gpt4o" ellama-providers))))
+  (setopt ellama-provider (eval (cdr (assoc "NVIDIA: Llama 3.1 Nemotron 70B Instruct" ellama-providers))))
 )
 
 (defun get-ollama-models ()
@@ -179,7 +182,6 @@
 
 (use-package! systemrdl-mode)
 
-(after! consult
-  (map! :leader
-        :desc "Run consult-ripgrep"
-        "gr" #'consult-ripgrep))
+(map! :leader
+      :desc "Run consult-ripgrep"
+      "gr" #'consult-ripgrep)
