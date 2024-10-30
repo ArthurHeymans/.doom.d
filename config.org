@@ -184,13 +184,21 @@ Set up LLM packages
                       :key (getenv "OPENAI_API_KEY")
                       :chat-model "gpt-4o"
                       ))
+          ("qwen2.5 72B Instruct" . (make-llm-openai-compatible
+                              :key (getenv "OPENROUTER_API_KEY")
+                              :url "https://openrouter.ai/api/v1"
+                              :chat-model "qwen/qwen-2.5-72b-instruct"))
+          ("Claude sonnet 3.5" . (make-llm-openai-compatible
+                              :key (getenv "OPENROUTER_API_KEY")
+                              :url "https://openrouter.ai/api/v1"
+                              :chat-model "anthropic/claude-3.5-sonnet"))
           ("deepseek-chat" . (make-llm-openai-compatible
                               :key (getenv "DEEPSEEK_API_KEY")
                               :url "https://api.deepseek.com/"
                               :chat-model "deepseek-chat"))
           )
-        )
   )
+)
 #+end_src
 ** GPTEL
 #+begin_src elisp :tangle packages.el
@@ -220,6 +228,13 @@ Set up LLM packages
     :stream t
     :key (getenv "DEEPSEEK_API_KEY")
     :models '("deepseek-chat" "deepseek-coder"))
+  (gptel-make-openai "OpenRouter"               ;Any name you want
+    :host "openrouter.ai"
+    :endpoint "/api/v1/chat/completions"
+    :stream t
+    :key (getenv "OPENROUTER_API_KEY")
+    :models '("anthropic/claude-3.5-sonnet"
+              "qwen/qwen-2.5-7b-instruct"))
   (gptel-make-anthropic "Claude"          ;Any name you want
     :stream t                             ;Streaming responses
     :key (getenv "ANTHROPIC_API_KEY"))
