@@ -265,3 +265,10 @@ Syntax highlight for systemRDL
 #+begin_src elisp :tangle config.el
 (use-package! systemrdl-mode)
 #+end_src
+* Consult
+#+begin_src elisp :tangle config.el
+(after! consult
+  (map! :leader
+        :desc "Run consult-ripgrep"
+        "gr" #'consult-ripgrep))
+#+end_src

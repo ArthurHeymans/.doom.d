@@ -150,3 +150,8 @@
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
 
 (use-package! systemrdl-mode)
+
+(after! consult
+  (map! :leader
+        :desc "Run consult-ripgrep"
+        "gr" #'consult-ripgrep))
