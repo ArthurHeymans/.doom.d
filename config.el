@@ -1,5 +1,16 @@
 ;; -*- lexical-binding: t; -*-
 
+(require 'auth-source)
+
+(defun get-auth-info (&rest params)
+  (let ((match (car (apply 'auth-source-search params))))
+    (if match
+        (let ((secret (plist-get match :secret)))
+          (if (functionp secret)
+              (funcall secret)
+            secret))
+      (error "Password not found for %S" params))))
+
 (setq doom-theme 'tsdh-dark
       display-line-numbers-type t
       calendar-week-start-day 1
@@ -86,7 +97,7 @@
 
 (defmacro add-openrouter-model (name model-url)
   `(cons ,name  (make-llm-openai-compatible
-                     :key (auth-source-pick-first-password
+                     :key (get-auth-info
                            :host "openrouter.ai"
                            :user "apikey")
                      :url "https://openrouter.ai/api/v1"
@@ -114,7 +125,7 @@
   (setq llm-warn-on-nonfree nil)
   (setq ellama-providers
         `(("gpt4o" . (make-llm-openai
-                        :key (auth-source-pick-first-password
+                        :key (get-auth-info
                               :host "api.openai.com"
                               :user "apikey")
                         :chat-model "gpt-4o"))
@@ -122,7 +133,7 @@
                      (add-openrouter-model (car model) (cdr model)))
                     (fetch-openrouter-models))
           ("deepseek-chat" . (make-llm-openai-compatible
-                              :key (auth-source-pick-first-password
+                              :key (get-auth-info
                                     :host "api.deepseek.com"
                                     :user "apikey")
                               :url "https://api.deepseek.com/"
@@ -184,18 +195,8 @@
       "gr" #'consult-ripgrep)
 
 (after! circe
-  (defun my-fetch-password (&rest params)
-  (require 'auth-source)
-  (let ((match (car (apply 'auth-source-search params))))
-    (if match
-        (let ((secret (plist-get match :secret)))
-          (if (functionp secret)
-              (funcall secret)
-            secret))
-      (error "Password not found for %S" params))))
-
   (defun my-nickserv-password (server)
-    (my-fetch-password :user "avph" :machine "irc.libera.chat"))
+    (get-auth-info :user "avph" :machine "irc.libera.chat"))
 
   (setq circe-network-options
          '(("Libera Chat"
