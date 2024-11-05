@@ -24,3 +24,5 @@
   :pin "b6889528a67cd169326422bfbdd6cdd031cbd09b")
 
 (package! ement)
+
+(package! smudge)
