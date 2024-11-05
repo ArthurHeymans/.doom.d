@@ -117,8 +117,11 @@
                       (alist-get 'id model)))
               models))))
 
+(use-package! ellama
+  :bind-keymap ("C-c z" . ellama-command-map)
+  )
+
 (after! ellama
-  (setopt ellama-keymap-prefix "C-c z")
   (setopt ellama-language "English")
   (require 'llm-openai)
   (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
