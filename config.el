@@ -182,3 +182,24 @@
 (map! :leader
       :desc "Run consult-ripgrep"
       "gr" #'consult-ripgrep)
+
+(after! circe
+  (defun my-fetch-password (&rest params)
+  (require 'auth-source)
+  (let ((match (car (apply 'auth-source-search params))))
+    (if match
+        (let ((secret (plist-get match :secret)))
+          (if (functionp secret)
+              (funcall secret)
+            secret))
+      (error "Password not found for %S" params))))
+
+  (defun my-nickserv-password (server)
+    (my-fetch-password :user "avph" :machine "irc.libera.chat"))
+
+  (setq circe-network-options
+         '(("Libera Chat"
+            :nick "avph"
+            :sasl-username "avph"
+            :sasl-password my-nickserv-password
+            :channels ("#flashprog")))))
