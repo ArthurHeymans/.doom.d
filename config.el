@@ -155,6 +155,7 @@
                                     :user "apikey")
                               :url "https://api.deepseek.com/"
                               :chat-model "deepseek-chat"))))
+  (setq ellama-auto-scroll t)
   (setopt ellama-provider (eval (cdr (assoc "NVIDIA: Llama 3.1 Nemotron 70B Instruct" ellama-providers))))
 )
 
@@ -171,7 +172,9 @@
 (after! gptel
   (setq!
          gptel-default-mode 'org-mode
-         gptel-model "gpt-4o")
+         gptel-model "nvidia/llama-3.1-nemotron-70b-instruct"
+         gptel-org-branching-context t)
+  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   ;; DeepSeek offers an OpenAI compatible API
   (gptel-make-openai "DeepSeek"       ;Any name you want
     :host "api.deepseek.com"
@@ -204,6 +207,13 @@
 (let ((local-bin (expand-file-name "~/.local/bin")))
   (setq exec-path (append exec-path (list local-bin)))
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
+
+(use-package! elysium
+  :after gptel
+  :custom
+  ;; Below are the default values
+  (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
+  (elysium-window-style 'vertical)) ; Can be customized to horizontal
 
 (use-package! systemrdl-mode)
 
