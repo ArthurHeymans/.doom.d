@@ -70,6 +70,20 @@
 (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
 (setq org-super-agenda-header-separator "\n---\n")
 
+(setq org-roam-capture-ref-templates
+      '(("r" "ref" plain "%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)
+        ("n" "node" entry "* ${title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:END:\n%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)))
+
+(setq org-roam-dailies-directory "daily"
+      org-roam-dailies-capture-templates
+      '(("d" "default" entry "* %?" :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))
+        ("m" "meeting" plain
+        "* Meeting: %^{Meeting Title}\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
+        :target (file+head "%<%Y-%m-%d>-meeting-%^{Meeting Title}.org" "#+title: %<%Y-%m-%d>\n")
+         :unnarrowed t)
+        )
+      )
+
 )
 
 (after! gnus-agent
