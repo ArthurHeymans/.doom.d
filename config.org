@@ -316,6 +316,20 @@ Add path to include aider installed from PIP
   (setq exec-path (append exec-path (list local-bin)))
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
 #+end_src
+** Elysium
+#+begin_src elisp :tangle packages.el
+(package! elysium)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! elysium
+  :after gptel
+  :custom
+  ;; Below are the default values
+  (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
+  (elysium-window-style 'vertical)) ; Can be customized to horizontal
+#+end_src
+
 * Kconfig mode
 Edit Kconfig like a pro
 #+begin_src elisp :tangle packages.el
