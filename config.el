@@ -78,8 +78,8 @@
       org-roam-dailies-capture-templates
       '(("d" "default" entry "* %?" :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))
         ("m" "meeting" plain
-        "* Meeting: %^{Meeting Title}\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
-        :target (file+head "%<%Y-%m-%d>-meeting-%^{Meeting Title}.org" "#+title: %<%Y-%m-%d>\n")
+        "* Meeting: %^{Meeting Title|microsoft_daily|9elements}\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants|Arthur Heymans}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
+        :target (file+head "%<%Y-%m-%d>-meeting-%^{Meeting Title|microsoft_daily|9elements}.org" "#+title: %<%Y-%m-%d>\n")
          :unnarrowed t)
         )
       )
