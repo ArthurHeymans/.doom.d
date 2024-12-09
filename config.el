@@ -61,10 +61,10 @@
          :deadline today)
         (:name "Overdue"
          :deadline past)
-        (:name "Due soon"
-         :deadline future)
         (:name "Scheduled earlier"
          :scheduled past)
+        (:name "Due soon"
+         :deadline future)
         )
       )
 (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
