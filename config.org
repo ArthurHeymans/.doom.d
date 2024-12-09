@@ -418,3 +418,20 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
   (bind-key "a" #'hydra-spotify/body smudge-command-map)
   )
 #+end_src
+* Mu4e email
+Show account in view.
+
+#+begin_src elisp :tangle config.el
+(setq +mu4e-gmail-account '(("arthur@aheymans.xyz" . "/aheymans")
+                            ("arthurphilippeheymans@gmail.com" . "/gmail")
+                            ("arthur.heymans@9elements.com" . "/9elements")))
+(setq mu4e-headers-fields
+      '((:account-stripe . 1) (:account . 10) (:human-date . 12) (:flags . 6) (:from-or-to . 25) (:subject)))
+(setq mu4e-maildir-shortcuts
+  '((:maildir "/aheymans/coreboot" :key  ?c)
+    (:maildir "/aheymans/gerrit"   :key  ?i)
+    (:maildir "/aheymans/github"   :key  ?g)))
+(setq mu4e-update-interval 900)
+(setq user-full-name "Arthur Heymans"
+      user-mail-address "arthur@aheymans.xyz")
+#+end_src
