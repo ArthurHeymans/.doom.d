@@ -434,4 +434,10 @@ Show account in view.
 (setq mu4e-update-interval 900)
 (setq user-full-name "Arthur Heymans"
       user-mail-address "arthur@aheymans.xyz")
+(setq sendmail-program (executable-find "msmtp")
+      message-sendmail-f-is-evil t
+      message-sendmail-extra-arguments '("--read-envelope-from")
+      send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'message-send-mail-with-sendmail)
+
 #+end_src
