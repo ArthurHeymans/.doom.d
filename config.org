@@ -422,7 +422,7 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
 Show account in view.
 
 #+begin_src elisp :tangle config.el
-(setq +mu4e-gmail-account '(("arthur@aheymans.xyz" . "/aheymans")
+(setq +mu4e-gmail-accounts '(("arthur@aheymans.xyz" . "/aheymans")
                             ("arthurphilippeheymans@gmail.com" . "/gmail")
                             ("arthur.heymans@9elements.com" . "/9elements")))
 (setq mu4e-headers-fields
