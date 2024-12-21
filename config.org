@@ -441,8 +441,10 @@ Show account in view.
       message-send-mail-function 'message-send-mail-with-sendmail)
 
 #+end_src
-* eshell
-#+begin_src elisp tangle config.el
+* Terminals
+** eshell
+
+#+begin_src elisp :tangle config.el
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
 (setq eshell-prompt-function
       (lambda ()
@@ -460,9 +462,27 @@ Show account in view.
          (propertize (if (= (user-uid) 0) " # " " $ ") 'face `(:foreground "white"))
          )))
 #+end_src
-* vterm
+
+** eat
+#+begin_src elisp :tangle packages.el
+(package! eat)
+#+end_src
+#+begin_src elisp :tangle config.el
+(after! eat
+    (custom-set-faces
+    `(eat-term-color-black   ((t (:foreground "#0d0d0d" :background "#0d0d0d"))))
+    `(eat-term-color-red     ((t (:foreground "#FF301B" :background "#FF4352"))))
+    `(eat-term-color-green   ((t (:foreground "#A0E521" :background "#B8E466"))))
+    `(eat-term-color-yellow  ((t (:foreground "#FFC620" :background "#FFD750"))))
+    `(eat-term-color-blue    ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
+    `(eat-term-color-magenta ((t (:foreground "#8763B8" :background "#A578EA"))))
+    `(eat-term-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
+    `(eat-term-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8")))))
+  )
+#+end_src
+** vterm
 Make colors more readable
-#+begin_src elisp tangle config.el
+#+begin_src elisp :tangle config.el
 (after! vterm
   (custom-set-faces
     `(vterm-color-default ((t (:foreground ,(doom-color 'fg)))))
