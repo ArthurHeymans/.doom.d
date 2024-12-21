@@ -497,3 +497,7 @@ Make colors more readable
   (setq vterm-titles t)
   (setq vterm-always-compile-module t))
 #+end_src
+* KDE connect
+#+begin_src elisp :tangle packages.el
+(package! kdeconnect)
+#+end_src
