@@ -510,3 +510,7 @@ Make colors more readable
 #+begin_src elisp :tangle packages.el
 (package! kdeconnect)
 #+end_src
+* SOPS
+#+begin_src elisp :tangle packages.el
+(package! sops)
+#+end_src
