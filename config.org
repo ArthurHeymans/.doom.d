@@ -122,7 +122,10 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
         (:name "Due today"
          :deadline today)
         (:name "Overdue"
-         :deadline past)
+         :and
+         (:todo ("TODO")
+          :deadline past)
+         )
         (:name "Scheduled earlier"
          :scheduled past)
         (:name "Due soon"
