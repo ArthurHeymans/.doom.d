@@ -28,6 +28,11 @@ Don't do init.el
             secret))
       (error "Password not found for %S" params))))
 #+end_src
+** Grep no ask for save
+#+begin_src elisp :tangle config.el
+(setq grep-save-buffers nil)
+#+end_src
+
 
 * General look and feel
 I like this theme as it has a lot of not washed out colors.
