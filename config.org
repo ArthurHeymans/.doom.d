@@ -508,6 +508,7 @@ Make colors more readable
     `(vterm-color-green   ((t (:foreground "#A0E521" :background "#B8E466"))))
     `(vterm-color-yellow  ((t (:foreground "#FFC620" :background "#FFD750"))))
     `(vterm-color-blue    ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
+    `(vterm-color-bright-blue ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
     `(vterm-color-magenta ((t (:foreground "#8763B8" :background "#A578EA"))))
     `(vterm-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
     `(vterm-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8")))))
