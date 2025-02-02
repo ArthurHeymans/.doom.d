@@ -342,7 +342,7 @@ Add path to include aider installed from PIP
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
 (after! aider
   :config
-    (setq aider-args '("--model" "openrouter/deepseek/deepseek-r1" "--watch-files" "--cache-prompts"))
+    (setq aider-args '("--model" "openrouter/deepseek/deepseek-r1" "--cache-prompts"))
     )
 #+end_src
 ** Elysium
