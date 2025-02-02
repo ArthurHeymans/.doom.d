@@ -340,7 +340,7 @@ Add path to include aider installed from PIP
 (let ((local-bin (expand-file-name "~/.local/bin")))
   (setq exec-path (append exec-path (list local-bin)))
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
-(use-package aider
+(after! aider
   :config
     (setq aider-args '("--model" "openrouter/deepseek/deepseek-r1" "--watch-files" "--cache-prompts"))
     )
