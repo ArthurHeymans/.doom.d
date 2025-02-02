@@ -360,7 +360,8 @@ Add path to include aider installed from PIP
 #+end_src
 ** whisper
 #+begin_src elisp :tangle packages.el
-(package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el")))
+(package! whisper :recipe (:host github :repo "ArthurHeymans/whisper.el" :files ("whisper.el"))
+  :pin "ee29777238fc089d66d8e4b6812fdd5743cad19a")
 #+end_src
 #+begin_src elisp :tangle config.el
 (map! "C-S-h" #'whisper-run)
