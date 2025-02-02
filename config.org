@@ -46,6 +46,11 @@ Week starts at monday here, despite what the Bible says.
       )
 (doom/set-frame-opacity 85)
 #+end_src
+** Grep no ask for save
+#+begin_src elisp :tangle config.el
+(setq grep-save-buffers nil)
+#+end_src
+
 * Org mode configuration
 Org mode configuration
 
