@@ -202,7 +202,7 @@ Show types in lsp and allow for larger projects without being bothered all the t
    indent-bars-display-on-blank-lines t)
   )
 #+end_src
-* AI / LLM
+* AI
 Set up LLM packages
 ** Ellama
 #+begin_src elisp :tangle packages.el
@@ -348,6 +348,13 @@ Add path to include aider installed from PIP
   ;; Below are the default values
   (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
   (elysium-window-style 'vertical)) ; Can be customized to horizontal
+#+end_src
+** whisper
+#+begin_src elisp :tangle packages.el
+(package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el")))
+#+end_src
+#+begin_src elisp :tangle config.el
+(map! "C-S-h" #'whisper-run)
 #+end_src
 
 * Kconfig mode
