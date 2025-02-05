@@ -361,9 +361,13 @@ Add path to include aider installed from PIP
 ** whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "ArthurHeymans/whisper.el" :files ("whisper.el"))
-  :pin "4768720e6845a9568144fa4a64529206d69bcbe9")
+  :pin "d3d5045899d93fb9a378754d536aa38a4542b7d6")
 #+end_src
 #+begin_src elisp :tangle config.el
+(after! whisper
+  (setq whisper-server-mode 'openai
+        whisper-openai-api-key (get-auth-info :user "apikey" :host "api.openai.com"))
+  )
 (map! "C-S-h" #'whisper-run)
 #+end_src
 
