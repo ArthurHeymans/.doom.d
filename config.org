@@ -340,6 +340,10 @@ Add path to include aider installed from PIP
 (let ((local-bin (expand-file-name "~/.local/bin")))
   (setq exec-path (append exec-path (list local-bin)))
   (setenv "PATH" (concat local-bin path-separator (getenv "PATH"))))
+(setenv "OPENAI_API_KEY" (get-auth-info :user "apikey" :host "api.openai.com"))
+(setenv "ANTHROPIC_API_KEY" (get-auth-info :user "apikey" :host "api.anthropic.com"))
+(setenv "DEEPSEEK_API_KEY" (get-auth-info :user "apikey" :host "api.deepseek.com"))
+(setenv "OPENROUTER_API_KEY" (get-auth-info :user "apikey" :host "openrouter.ai"))
 (after! aider
   :config
     (setq aider-args '("--model" "openrouter/deepseek/deepseek-r1" "--cache-prompts"))
