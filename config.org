@@ -350,7 +350,7 @@ Add path to include aider installed from PIP
   (setenv "DEEPSEEK_API_KEY" (get-auth-info :user "apikey" :host "api.deepseek.com")))
 (unless (getenv "OPENROUTER_API_KEY")
   (setenv "OPENROUTER_API_KEY" (get-auth-info :user "apikey" :host "openrouter.ai")))
-(after! aider
+(after! aidermacs
   :config
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-args '("--model" "openrouter/anthropic/claude-3.5-sonnet" "--cache-prompts" "--watch-files"))
