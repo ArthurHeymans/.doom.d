@@ -350,7 +350,7 @@ Add path to include aider installed from PIP
 (after! aidermacs
   :config
   (setq aidermacs-backend 'vterm)
-  (setq aidermacs-args '("--model" "openrouter/anthropic/claude-3.5-sonnet" "--cache-prompts" "--watch-files"))
+  (setq aidermacs-args '("--model" "openrouter/anthropic/claude-3.7-sonnet" "--cache-prompts" "--watch-files"))
      )
 #+end_src
 ** Elysium
