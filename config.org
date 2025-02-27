@@ -552,3 +552,9 @@ Make colors more readable
 #+begin_src elisp :tangle packages.el
 (package! sops)
 #+end_src
+* Magit
+#+begin_src emacs-lisp :tangle config.el
+(after! magit
+  (setq transient-default-level 6)
+  )
+#+end_src
