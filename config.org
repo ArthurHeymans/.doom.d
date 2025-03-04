@@ -127,19 +127,22 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
         (:name "Schedule"
          :time-grid t)
         (:name "Today"
-         :scheduled today)
+         :and (:scheduled today
+               :todo ("TODO")))
         (:habit t)
         (:name "Due today"
          :deadline today)
         (:name "Overdue"
          :and
          (:todo ("TODO")
-          :deadline past)
-         )
+          :deadline past))
         (:name "Scheduled earlier"
-         :scheduled past)
+         :and (:scheduled past
+               :todo ("TODO")))
         (:name "Due soon"
          :deadline future)
+        (:name "HOLD"
+         :todo "HOLD")
         )
       )
 (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
