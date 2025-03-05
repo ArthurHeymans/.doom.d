@@ -193,7 +193,7 @@ Show types in lsp and allow for larger projects without being bothered all the t
 #+begin_src elisp :tangle config.el
 (after! lsp-mode
   (setq lsp-inlay-hint-enable t
-        lsp-file-watch-threshold 3000)
+        lsp-file-watch-threshold 4000)
   )
 #+end_src
 * Indent bars
