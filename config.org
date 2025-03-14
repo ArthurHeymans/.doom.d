@@ -103,7 +103,7 @@ Add gnus support
 ** Org-ql
 This allows to index org-mode quickly. Might be a good alternative to org-agenda
 #+begin_src elisp :tangle packages.el
-(package! org-ql)
+(package! org-ql :recipe (:host github :repo "anpandey/org-ql" :branch "format-element-effort"))
 #+end_src
 ** Agenda
 *** Agenda format
