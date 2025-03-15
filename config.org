@@ -180,7 +180,7 @@ longer than LEN."
 #+end_src
 ** org-roam
 *** TODO files
-#+begin_src emacs-lisp :tangle yes config.el
+#+begin_src elisp :tangle config.el
 (defun roam-extra:todo-p ()
   "Return non-nil if current buffer has any TODO entry."
   (org-element-map (org-element-parse-buffer 'headline) 'headline
