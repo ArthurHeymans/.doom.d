@@ -617,7 +617,8 @@ Show account in view.
 ** eat
 #+begin_src elisp :tangle packages.el
 (package! eat)
-(package! aweshell :recipe (:host github :repo "manateelazycat/aweshell"))
+(package! aweshell :recipe (:host github :repo "manateelazycat/aweshell")
+  :pin "db495f29eef9013cf6b3796c3797e0ec76352e3f")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! eat
