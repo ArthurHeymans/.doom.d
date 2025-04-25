@@ -579,6 +579,20 @@ Show account in view.
 
 #+end_src
 * Terminals
+** aweshell
+#+begin_src elisp :tangle config.el
+(use-package! aweshell
+  :bind (("C-c t n" . aweshell-new)
+         ("C-c t p" . aweshell-prev)
+         ("C-c t t" . aweshell-next)
+         ("C-c t c" . aweshell-clear-buffer)
+         ("C-c t s" . aweshell-sudo-toggle)
+         ("C-c t d" . aweshell-dedicated-toggle))
+  :config
+  (setq aweshell-use-exec-path-from-shell t
+        aweshell-dedicated-window-height 30))
+#+end_src
+
 ** eshell
 
 #+begin_src elisp :tangle config.el
@@ -603,6 +617,7 @@ Show account in view.
 ** eat
 #+begin_src elisp :tangle packages.el
 (package! eat)
+(package! aweshell :recipe (:host github :repo "manateelazycat/aweshell"))
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! eat
