@@ -156,9 +156,14 @@ longer than LEN."
       '((:log t)  ; Automatically named "Log"
         (:name "Schedule"
          :time-grid t)
-        (:name "Today"
+        (:name "Today: work"
          :and (:scheduled today
-               :todo ("TODO")))
+               :todo ("TODO")
+               :tag "WORK"))
+         (:name "Today: other"
+          :and (:scheduled today
+               :todo ("TODO"))
+          )
         (:habit t)
         (:name "Due today"
          :deadline today)
@@ -171,8 +176,9 @@ longer than LEN."
                :todo ("TODO")))
         (:name "Due soon"
          :deadline future)
-        (:name "HOLD"
-         :todo "HOLD")
+        ;(:name "HOLD"
+        ; :todo "HOLD")
+        (:discard (:anything))
         )
       )
 (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
