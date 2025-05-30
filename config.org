@@ -285,6 +285,23 @@ Show types in lsp and allow for larger projects without being bothered all the t
         lsp-file-watch-threshold 4000)
   )
 #+end_src
+** LSP-bridge
+#+begin_src elisp :tangle packages.el
+(when (package! lsp-bridge
+        :recipe (:host github
+                 :repo "manateelazycat/lsp-bridge"
+                 :branch "master"
+                 :files ("*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+                 ;; do not perform byte compilation or native compilation for lsp-bridge
+                 :build (:not compile)))
+  (package! markdown-mode)
+  (package! yasnippet))
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! lsp-bridge
+  :config
+  (global-lsp-bridge-mode))
+#+end_src
 * Indent bars
 #+begin_src elisp :tangle config.el
 (after! indent-bars
