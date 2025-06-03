@@ -694,8 +694,12 @@ Make colors more readable
 (package! sops)
 #+end_src
 * Magit
+#+begin_src elisp :tangle packages.el
+(package! magit-delta :recipe (:host github :repo "dandavison/magit-delta") :pin "56cdffd377279589aa0cb1df99455c098f1848cf")
+#+end_src
 #+begin_src emacs-lisp :tangle config.el
 (after! magit
   (setq transient-default-level 6)
+  (magit-delta-mode +1)
   )
 #+end_src
