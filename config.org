@@ -522,6 +522,10 @@ Syntax highlight for systemRDL
 #+begin_src elisp :tangle config.el
 (use-package! systemrdl-mode)
 #+end_src
+* just-mode
+#+begin_src elisp :tangle packages.el
+(package! just-mode)
+#+end_src
 * Consult
 #+begin_src elisp :tangle config.el
 (map! :leader
