@@ -507,9 +507,10 @@ Syntax highlight for systemRDL
 #+begin_src elisp :tangle config.el
 (use-package! systemrdl-mode)
 #+end_src
-* just-mode
+* justfile
 #+begin_src elisp :tangle packages.el
 (package! just-mode)
+(package! justl :recipe (:host github :repo "psibi/justl.el"))
 #+end_src
 * Consult
 #+begin_src elisp :tangle config.el
