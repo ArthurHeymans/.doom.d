@@ -23,3 +23,27 @@ Archived entries from file /home/arthur/src/doom/config.org
   (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
   (elysium-window-style 'vertical)) ; Can be customized to horizontal
 #+end_src
+
+* LSP-bridge
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-06-06 Fri 08:54
+:ARCHIVE_FILE: ~/src/doom/config.org
+:ARCHIVE_OLPATH: LSP-mode
+:ARCHIVE_CATEGORY: config
+:END:
+#+begin_src elisp :tangle packages.el
+(when (package! lsp-bridge
+        :recipe (:host github
+                 :repo "manateelazycat/lsp-bridge"
+                 :branch "master"
+                 :files ("*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+                 ;; do not perform byte compilation or native compilation for lsp-bridge
+                 :build (:not compile)))
+  (package! markdown-mode)
+  (package! yasnippet))
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! lsp-bridge
+  :config
+  (global-lsp-bridge-mode))
+#+end_src
