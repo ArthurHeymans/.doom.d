@@ -471,9 +471,11 @@ Add path to include aider installed from PIP
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-watch-files t)
   (setq aidermacs-show-diff-after-change t)
-  (map! "C-c a" #'aidermacs-transient-menu)
+  (map! :leader
+        :desc "aidermacs transient menu" "A" #'aidermacs-transient-menu)
   )
 #+end_src
+
 ** whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "ArthurHeymans/whisper.el" :files ("whisper.el"))
