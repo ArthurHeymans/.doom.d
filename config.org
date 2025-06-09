@@ -1,6 +1,6 @@
 #+title: Doom emacs configuration
 
-* Setup
+* Core Setup
 ** Tangle Headers
 #+begin_src elisp :tangle config.el
 ;; -*- lexical-binding: t; -*-
@@ -15,7 +15,9 @@ Don't do init.el
 # #+begin_src elisp :tangle "init.el" :comments no
 # ;; -*- no-byte-compile: t; -*-
 # #+end_src
-** Helper for authinfo
+
+** Helper Functions
+*** Helper for authinfo
 #+begin_src elisp :tangle config.el
 (require 'auth-source)
 
@@ -28,13 +30,15 @@ Don't do init.el
             secret))
       (error "Password not found for %S" params))))
 #+end_src
-** Grep no ask for save
+
+** Basic Settings
+*** Grep no ask for save
 #+begin_src elisp :tangle config.el
 (setq grep-save-buffers nil)
 #+end_src
 
-
-* General look and feel
+* Appearance & UI
+** Theme and Fonts
 I like this theme as it has a lot of not washed out colors.
 Week starts at monday here, despite what the Bible says.
 
@@ -46,35 +50,49 @@ Week starts at monday here, despite what the Bible says.
       )
 (doom/set-frame-opacity 85)
 #+end_src
-** Grep no ask for save
+
+** Visual Enhancements
+*** Indent bars
 #+begin_src elisp :tangle config.el
-(setq grep-save-buffers nil)
+(after! indent-bars
+  (setq
+   indent-bars-color '(highlight :face-bg t :blend 0.15)
+   indent-bars-pattern "."
+   indent-bars-width-frac 0.1
+   indent-bars-pad-frac 0.1
+   indent-bars-zigzag nil
+   indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 1) ; blend=1: blend with BG only
+   indent-bars-highlight-current-depth '(:blend 0.5) ; pump up the BG blend on current
+   indent-bars-display-on-blank-lines t)
+  )
 #+end_src
 
-* Org mode configuration
-Org mode configuration
-
-** Emacs start config
+* Org Mode
+** Basic Configuration
+*** Emacs start config
 Open this and close at the end of org mode configuration
 #+begin_src elisp :tangle config.el
 (after! org
 #+end_src
 
-** org-mode dirs
+*** org-mode dirs
 #+begin_src elisp :tangle config.el
 (setq org-directory "~/org/")
 #+end_src
-** look and feel
-*** org-modern
+
+*** Look and feel
+**** org-modern
 #+begin_src elisp :tangle packages.el
 (package! org-modern)
 #+end_src
-*** indent level
+
+**** indent level
 Indent each org mode level a bit more for a better overview
 #+begin_src elisp :tangle config.el
 (setq org-indent-indentation-per-level 4)
 #+end_src
-*** 'REVIEW' keyword
+
+**** 'REVIEW' keyword
 #+begin_src elisp :tangle config.el
 (defun append-org-todo-keyword (new-keyword)
   "Append a NEW-KEYWORD to the first sequence in `org-todo-keywords`."
@@ -87,7 +105,8 @@ Indent each org mode level a bit more for a better overview
 ;; Call the (function )
 (append-org-todo-keyword "REVIEW")
 #+end_src
-*** Custom faces
+
+**** Custom faces
 #+begin_src elisp :tangle config.el
 (setq org-todo-keyword-faces
       (append org-todo-keyword-faces
@@ -95,17 +114,21 @@ Indent each org mode level a bit more for a better overview
                 ("DONE" . (:foreground "green" :weight bold :strike-through t)))))
 (custom-set-faces '(org-drawer ((t (:foreground "grey" :weight bold :height: 1.3)))))
 #+end_src
-** Org ol-gnus
+
+** Export & Integration
+*** Org ol-gnus
 Add gnus support
 #+begin_src elisp :tangle config.el
 (add-to-list 'org-modules 'ol-gnus)
 #+end_src
-** Org-ql
+
+*** Org-ql
 This allows to index org-mode quickly. Might be a good alternative to org-agenda
 #+begin_src elisp :tangle packages.el
 (package! org-ql)
 #+end_src
-** Agenda
+
+** Agenda & Scheduling
 *** Agenda format
 #+begin_src elisp :tangle config.el
 (defun get-agenda-category (&optional len)
@@ -145,6 +168,7 @@ longer than LEN."
         (tags .   "   %i %(get-agenda-category 16) %-12:t %s")   ; Tagged items: icon, category, time (if any), and extra info
         (search . "   %i %(get-agenda-category 16) %s")))      ; Search results: icon, category, and extra info
 #+end_src
+
 *** Super agenda setup
 #+begin_src elisp :tangle packages.el
 (package! org-super-agenda)
@@ -185,7 +209,8 @@ longer than LEN."
 (setq org-super-agenda-header-separator "\n---\n")
 (add-to-list 'warning-suppress-types '(org-element org-element-parser))
 #+end_src
-** org-roam
+
+** Org-roam & Knowledge Management
 *** TODO files
 #+begin_src elisp :tangle config.el
 (defun roam-extra:todo-p ()
@@ -239,7 +264,6 @@ Includes roam files with todo tag and specific additional files."
 (advice-add 'org-agenda :before #'roam-extra:update-todo-files)
 #+end_src
 
-
 *** roam-ref
 Capture files from browser bookmarklet
 #+begin_src elisp :tangle config.el
@@ -247,6 +271,7 @@ Capture files from browser bookmarklet
       '(("r" "ref" plain "%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)
         ("n" "node" entry "* ${title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:END:\n%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)))
 #+end_src
+
 *** roam-dailies meeting
 #+begin_src elisp :tangle config.el
 (setq org-roam-dailies-directory "daily"
@@ -260,23 +285,42 @@ Capture files from browser bookmarklet
       )
 
 #+end_src
+
 ** Org mode configuration end
 #+begin_src elisp :tangle config.el
 )
 #+end_src
-* GnuPG
-Use gnome GPG agent
-#+begin_src elisp :tangle config.el
-(after! gnus-agent
-  (setq epg-pinentry-mode 'nil)
-  )
-#+end_src
-* Rust
+
+* Development
+** Language Support
+*** Rust
 Don't continue comment on the next line when. This is annoying
 #+begin_src elisp :tangle config.el
 (setq-hook! 'rust-mode-hook comment-line-break-function nil)
 #+end_src
-* LSP-mode
+
+*** Kconfig Mode
+Edit Kconfig like a pro
+#+begin_src elisp :tangle packages.el
+(package! kconfig-mode
+  :recipe (:host github :repo "delaanthonio/kconfig-mode")
+  :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
+#+end_src
+
+*** SystemRDL Mode
+Syntax highlight for systemRDL
+#+begin_src elisp :tangle packages.el
+(package! systemrdl-mode
+  :recipe (:host github :repo "luisgutz/emacs-system-rdl")
+  :pin "b6889528a67cd169326422bfbdd6cdd031cbd09b")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! systemrdl-mode)
+#+end_src
+
+** Development Tools
+*** LSP Configuration
 Show types in lsp and allow for larger projects without being bothered all the time about it.
 
 #+begin_src elisp :tangle config.el
@@ -285,23 +329,33 @@ Show types in lsp and allow for larger projects without being bothered all the t
         lsp-file-watch-threshold 4000)
   )
 #+end_src
-* Indent bars
+
+*** Build Tools
+**** Justfile
+#+begin_src elisp :tangle packages.el
+(package! just-mode)
+(package! justl :recipe (:host github :repo "psibi/justl.el"))
+#+end_src
 #+begin_src elisp :tangle config.el
-(after! indent-bars
-  (setq
-   indent-bars-color '(highlight :face-bg t :blend 0.15)
-   indent-bars-pattern "."
-   indent-bars-width-frac 0.1
-   indent-bars-pad-frac 0.1
-   indent-bars-zigzag nil
-   indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 1) ; blend=1: blend with BG only
-   indent-bars-highlight-current-depth '(:blend 0.5) ; pump up the BG blend on current
-   indent-bars-display-on-blank-lines t)
+(after! justl
+  (setq justl-shell 'eshell))
+#+end_src
+
+*** Version Control
+**** Magit
+#+begin_src elisp :tangle packages.el
+(package! magit-delta :recipe (:host github :repo "dandavison/magit-delta") :pin "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")
+#+end_src
+#+begin_src emacs-lisp :tangle config.el
+(after! magit
+  (setq transient-default-level 6)
+  (magit-delta-mode +1)
   )
 #+end_src
-* AI
-Set up LLM packages
-** Ellama
+
+* AI & Assistance
+** LLM Clients
+*** Ellama
 #+begin_src elisp :tangle packages.el
 (package! ellama)
 #+end_src
@@ -369,7 +423,8 @@ Btw this code is generated by ellama.
 )
 
 #+end_src
-** GPTEL
+
+*** GPTEL
 #+begin_src elisp :tangle packages.el
 (package! gptel :recipe (:nonrecursive t))
 (package! mcp
@@ -447,7 +502,9 @@ Btw this code is generated by ellama.
 ;        ("qdrant" . (:url "http://localhost:8000/sse"))
         ))
 #+end_src
-** Aidermacs
+
+## Code Generation
+*** Aidermacs
 #+begin_src elisp :tangle packages.el
 (package! aidermacs :recipe (:host github :repo "MatthewZMD/aidermacs"
                              :files ("aidermacs-backend-comint.el" "aidermacs-backend-vterm.el"
@@ -476,7 +533,8 @@ Add path to include aider installed from PIP
   )
 #+end_src
 
-** whisper
+## Voice Input
+*** Whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "ArthurHeymans/whisper.el" :files ("whisper.el"))
   :pin "9289efb6dbe472d0f18982dfbf6d14bcc9f998b0")
@@ -489,40 +547,34 @@ Add path to include aider installed from PIP
 (map! "C-S-h" #'whisper-run)
 #+end_src
 
-* Kconfig mode
-Edit Kconfig like a pro
-#+begin_src elisp :tangle packages.el
-(package! kconfig-mode
-  :recipe (:host github :repo "delaanthonio/kconfig-mode")
-  :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
-#+end_src
-* SystemRDL mode
-Syntax highlight for systemRDL
-#+begin_src elisp :tangle packages.el
-(package! systemrdl-mode
-  :recipe (:host github :repo "luisgutz/emacs-system-rdl")
-  :pin "b6889528a67cd169326422bfbdd6cdd031cbd09b")
-#+end_src
+* Communication & Social
+** Email
+*** Mu4e
+Show account in view.
 
 #+begin_src elisp :tangle config.el
-(use-package! systemrdl-mode)
+(setq +mu4e-gmail-accounts '(("arthur@aheymans.xyz" . "/aheymans")
+                            ("arthurphilippeheymans@gmail.com" . "/gmail")
+                            ("arthur.heymans@9elements.com" . "/9elements")))
+(setq mu4e-headers-fields
+      '((:account-stripe . 1) (:account . 10) (:human-date . 12) (:flags . 6) (:from-or-to . 25) (:subject)))
+(setq mu4e-maildir-shortcuts
+  '((:maildir "/aheymans/coreboot" :key  ?c)
+    (:maildir "/aheymans/gerrit"   :key  ?i)
+    (:maildir "/aheymans/github"   :key  ?g)))
+(setq mu4e-update-interval 900)
+(setq user-full-name "Arthur Heymans"
+      user-mail-address "arthur@aheymans.xyz")
+(setq sendmail-program (executable-find "msmtp")
+      message-sendmail-f-is-evil t
+      message-sendmail-extra-arguments '("--read-envelope-from")
+      send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'message-send-mail-with-sendmail)
+
 #+end_src
-* justfile
-#+begin_src elisp :tangle packages.el
-(package! just-mode)
-(package! justl :recipe (:host github :repo "psibi/justl.el"))
-#+end_src
-* Consult
-#+begin_src elisp :tangle config.el
-(map! :leader
-      :desc "Run consult-ripgrep"
-      "gr" #'consult-ripgrep)
-#+end_src
-* Matrix
-#+begin_src elisp :tangle packages.el
-(package! ement)
-#+end_src
-* IRC
+
+** Chat
+*** IRC
 Do socials like neckbears
 #+begin_src elisp :tangle config.el
 (after! circe
@@ -536,7 +588,14 @@ Do socials like neckbears
             :sasl-password my-nickserv-password
             :channels ("#flashprog")))))
 #+end_src
-* Spotify
+
+*** Matrix
+#+begin_src elisp :tangle packages.el
+(package! ement)
+#+end_src
+
+** Media
+*** Spotify
 Do spotify from emacs
 #+begin_src elisp :tangle packages.el
 (package! smudge)
@@ -579,31 +638,31 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
   (bind-key "a" #'hydra-spotify/body smudge-command-map)
   )
 #+end_src
-* Mu4e email
-Show account in view.
 
+* System Integration
+** Security
+*** GnuPG
+Use gnome GPG agent
 #+begin_src elisp :tangle config.el
-(setq +mu4e-gmail-accounts '(("arthur@aheymans.xyz" . "/aheymans")
-                            ("arthurphilippeheymans@gmail.com" . "/gmail")
-                            ("arthur.heymans@9elements.com" . "/9elements")))
-(setq mu4e-headers-fields
-      '((:account-stripe . 1) (:account . 10) (:human-date . 12) (:flags . 6) (:from-or-to . 25) (:subject)))
-(setq mu4e-maildir-shortcuts
-  '((:maildir "/aheymans/coreboot" :key  ?c)
-    (:maildir "/aheymans/gerrit"   :key  ?i)
-    (:maildir "/aheymans/github"   :key  ?g)))
-(setq mu4e-update-interval 900)
-(setq user-full-name "Arthur Heymans"
-      user-mail-address "arthur@aheymans.xyz")
-(setq sendmail-program (executable-find "msmtp")
-      message-sendmail-f-is-evil t
-      message-sendmail-extra-arguments '("--read-envelope-from")
-      send-mail-function 'smtpmail-send-it
-      message-send-mail-function 'message-send-mail-with-sendmail)
-
+(after! gnus-agent
+  (setq epg-pinentry-mode 'nil)
+  )
 #+end_src
-* Terminals
-** aweshell
+
+*** SOPS
+#+begin_src elisp :tangle packages.el
+(package! sops)
+#+end_src
+
+** Desktop Integration
+*** KDE Connect
+#+begin_src elisp :tangle packages.el
+(package! kdeconnect)
+#+end_src
+
+* Terminal & Shell
+** Terminal Emulators
+*** aweshell
 #+begin_src elisp :tangle config.el
 (use-package! aweshell
   :bind (("C-c t n" . aweshell-new)
@@ -617,7 +676,7 @@ Show account in view.
         aweshell-dedicated-window-height 30))
 #+end_src
 
-** eshell
+*** eshell
 
 #+begin_src elisp :tangle config.el
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
@@ -638,7 +697,7 @@ Show account in view.
          )))
 #+end_src
 
-** eat
+*** eat
 #+begin_src elisp :tangle packages.el
 (package! eat)
 (package! aweshell :recipe (:host github :repo "manateelazycat/aweshell")
@@ -657,7 +716,8 @@ Show account in view.
     `(eat-term-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8")))))
   )
 #+end_src
-** vterm
+
+*** vterm
 Make colors more readable
 #+begin_src elisp :tangle config.el
 (after! vterm
@@ -675,21 +735,12 @@ Make colors more readable
   (setq vterm-titles t)
   (setq vterm-always-compile-module t))
 #+end_src
-* KDE connect
-#+begin_src elisp :tangle packages.el
-(package! kdeconnect)
-#+end_src
-* SOPS
-#+begin_src elisp :tangle packages.el
-(package! sops)
-#+end_src
-* Magit
-#+begin_src elisp :tangle packages.el
-(package! magit-delta :recipe (:host github :repo "dandavison/magit-delta") :pin "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")
-#+end_src
-#+begin_src emacs-lisp :tangle config.el
-(after! magit
-  (setq transient-default-level 6)
-  (magit-delta-mode +1)
-  )
+
+* Navigation & Search
+** Search Tools
+*** Consult
+#+begin_src elisp :tangle config.el
+(map! :leader
+      :desc "Run consult-ripgrep"
+      "gr" #'consult-ripgrep)
 #+end_src
