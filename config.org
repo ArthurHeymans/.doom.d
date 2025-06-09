@@ -1,5 +1,7 @@
 #+title: Doom emacs configuration
 
+This is a literate doom emacs config file.
+
 * Core Setup
 ** Tangle Headers
 #+begin_src elisp :tangle config.el
