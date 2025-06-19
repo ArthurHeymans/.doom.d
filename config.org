@@ -322,6 +322,12 @@ Syntax highlight for systemRDL
 #+end_src
 
 ** Development Tools
+*** Unsafe local settings
+This allows us to set cargo lsp features in .dir-locals.el
+#+begin_src elisp :tangle config.el
+(setq safe-local-variable-directories "/home/arthur/src/caliptra-sw/")
+#+end_src
+
 *** LSP Configuration
 Show types in lsp and allow for larger projects without being bothered all the time about it.
 
