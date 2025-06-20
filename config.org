@@ -637,8 +637,9 @@ Do spotify from emacs
 #+end_src
 
 #+begin_src elisp :tangle config.el
+(map! :leader
+      :desc "Spotify" "S" #'smudge-command-map)
 (use-package! smudge
-  :bind-keymap ("C-c ." . smudge-command-map)
   :custom
   (smudge-oauth2-client-secret (get-auth-info :user "secret" :host "spotify"))
   (smudge-oauth2-client-id (get-auth-info :user "id" :host "spotify"))
