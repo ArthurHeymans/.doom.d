@@ -260,9 +260,9 @@ Includes roam files with todo tag and specific additional files."
                 (mapcar (lambda (file) (expand-file-name file org-directory))
                         '("fstart.org" "prive.org" "random_ideas.org" "work.org")))))
 
-(add-hook 'find-file-hook #'roam-extra:update-todo-files)
+(add-hook 'find-file-hook #'roam-extra:update-todo-tag)
 (add-hook 'org-roam-file-setup-hook #'roam-extra:update-todo-files)
-(add-hook 'before-save-hook #'roam-extra:update-todo-files)
+(add-hook 'before-save-hook #'roam-extra:update-todo-tag)
 (advice-add 'org-agenda :before #'roam-extra:update-todo-files)
 #+end_src
 
