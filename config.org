@@ -332,6 +332,7 @@ This allows us to set cargo lsp features in .dir-locals.el
 Show types in lsp and allow for larger projects without being bothered all the time about it.
 
 #+begin_src elisp :tangle config.el
+(setq max-lisp-eval-depth 16000)
 (after! lsp-mode
   (setq lsp-inlay-hint-enable t
         lsp-file-watch-threshold 4000)
