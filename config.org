@@ -359,6 +359,7 @@ magit-delta is too buggy for now.
 #+begin_src emacs-lisp :tangle config.el
 (after! magit
   (setq transient-default-level 6)
+  (setq git-commit-summary-max-length 72)
 ;;  (magit-delta-mode +1)
   )
 #+end_src
