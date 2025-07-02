@@ -675,6 +675,16 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
   )
 #+end_src
 
+** Reddit
+#+begin_src elisp :tangle packages.el
+(package! reddigg)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(after! reddigg
+  (setq reddigg-subs '(emacs localllama rust chatgptcoding researchchemicals)))
+#+end_src
+
 * System Integration
 ** Security
 *** GnuPG
