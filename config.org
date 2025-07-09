@@ -268,10 +268,7 @@ longer than LEN."
 (defun roam-extra:update-todo-files (&rest _)
   "Update the value of `org-agenda-files'.
 Includes roam files with todo tag and specific additional files."
-  (setq org-agenda-files
-        (append (roam-extra:todo-files)
-                (mapcar (lambda (file) (expand-file-name file org-directory))
-                        '("random_ideas.org")))))
+  (setq org-agenda-files (roam-extra:todo-files)))
 
 (add-hook 'find-file-hook #'roam-extra:update-todo-tag)
 (add-hook 'before-save-hook #'roam-extra:update-todo-tag)
