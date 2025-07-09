@@ -313,9 +313,7 @@ Don't continue comment on the next line when. This is annoying
 *** Kconfig Mode
 Edit Kconfig like a pro
 #+begin_src elisp :tangle packages.el
-(package! kconfig-mode
-  :recipe (:host github :repo "delaanthonio/kconfig-mode")
-  :pin "cd87b71c8c1739d026645ece0bbd20055a7a2d4a")
+(package! kconfig-mode)
 #+end_src
 
 *** SystemRDL Mode
