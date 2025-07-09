@@ -367,12 +367,13 @@ Show types in lsp and allow for larger projects without being bothered all the t
 magit-delta is too buggy for now.
 #+begin_src elisp :tangle packages.el
 ;; (package! magit-delta :recipe (:host github :repo "dandavison/magit-delta") :pin "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")
-(package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "f46fd32158fb88eb379075b0e4027201cf651705")
+(package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "4a40c3fc201d60d2f0589c2e1a6693fd94bb4c98")
 #+end_src
 #+begin_src emacs-lisp :tangle config.el
 (after! magit
   (setq transient-default-level 6)
   (setq git-commit-summary-max-length 72)
+  (setq gptel-magit-body-length 72)
 ;;  (magit-delta-mode +1)
   )
 #+end_src
