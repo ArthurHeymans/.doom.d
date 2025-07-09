@@ -350,7 +350,7 @@ Show types in lsp and allow for larger projects without being bothered all the t
 **** Justfile
 #+begin_src elisp :tangle packages.el
 (package! just-mode)
-(package! justl :recipe (:host github :repo "psibi/justl.el"))
+(package! justl)
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! justl
