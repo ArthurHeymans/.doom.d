@@ -278,6 +278,7 @@ Includes roam files with todo tag and specific additional files."
 (add-hook 'find-file-hook #'roam-extra:update-todo-tag)
 (add-hook 'before-save-hook #'roam-extra:update-todo-tag)
 (advice-add 'org-agenda :before #'roam-extra:update-todo-files)
+(setq org-agenda-hide-tags-regexp "todo")
 #+end_src
 
 *** roam-ref
