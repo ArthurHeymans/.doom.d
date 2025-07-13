@@ -136,6 +136,11 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 #+end_src
 
 ** Agenda & Scheduling
+*** habits
+#+begin_src elisp :tangle config.el
+(add-to-list 'org-modules 'org-habit)
+#+end_src
+
 *** Agenda format
 #+begin_src elisp :tangle config.el
 (defun get-agenda-category (&optional len)
@@ -187,6 +192,7 @@ longer than LEN."
       '((:log t)  ; Automatically named "Log"
         (:name "Schedule"
          :time-grid t)
+        (:habit t)
         (:name "Today: labora"
          :and (:scheduled today
                :todo ("TODO")
@@ -203,7 +209,6 @@ longer than LEN."
           :and (:scheduled today
                :todo ("TODO"))
           )
-        (:habit t)
         (:name "Due today"
          :deadline today)
         (:name "Overdue"
