@@ -141,7 +141,19 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 (add-to-list 'org-modules 'org-habit)
 (setq org-habit-show-all-today t)
 #+end_src
+*** timer config
+Somehow emacs sound does not work. Use aplay instead.
+#+begin_src elisp :tangle config.el
+(defun my/org-play-sound (file)
+  "Play a sound FILE using aplay."
+  (start-process "aplay-sound" nil "aplay" file))
 
+(defun my/org-clock-out-sound ()
+  (my/org-play-sound "/home/arthur/Music/ding0.wav"))
+
+(add-hook 'org-timer-done-hook #'my/org-clock-out-sound :append)
+(setq org-clock-sound nil)
+#+end_src
 *** Agenda format
 #+begin_src elisp :tangle config.el
 (defun get-agenda-category (&optional len)
