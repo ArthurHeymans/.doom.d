@@ -139,6 +139,7 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 *** habits
 #+begin_src elisp :tangle config.el
 (add-to-list 'org-modules 'org-habit)
+(setq org-habit-show-all-today t)
 #+end_src
 
 *** Agenda format
