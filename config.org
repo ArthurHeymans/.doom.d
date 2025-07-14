@@ -192,19 +192,19 @@ longer than LEN."
       '((:log t)  ; Automatically named "Log"
         (:name "Schedule"
          :time-grid t)
+        (:name "Habit: ora"
+         :and (:habit t
+               :tag "PRAYER")
+         )
+        (:name "Habit: corpus"
+         :and (:habit t
+               :tag "LICHAAM")
+         )
         (:habit t)
         (:name "Today: labora"
          :and (:scheduled today
                :todo ("TODO")
                :tag "WORK"))
-        (:name "Today: ora"
-         :and (:scheduled today
-               :todo ("TODO")
-               :tag "PRAYER"))
-        (:name "Today: corpus"
-         :and (:scheduled today
-               :todo ("TODO")
-               :tag "LICHAAM"))
         (:name "Today: other"
           :and (:scheduled today
                :todo ("TODO"))
