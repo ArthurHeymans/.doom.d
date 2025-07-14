@@ -608,7 +608,8 @@ Show account in view.
   '((:maildir "/aheymans/coreboot" :key  ?c)
     (:maildir "/aheymans/gerrit"   :key  ?i)
     (:maildir "/aheymans/github"   :key  ?g)))
-(setq mu4e-update-interval 900)
+(after! mu4e
+  (setq mu4e-update-interval 900))
 (setq user-full-name "Arthur Heymans"
       user-mail-address "arthur@aheymans.xyz")
 (setq sendmail-program (executable-find "msmtp")
