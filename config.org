@@ -352,6 +352,10 @@ Syntax highlight for systemRDL
 #+begin_src elisp :tangle config.el
 (use-package! systemrdl-mode)
 #+end_src
+*** KDL
+#+begin_src elisp :tangle packages.el
+(package! kdl-mode)
+#+end_src
 
 ** Development Tools
 *** Unsafe local settings
