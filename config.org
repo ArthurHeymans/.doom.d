@@ -720,11 +720,9 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
 * System Integration
 ** Security
 *** GnuPG
-Use gnome GPG agent
+Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 #+begin_src elisp :tangle config.el
-(after! gnus-agent
-  (setq epg-pinentry-mode 'nil)
-  )
+(setq epg-pinentry-mode 'loopback)
 #+end_src
 
 *** SOPS
