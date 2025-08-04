@@ -401,6 +401,10 @@ magit-delta is too buggy for now.
 ;;  (magit-delta-mode +1)
   )
 #+end_src
+**** emacs-pr-review
+#+begin_src elisp :tangle packages.el
+(package! pr-review)
+#+end_src
 
 * AI & Assistance
 ** LLM Clients
