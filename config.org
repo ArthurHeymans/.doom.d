@@ -247,6 +247,7 @@ longer than LEN."
 (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
 (setq org-super-agenda-header-separator "\n---\n")
 (add-to-list 'warning-suppress-types '(org-element org-element-parser))
+(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 #+end_src
 
 ** Org-roam & Knowledge Management
