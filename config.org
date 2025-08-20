@@ -736,6 +736,11 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
 Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 #+begin_src elisp :tangle config.el
 (setq epg-pinentry-mode 'loopback)
+(pinentry-start)
+#+end_src
+
+#+begin_src elisp :tangle packages.el
+(package! pinentry)
 #+end_src
 
 *** SOPS
