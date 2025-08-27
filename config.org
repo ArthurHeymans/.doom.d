@@ -50,7 +50,7 @@ Week starts at monday here, despite what the Bible says.
       calendar-week-start-day 1
       doom-font (font-spec :family "FiraCode Nerd Font" :size 15)
       )
-(doom/set-frame-opacity 85)
+(doom/set-frame-opacity 85 't)
 #+end_src
 
 ** Visual Enhancements
