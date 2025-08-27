@@ -613,6 +613,10 @@ Add path to include aider installed from PIP
 #+end_src
 
 ## Voice Input
+*** ECA
+#+begin_src elisp :tangle packages.el
+(package! eca :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
+#+end_src
 *** Whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "ArthurHeymans/whisper.el" :files ("whisper.el"))
