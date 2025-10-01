@@ -83,11 +83,6 @@ Open this and close at the end of org mode configuration
 #+end_src
 
 *** Look and feel
-**** org-modern
-#+begin_src elisp :tangle packages.el
-(package! org-modern)
-#+end_src
-
 **** indent level
 Indent each org mode level a bit more for a better overview
 #+begin_src elisp :tangle config.el
@@ -362,7 +357,7 @@ Syntax highlight for systemRDL
 *** Unsafe local settings
 This allows us to set cargo lsp features in .dir-locals.el
 #+begin_src elisp :tangle config.el
-(setq safe-local-variable-directories '("/home/arthur/src/caliptra-sw/" "/home/arthur/src/caliptra-mcu-sw"))
+(setq safe-local-variable-values '((lsp-rust-features . listp)))
 #+end_src
 
 *** LSP Configuration
