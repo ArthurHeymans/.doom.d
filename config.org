@@ -773,6 +773,11 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 * Terminal & Shell
 ** Terminal Emulators
 *** aweshell
+#+begin_src elisp :tangle packages.el
+(package! aweshell :recipe (:host github :repo "manateelazycat/aweshell")
+  :pin "db495f29eef9013cf6b3796c3797e0ec76352e3f")
+#+end_src
+#+begin_
 #+begin_src elisp :tangle config.el
 (use-package! aweshell
   :bind (("C-c t n" . aweshell-new)
@@ -810,8 +815,6 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 *** eat
 #+begin_src elisp :tangle packages.el
 (package! eat)
-(package! aweshell :recipe (:host github :repo "manateelazycat/aweshell")
-  :pin "db495f29eef9013cf6b3796c3797e0ec76352e3f")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! eat
@@ -825,25 +828,6 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
     `(eat-term-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
     `(eat-term-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8")))))
   )
-#+end_src
-
-*** vterm
-Make colors more readable
-#+begin_src elisp :tangle config.el
-(after! vterm
-  (custom-set-faces
-    `(vterm-color-default ((t (:foreground ,(doom-color 'fg)))))
-    `(vterm-color-black   ((t (:foreground "#0d0d0d" :background "#0d0d0d"))))
-    `(vterm-color-red     ((t (:foreground "#FF301B" :background "#FF4352"))))
-    `(vterm-color-green   ((t (:foreground "#A0E521" :background "#B8E466"))))
-    `(vterm-color-yellow  ((t (:foreground "#FFC620" :background "#FFD750"))))
-    `(vterm-color-blue    ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
-    `(vterm-color-bright-blue ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
-    `(vterm-color-magenta ((t (:foreground "#8763B8" :background "#A578EA"))))
-    `(vterm-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
-    `(vterm-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8")))))
-  (setq vterm-titles t)
-  (setq vterm-always-compile-module t))
 #+end_src
 
 * Navigation & Search
