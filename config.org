@@ -562,6 +562,8 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
+(require 'acp)
+(require 'agent-shell)
 (after! agent-shell
   (setq agent-shell-google-authentication
       (agent-shell-google-make-authentication :login t))
