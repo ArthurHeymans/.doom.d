@@ -661,11 +661,37 @@ Show account in view.
   (setq mu4e-update-interval (* 15 60)))
 (setq user-full-name "Arthur Heymans"
       user-mail-address "arthur@aheymans.xyz")
-(setq sendmail-program (executable-find "msmtp")
-      message-sendmail-f-is-evil t
-      message-sendmail-extra-arguments '("--read-envelope-from")
-      send-mail-function 'smtpmail-send-it
-      message-send-mail-function 'message-send-mail-with-sendmail)
+(setq send-mail-function 'smtpmail-send-it)
+(set-email-account! "gmail"
+                    '((user-mail-address      . "arthurphilippeheymans@gmail.com")
+                      (user-full-name         . "Arthur Heymans")
+                      (smtpmail-smtp-server   . "smtp.gmail.com")
+                      (smtpmail-smtp-service  . 587)
+                      (smtpmail-stream-type   . starttls)
+                      (smtpmail-debug-info    . t)
+                      (mu4e-sent-folder       . "[Gmail]/Sent Items")
+                      )
+                    t)
+(set-email-account! "aheymans"
+                    '((user-mail-address      . "arthur@aheymans.xyz")
+                      (user-full-name         . "Arthur Heymans")
+                      (smtpmail-smtp-server   . "smtp.gmail.com")
+                      (smtpmail-smtp-service  . 587)
+                      (smtpmail-stream-type   . starttls)
+                      (smtpmail-debug-info    . t)
+                      (mu4e-sent-folder       . "[Gmail]/Sent Items")
+                      )
+                    t)
+(set-email-account! "9elements"
+                    '((user-mail-address      . "arthur.heymans@9elements.com")
+                      (user-full-name         . "Arthur Heymans")
+                      (smtpmail-smtp-server   . "smtp.gmail.com")
+                      (smtpmail-smtp-service  . 587)
+                      (smtpmail-stream-type   . starttls)
+                      (smtpmail-debug-info    . t)
+                      (mu4e-sent-folder       . "[Gmail]/Sent Items")
+                      )
+                    t)
 
 #+end_src
 
