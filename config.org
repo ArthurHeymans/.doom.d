@@ -762,6 +762,11 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
   )
 #+end_src
 
+** Torrent: transmission
+#+begin_src elisp :tangle packages.el
+(package! transmission)
+#+end_src
+
 ** Reddit
 #+begin_src elisp :tangle packages.el
 (package! reddigg)
