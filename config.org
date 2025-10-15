@@ -567,6 +567,8 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
   (require 'agent-shell)
   (setq agent-shell-google-authentication
       (agent-shell-google-make-authentication :login t))
+  (setq agent-shell-openai-authentication
+      (agent-shell-openai-make-authentication :api-key (get-auth-info :user "apikey" :host "api.openai.com")))
 )
 #+end_src
 
