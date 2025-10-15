@@ -403,6 +403,18 @@ magit-delta is too buggy for now.
 #+end_src
 
 * AI & Assistance
+** API keys
+#+begin_src elisp :tangle config.el
+(unless (getenv "OPENAI_API_KEY")
+  (setenv "OPENAI_API_KEY" (get-auth-info :user "apikey" :host "api.openai.com")))
+(unless (getenv "ANTHROPIC_API_KEY")
+  (setenv "ANTHROPIC_API_KEY" (get-auth-info :user "apikey" :host "api.anthropic.com")))
+(unless (getenv "DEEPSEEK_API_KEY")
+  (setenv "DEEPSEEK_API_KEY" (get-auth-info :user "apikey" :host "api.deepseek.com")))
+(unless (getenv "OPENROUTER_API_KEY")
+  (setenv "OPENROUTER_API_KEY" (get-auth-info :user "apikey" :host "openrouter.ai")))
+#+end_src
+
 ** LLM Clients
 *** Ellama
 #+begin_src elisp :tangle packages.el
@@ -588,7 +600,6 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
   )
 (map! "C-S-h" #'whisper-run)
 #+end_src
-
 * Communication & Social
 ** Email
 *** Mu4e
