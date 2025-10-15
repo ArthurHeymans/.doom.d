@@ -570,61 +570,6 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 )
 #+end_src
 
-*** Aider.el
-Modern AI pair programming tool for Emacs with comprehensive features
-#+begin_src elisp :tangle packages.el
-(package! aider :recipe (:host github :repo "tninja/aider.el"))
-#+end_src
-
-#+begin_src elisp :tangle config.el
-;; Setup API keys for aider.el
-(unless (getenv "OPENAI_API_KEY")
-  (setenv "OPENAI_API_KEY" (get-auth-info :user "apikey" :host "api.openai.com")))
-(unless (getenv "ANTHROPIC_API_KEY")
-  (setenv "ANTHROPIC_API_KEY" (get-auth-info :user "apikey" :host "api.anthropic.com")))
-(unless (getenv "DEEPSEEK_API_KEY")
-  (setenv "DEEPSEEK_API_KEY" (get-auth-info :user "apikey" :host "api.deepseek.com")))
-(unless (getenv "OPENROUTER_API_KEY")
-  (setenv "OPENROUTER_API_KEY" (get-auth-info :user "apikey" :host "openrouter.ai")))
-
-;; Set up doom keys
-(require 'aider-doom)
-
-(after! aider
-  (setq aider-todo-keyword-pair "AI!"))
-#+end_src
-
-*** Aidermacs (DISABLED)
-Disabled in favor of aider.el which provides better features and active development
-#+begin_src elisp :tangle no
-(package! aidermacs :recipe (:host github :repo "MatthewZMD/aidermacs"
-                             :files ("aidermacs-backend-comint.el" "aidermacs-backend-vterm.el"
-                                     "aidermacs-backends.el" "aidermacs-models.el"
-                                     "aidermacs-output.el"  "aidermacs.el"))
-)
-#+end_src
-
-Add path to include aider installed from PIP
-#+begin_src elisp :tangle no
-(unless (getenv "OPENAI_API_KEY")
-  (setenv "OPENAI_API_KEY" (get-auth-info :user "apikey" :host "api.openai.com")))
-(unless (getenv "ANTHROPIC_API_KEY")
-  (setenv "ANTHROPIC_API_KEY" (get-auth-info :user "apikey" :host "api.anthropic.com")))
-(unless (getenv "DEEPSEEK_API_KEY")
-  (setenv "DEEPSEEK_API_KEY" (get-auth-info :user "apikey" :host "api.deepseek.com")))
-(unless (getenv "OPENROUTER_API_KEY")
-  (setenv "OPENROUTER_API_KEY" (get-auth-info :user "apikey" :host "openrouter.ai")))
-(after! aidermacs
-  :config
-  (setq aidermacs-backend 'vterm)
-  (setq aidermacs-watch-files t)
-  (setq aidermacs-show-diff-after-change t)
-  (map! :leader
-        :desc "aidermacs transient menu" "A" #'aidermacs-transient-menu)
-  )
-#+end_src
-
-## Voice Input
 *** ECA
 #+begin_src elisp :tangle packages.el
 (package! eca :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")) :pin "31c1fc73d058daedb52eb7b51fea6b4fb94c2fab")
