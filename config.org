@@ -357,8 +357,15 @@ Syntax highlight for systemRDL
 *** Unsafe local settings
 This allows us to set cargo lsp features in .dir-locals.el
 #+begin_src elisp :tangle config.el
-(setq safe-local-variable-values '((lsp-rust-features . listp)))
+(put 'lsp-rust-features 'safe-local-variable #'vectorp)
+(put 'lsp-rust-no-default-features 'safe-local-variable #'booleanp)
 #+end_src
+*** Rust feature setter
+#+begin_src elisp :tangle packages.el
+(package! toml :recipe (:host github :repo "ArthurHeymans/emacs-toml") :pin "2f41d7b6b243bb83d1a0fc28ba4811fc40a89ef1")
+(package! lsp-cargo-feature-switcher :recipe (:host github :repo "ArthurHeymans/lsp-cargo-feature-switcher") :pin "815e0f2fa86f0314c48601bd48c97617fd4efcf7")
+#+end_src
+
 
 *** LSP Configuration
 Show types in lsp and allow for larger projects without being bothered all the time about it.
