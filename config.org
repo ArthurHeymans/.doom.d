@@ -686,6 +686,18 @@ Do socials like neckbears
 #+end_src
 
 ** Media
+*** Gif Screencast
+#+begin_src elisp :tangle packages.el
+(package! gif-screencast)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(after! gif-screencast
+  (setq gif-screencast-screenshot-directory "~/Pictures/screencasts/"
+        gif-screencast-program "flameshot"
+        gif-screencast-args '()))
+#+end_src
+
 *** Spotify
 Do spotify from emacs
 #+begin_src elisp :tangle packages.el
