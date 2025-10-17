@@ -636,7 +636,7 @@ Show account in view.
                       (smtpmail-smtp-service  . 587)
                       (smtpmail-stream-type   . starttls)
                       (smtpmail-debug-info    . t)
-                      (mu4e-sent-folder       . "[Gmail]/Sent Items")
+                      (mu4e-sent-folder       . "/gmail/[Gmail]/Sent Mail")
                       )
                     nil)
 (set-email-account! "aheymans"
@@ -647,7 +647,7 @@ Show account in view.
                       (smtpmail-smtp-service  . 587)
                       (smtpmail-stream-type   . starttls)
                       (smtpmail-debug-info    . t)
-                      (mu4e-sent-folder       . "[Gmail]/Sent Items")
+                      (mu4e-sent-folder       . "/aheymans/[Gmail]/Sent Mail")
                       )
                     t)
 (set-email-account! "9elements"
@@ -658,7 +658,7 @@ Show account in view.
                       (smtpmail-smtp-service  . 587)
                       (smtpmail-stream-type   . starttls)
                       (smtpmail-debug-info    . t)
-                      (mu4e-sent-folder       . "[Gmail]/Sent Items")
+                      (mu4e-sent-folder       . "/9elements/[Gmail]/Sent Mail")
                       )
                     nil)
 
