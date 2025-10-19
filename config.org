@@ -363,7 +363,7 @@ This allows us to set cargo lsp features in .dir-locals.el
 *** Rust feature setter
 #+begin_src elisp :tangle packages.el
 (package! toml :recipe (:host github :repo "ArthurHeymans/emacs-toml") :pin "2f41d7b6b243bb83d1a0fc28ba4811fc40a89ef1")
-(package! lsp-cargo-feature-switcher :recipe (:host github :repo "ArthurHeymans/lsp-cargo-feature-switcher") :pin "815e0f2fa86f0314c48601bd48c97617fd4efcf7")
+(package! lsp-cargo-feature-switcher :recipe (:host github :repo "ArthurHeymans/lsp-cargo-feature-switcher") :pin "e5c5993bc77e0295b08902e4cccf1df4c277e4b1")
 #+end_src
 
 
