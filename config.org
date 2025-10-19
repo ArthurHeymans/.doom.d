@@ -578,7 +578,7 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 #+begin_src elisp :tangle packages.el
 (package! shell-maker)
 (package! acp :recipe (:host github :repo "xenodium/acp.el") :pin "041b32f515fd21b0f241c4f2568de15c52378de2")
-(package! agent-shell :recipe (:host github :repo "ArthurHeymans/agent-shell") :pin "d1072abf0341a05e1260a990fa837bd12d7313f3")
+(package! agent-shell :recipe (:host github :repo "xenodium/agent-shell") :pin "3ebc2a5b8389c861966cf94812481ca077516d6b")
 #+end_src
 
 #+begin_src elisp :tangle config.el
