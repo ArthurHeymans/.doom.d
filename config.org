@@ -121,7 +121,15 @@ Indent each org mode level a bit more for a better overview
 (setq org-log-done 'time
       org-log-into-drawer "LOGBOOK")
 #+end_src
-****
+**** modern-indent
+make "src" blocks look really good.
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-modern-indent :recipe (:host github :repo "jdtsmith/org-modern-indent") :pin "9973bd3b91e4733a3edd1fca232208c837c05473")
+#+end_src
+#+begin_src emacs-lisp :tangle config.el
+(add-hook 'org-mode-hook #'org-modern-indent-mode 90)
+#+end_src
+
 
 ** Export & Integration
 *** Org ol-gnus
