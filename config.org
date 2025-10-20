@@ -153,7 +153,7 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 *** org-window-habit
 Show habit consistency in a dedicated window while navigating agenda items.
 #+begin_src elisp :tangle packages.el
-(package! org-window-habit :recipe (:host github :repo "colonelpanic8/org-window-habit"))
+(package! org-window-habit :recipe (:host github :repo "colonelpanic8/org-window-habit") :pin "f326697899f3c67257137dc482a52f5d1b4acc10")
 #+end_src
 #+begin_src elisp :tangle config.el
 (require 'org-window-habit)
