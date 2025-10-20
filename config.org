@@ -263,7 +263,7 @@ longer than LEN."
 #+end_src
 
 ** Org-roam & Knowledge Management
-*** TODO files
+*** files
 #+begin_src elisp :tangle config.el
 (defun roam-extra:todo-p ()
   "Return non-nil if current buffer has any TODO entry."
@@ -305,7 +305,12 @@ longer than LEN."
 (defun roam-extra:update-todo-files (&rest _)
   "Update the value of `org-agenda-files'.
 Includes roam files with todo tag and specific additional files."
-  (setq org-agenda-files (roam-extra:todo-files)))
+  (setq org-agenda-files
+        (append (roam-extra:todo-files)
+                (mapcar (lambda (file) (expand-file-name file org-directory))
+                        default-org-agenda-files))))
+
+(defvar default-org-agenda-files '("9e_work.org" "cal.org" "aheymans_cal.org" "gedeelde_cal.org"))
 
 (add-hook 'find-file-hook #'roam-extra:update-todo-tag)
 (add-hook 'before-save-hook #'roam-extra:update-todo-tag)
@@ -339,6 +344,23 @@ Capture files from browser bookmarklet
 #+begin_src elisp :tangle config.el
 )
 #+end_src
+** calendar
+#+begin_src emacs-lisp :tangle config.el
+(use-package! org-gcal
+  :commands (org-gcal-fetch org-gcal-sync)
+  :init
+  (let* ((auth-info (car (auth-source-search :host "EmacsCall")))
+         (secret (plist-get auth-info :secret)))
+    (setq org-gcal-client-id (plist-get auth-info :user)
+          org-gcal-client-secret (if (functionp secret) (funcall secret) secret)
+          org-gcal-fetch-file-alist '(("arthurphilippeheymans@gmail.com" .  "~/org/cal.org")
+                                      ("arthur.heymans@9elements.com" .  "~/org/9e_work.org")
+                                      ("arthur@aheymans.xyz" .  "~/org/aheymans_cal.org")
+                                      ("b6d6c10e3c9438a60cfa53c3c2c3a3b86fc81ee390a6d221445b79738c569488@group.calendar.google.com" . "~/org/gedeelde_cal.org"))))
+  (setq plstore-cache-passphrase-for-symmetric-encryption t)
+  )
+#+end_src
+
 
 * Development
 ** Language Support
