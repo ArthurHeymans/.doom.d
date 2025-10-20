@@ -615,7 +615,7 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 #+end_src
 *** Whisper
 #+begin_src elisp :tangle packages.el
-(package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el"))
+(package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el" "whisper-languages.el"))
   :pin "6198ce3d9bff0555cf098a77b78d6c2d79baf4f9")
 #+end_src
 #+begin_src elisp :tangle config.el
