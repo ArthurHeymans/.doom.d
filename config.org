@@ -150,6 +150,15 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 (add-to-list 'org-modules 'org-habit)
 (setq org-habit-show-all-today t)
 #+end_src
+*** org-window-habit
+Show habit consistency in a dedicated window while navigating agenda items.
+#+begin_src elisp :tangle packages.el
+(package! org-window-habit :recipe (:host github :repo "colonelpanic8/org-window-habit"))
+#+end_src
+#+begin_src elisp :tangle config.el
+(require 'org-window-habit)
+(progn (org-window-habit-mode +1))
+#+end_src
 *** timer config
 Somehow emacs sound does not work. Use aplay instead.
 #+begin_src elisp :tangle config.el
