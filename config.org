@@ -344,6 +344,19 @@ Capture files from browser bookmarklet
 #+begin_src elisp :tangle config.el
 )
 #+end_src
+** consult-org-roam
+#+begin_src elisp :tangle packages.el
+(package! consult-org-roam)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(after! org-roam
+  (consult-org-roam-mode 1)
+  (setq consult-org-roam-grep-func #'consult-ripgrep)
+  )
+(use-package! org-roam
+  :bind (("C-c n r c" . consult-org-roam-search)))
+#+end_src
 ** calendar
 #+begin_src emacs-lisp :tangle config.el
 (use-package! org-gcal
