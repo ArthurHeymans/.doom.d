@@ -358,6 +358,9 @@ Capture files from browser bookmarklet
   :bind (("C-c n r c" . consult-org-roam-search)))
 #+end_src
 ** calendar
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-timeblock)
+#+end_src
 #+begin_src emacs-lisp :tangle config.el
 (use-package! org-gcal
   :commands (org-gcal-fetch org-gcal-sync)
