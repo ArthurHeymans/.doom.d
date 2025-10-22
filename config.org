@@ -158,6 +158,7 @@ Show habit consistency in a dedicated window while navigating agenda items.
 #+begin_src elisp :tangle config.el
 (require 'org-window-habit)
 (progn (org-window-habit-mode +1))
+(setq org-window-habit-repeat-to-deadline nil)
 #+end_src
 *** timer config
 Somehow emacs sound does not work. Use aplay instead.
