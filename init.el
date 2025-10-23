@@ -85,7 +85,7 @@
 
        :checkers
        (syntax +childframe +flymake +icons)              ; tasing you for every semicolon you forget
-       (spell +flyspell + everywhere +hunspell) ; tasing you for misspelling mispelling
+       (spell +flyspell +everywhere +hunspell) ; tasing you for misspelling mispelling
        grammar           ; tasing grammar mistake every you make
 
        :tools
