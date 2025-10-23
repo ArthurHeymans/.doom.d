@@ -897,6 +897,7 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
     `(eat-term-color-magenta ((t (:foreground "#8763B8" :background "#A578EA"))))
     `(eat-term-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
     `(eat-term-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8")))))
+    (setq eat-term-scrollback-size (* 20 1024 1024))
   )
 #+end_src
 
