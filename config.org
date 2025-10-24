@@ -150,12 +150,12 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 (add-to-list 'org-modules 'org-habit)
 (setq org-habit-show-all-today t)
 #+end_src
-*** org-window-habit
+*** org-window-habit (disabled)
 Show habit consistency in a dedicated window while navigating agenda items.
-#+begin_src elisp :tangle packages.el
+#+begin_src elisp :tangle no
 (package! org-window-habit :recipe (:host github :repo "colonelpanic8/org-window-habit") :pin "f326697899f3c67257137dc482a52f5d1b4acc10")
 #+end_src
-#+begin_src elisp :tangle config.el
+#+begin_src elisp :tangle no
 (require 'org-window-habit)
 (progn (org-window-habit-mode +1))
 (setq org-window-habit-repeat-to-deadline nil)
@@ -357,6 +357,19 @@ Capture files from browser bookmarklet
   )
 (use-package! org-roam
   :bind (("C-c n r c" . consult-org-roam-search)))
+#+end_src
+** org-habits-stats
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-habit-stats)
+#+end_src
+#+begin_src emacs-lisp :tangle config.el
+(use-package! org-habit-stats
+  :bind
+  (("C-c h" . org-habit-stats-view-habit-at-point)
+  :map org-agenda-mode-map
+         ("H" . org-habit-stats-view-habit-at-point-agenda)))
+(after! org
+  (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
 #+end_src
 ** calendar (WIP)
 #+begin_src emacs-lisp :tangle no
