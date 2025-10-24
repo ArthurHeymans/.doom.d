@@ -766,7 +766,8 @@ Do socials like neckbears
 *** Spotify
 Do spotify from emacs
 #+begin_src elisp :tangle packages.el
-(package! smudge)
+;; Override for oauth fix, keep track of https://github.com/danielfm/smudge/pull/106/commits
+(package! smudge :recipe (:host github :repo "JoaoZPalma/smudge") :pin "6be8d1eaa800200f2547c90844e5c198b22277e9")
 #+end_src
 
 #+begin_src elisp :tangle config.el
