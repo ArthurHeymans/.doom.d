@@ -846,6 +846,16 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 #+begin_src elisp :tangle packages.el
 (package! kdeconnect)
 #+end_src
+** proced
+Don't use htop
+#+begin_src emacs-lisp :tangle config.el
+(after! proced
+  (setq proced-enable-color-flag t)
+  (add-to-list
+   'proced-format-alist
+   '(custom user pid ppid sess tree pcpu pmem rss start time state (args comm)))
+  (setq-default proced-format 'custom))
+#+end_src
 
 * Terminal & Shell
 ** Terminal Emulators
