@@ -417,6 +417,7 @@ This allows us to set cargo lsp features in .dir-locals.el
 #+begin_src elisp :tangle config.el
 (put 'lsp-rust-features 'safe-local-variable #'vectorp)
 (put 'lsp-rust-no-default-features 'safe-local-variable #'booleanp)
+(setq safe-local-variable-values '((eval run-with-timer 0.1 nil #'sops-edit-file)))
 #+end_src
 *** Rust feature setter
 #+begin_src elisp :tangle packages.el
