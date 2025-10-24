@@ -71,55 +71,39 @@ Week starts at monday here, despite what the Bible says.
 
 * Org Mode
 ** Basic Configuration
-*** Emacs start config
-Open this and close at the end of org mode configuration
-#+begin_src elisp :tangle config.el
-(after! org
-#+end_src
-
 *** org-mode dirs
 #+begin_src elisp :tangle config.el
-(setq org-directory "~/org/")
+(after! org
+  (setq org-directory "~/org/")
+  )
 #+end_src
 
 *** Look and feel
-**** indent level
-Indent each org mode level a bit more for a better overview
 #+begin_src elisp :tangle config.el
-(setq org-indent-indentation-per-level 4)
-#+end_src
-
-**** 'REVIEW' keyword
-#+begin_src elisp :tangle config.el
-(defun append-org-todo-keyword (new-keyword)
-  "Append a NEW-KEYWORD to the first sequence in `org-todo-keywords`."
-  (let ((current-keywords (car org-todo-keywords)))
-    (when (eq (car current-keywords) 'sequence)
-      (setq org-todo-keywords
-            (cons (append current-keywords (list new-keyword))
-                  (cdr org-todo-keywords))))))
-
-;; Call the (function )
-(append-org-todo-keyword "REVIEW")
-#+end_src
-
-**** Custom faces
-#+begin_src elisp :tangle config.el
-(setq org-todo-keyword-faces
-      (append org-todo-keyword-faces
-              '(("REVIEW" . (:foreground "light blue" :weight bold))
-                ("DONE" . (:foreground "green" :weight bold :strike-through t)))))
-(custom-set-faces '(org-drawer ((t (:foreground "grey" :weight bold :height: 1.3)))))
-#+end_src
-**** global effort
-#+begin_src elisp :tangle config.el
-(setq org-global-properties
-      '(("Effort_all" . "0:05 0:10 0:15 0:20 0:30 0:45 1:00 1:30 2:00 3:00 4:00 5:00 6:00 7:00")))
-#+end_src
-**** Log closing with note
-#+begin_src elisp :tangle config.el
-(setq org-log-done 'time
-      org-log-into-drawer "LOGBOOK")
+(after! org
+  (setq org-indent-indentation-per-level 4)
+  (defun append-org-todo-keyword (new-keyword)
+    "Append a NEW-KEYWORD to the first sequence in `org-todo-keywords`."
+    (let ((current-keywords (car org-todo-keywords)))
+      (when (eq (car current-keywords) 'sequence)
+        (setq org-todo-keywords
+              (cons (append current-keywords (list new-keyword))
+                    (cdr org-todo-keywords))))))
+  
+  (append-org-todo-keyword "REVIEW")
+  
+  (setq org-todo-keyword-faces
+        (append org-todo-keyword-faces
+                '(("REVIEW" . (:foreground "light blue" :weight bold))
+                  ("DONE" . (:foreground "green" :weight bold :strike-through t)))))
+  (custom-set-faces '(org-drawer ((t (:foreground "grey" :weight bold :height: 1.3)))))
+  
+  (setq org-global-properties
+        '(("Effort_all" . "0:05 0:10 0:15 0:20 0:30 0:45 1:00 1:30 2:00 3:00 4:00 5:00 6:00 7:00")))
+  
+  (setq org-log-done 'time
+        org-log-into-drawer "LOGBOOK")
+  )
 #+end_src
 **** modern-indent
 make "src" blocks look really good.
@@ -135,7 +119,9 @@ make "src" blocks look really good.
 *** Org ol-gnus
 Add gnus support
 #+begin_src elisp :tangle config.el
-(add-to-list 'org-modules 'ol-gnus)
+(after! org
+  (add-to-list 'org-modules 'ol-gnus)
+  )
 #+end_src
 
 *** Org-ql
@@ -147,8 +133,10 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 ** Agenda & Scheduling
 *** habits
 #+begin_src elisp :tangle config.el
-(add-to-list 'org-modules 'org-habit)
-(setq org-habit-show-all-today t)
+(after! org
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-habit-show-all-today t)
+  )
 #+end_src
 *** org-window-habit (disabled)
 Show habit consistency in a dedicated window while navigating agenda items.
@@ -163,20 +151,23 @@ Show habit consistency in a dedicated window while navigating agenda items.
 *** timer config
 Somehow emacs sound does not work. Use aplay instead.
 #+begin_src elisp :tangle config.el
-(defun my/org-play-sound (file)
-  "Play a sound FILE using aplay."
-  (start-process "aplay-sound" nil "aplay" file))
-
-(defun my/org-clock-out-sound ()
-  (my/org-play-sound "/home/arthur/Music/ding0.wav"))
-
-(add-hook 'org-timer-done-hook #'my/org-clock-out-sound :append)
-(setq org-clock-sound nil)
+(after! org
+  (defun my/org-play-sound (file)
+    "Play a sound FILE using aplay."
+    (start-process "aplay-sound" nil "aplay" file))
+  
+  (defun my/org-clock-out-sound ()
+    (my/org-play-sound "/home/arthur/Music/ding0.wav"))
+  
+  (add-hook 'org-timer-done-hook #'my/org-clock-out-sound :append)
+  (setq org-clock-sound nil)
+  )
 #+end_src
 *** Agenda format
 #+begin_src elisp :tangle config.el
-(defun get-agenda-category (&optional len)
-  "Get category of item at point for agenda.
+(after! org
+  (defun get-agenda-category (&optional len)
+    "Get category of item at point for agenda.
 
 Category is defined by one of the following items:
 - CATEGORY property
@@ -186,31 +177,32 @@ Category is defined by one of the following items:
 When LEN is a number, resulting string is padded right with
 spaces and then truncated with ... on the right if result is
 longer than LEN."
-  (let* ((file-name (when buffer-file-name
-                      (file-name-sans-extension
-                       (file-name-nondirectory buffer-file-name))))
-         (title (org-with-point-at 1
-                  (when (re-search-forward (concat "^#\\+title: \\(.*\\)")
-                                           (point-max) t)
-                    (buffer-substring-no-properties
-                     (match-beginning 1)
-                     (match-end 1)))))
-         (category (org-get-category))
-         (result
-          (or (if (and title
-                       (string-equal category file-name))
-                  title
-                category)
-              "")))
-    (if (numberp len)
-        (s-truncate len (s-pad-right len " " result))
-      result)))
-
-(setq org-agenda-prefix-format
-      '((agenda . "   %i %(get-agenda-category 16)%?-2t %-12s %-6e")  ; Agenda items: icon, category, time, and extra info, estimate
-        (todo .   "   %i %(get-agenda-category 16) %-12:t %s")   ; TODO items: icon, category, time (if any), and extra info
-        (tags .   "   %i %(get-agenda-category 16) %-12:t %s")   ; Tagged items: icon, category, time (if any), and extra info
-        (search . "   %i %(get-agenda-category 16) %s")))      ; Search results: icon, category, and extra info
+    (let* ((file-name (when buffer-file-name
+                        (file-name-sans-extension
+                         (file-name-nondirectory buffer-file-name))))
+           (title (org-with-point-at 1
+                    (when (re-search-forward (concat "^#\\+title: \\(.*\\)")
+                                             (point-max) t)
+                      (buffer-substring-no-properties
+                       (match-beginning 1)
+                       (match-end 1)))))
+           (category (org-get-category))
+           (result
+            (or (if (and title
+                         (string-equal category file-name))
+                    title
+                  category)
+                "")))
+      (if (numberp len)
+          (s-truncate len (s-pad-right len " " result))
+        result)))
+  
+  (setq org-agenda-prefix-format
+        '((agenda . "   %i %(get-agenda-category 16)%?-2t %-12s %-6e")
+          (todo .   "   %i %(get-agenda-category 16) %-12:t %s")
+          (tags .   "   %i %(get-agenda-category 16) %-12:t %s")
+          (search . "   %i %(get-agenda-category 16) %s")))
+  )
 #+end_src
 
 *** Super agenda setup
@@ -219,159 +211,51 @@ longer than LEN."
 #+end_src
 
 #+begin_src elisp :tangle config.el
-(add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
-(setq org-super-agenda-groups
-      '((:log t)  ; Automatically named "Log"
-        (:name "Schedule"
-         :time-grid t)
-        (:name "Habit: ora"
-         :and (:habit t
-               :tag "PRAYER")
-         )
-        (:name "Habit: corpus"
-         :and (:habit t
-               :tag "LICHAAM")
-         )
-        (:habit t)
-        (:name "Today: labora"
-         :and (:scheduled today
-               :todo ("TODO")
-               :tag "WORK"))
-        (:name "Today: other"
-          :and (:scheduled today
-               :todo ("TODO"))
-          )
-        (:name "Due today"
-         :deadline today)
-        (:name "Overdue"
-         :and
-         (:todo ("TODO")
-          :deadline past))
-        (:name "Scheduled earlier"
-         :and (:scheduled past
-               :todo ("TODO")))
-        (:name "Due soon"
-         :deadline future)
-        ;(:name "HOLD"
-        ; :todo "HOLD")
-        (:discard (:anything))
-        )
-      )
-(custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
-(setq org-super-agenda-header-separator "\n---\n")
-(add-to-list 'warning-suppress-types '(org-element org-element-parser))
-(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-#+end_src
-
-** Org-roam & Knowledge Management
-*** files
-#+begin_src elisp :tangle config.el
-(defun roam-extra:todo-p ()
-  "Return non-nil if current buffer has any TODO entry."
-  (org-element-map (org-element-parse-buffer 'headline) 'headline
-    (lambda (h) (eq (org-element-property :todo-type h) 'todo))
-    nil 'first-match))
-
-(defun roam-extra:update-todo-tag ()
-  "Update TODO tag in the current buffer."
-  (when (and (not (active-minibuffer-window))
-             (org-roam-file-p))
-    (let* ((tags (roam-extra:get-filetags))
-           (is-todo (roam-extra:todo-p)))
-      (cond ((and is-todo (not (seq-contains-p tags "todo")))
-             (roam-extra:add-filetag "todo"))
-            ((and (not is-todo) (seq-contains-p tags "todo"))
-             (roam-extra:del-filetag "todo"))))))
-
-(defun roam-extra:get-filetags ()
-  (split-string (or (org-roam-get-keyword "filetags") "")))
-
-(defun roam-extra:add-filetag (tag)
-  (let* ((new-tags (cons tag (roam-extra:get-filetags)))
-         (new-tags-str (combine-and-quote-strings new-tags)))
-    (org-roam-set-keyword "filetags" new-tags-str)))
-
-(defun roam-extra:del-filetag (tag)
-  (let* ((new-tags (seq-difference (roam-extra:get-filetags) `(,tag)))
-         (new-tags-str (combine-and-quote-strings new-tags)))
-    (org-roam-set-keyword "filetags" new-tags-str)))
-
-(defun roam-extra:todo-files ()
-  "Return a list of roam files containing todo tag."
-  (org-roam-db-sync)
-  (let ((todo-nodes (seq-filter (lambda (n) (seq-contains-p (org-roam-node-tags n) "todo"))
-                                (org-roam-node-list))))
-    (seq-uniq (seq-map #'org-roam-node-file todo-nodes))))
-
-(defun roam-extra:update-todo-files (&rest _)
-  "Update the value of `org-agenda-files'.
-Includes roam files with todo tag and specific additional files."
-  (setq org-agenda-files
-        (append (roam-extra:todo-files)
-                (mapcar (lambda (file) (expand-file-name file org-directory))
-                        default-org-agenda-files))))
-
-(defvar default-org-agenda-files '("9e_work.org" "cal.org" "aheymans_cal.org" "gedeelde_cal.org"))
-
-(add-hook 'find-file-hook #'roam-extra:update-todo-tag)
-(add-hook 'before-save-hook #'roam-extra:update-todo-tag)
-(advice-add 'org-agenda :before #'roam-extra:update-todo-files)
-(setq org-agenda-hide-tags-regexp "todo")
-#+end_src
-
-*** roam-ref
-Capture files from browser bookmarklet
-#+begin_src elisp :tangle config.el
-(setq org-roam-capture-ref-templates
-      '(("r" "ref" plain "%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)
-        ("n" "node" entry "* ${title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:END:\n%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)))
-#+end_src
-
-*** roam-dailies meeting
-#+begin_src elisp :tangle config.el
-(setq org-roam-dailies-directory "daily"
-      org-roam-dailies-capture-templates
-      '(("d" "default" entry "* %?" :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))
-        ("m" "meeting" plain
-        "* Meeting: %^{Meeting Title|microsoft_daily|9elements}\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants|Arthur Heymans}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
-        :target (file+head "%<%Y-%m-%d>-meeting-%^{Meeting Title|microsoft_daily|9elements}.org" "#+title: %<%Y-%m-%d>\n")
-         :unnarrowed t)
-        )
-      )
-
-#+end_src
-
-** Org mode configuration end
-#+begin_src elisp :tangle config.el
-)
-#+end_src
-** consult-org-roam
-#+begin_src elisp :tangle packages.el
-(package! consult-org-roam)
-#+end_src
-
-#+begin_src emacs-lisp :tangle config.el
-(after! org-roam
-  (consult-org-roam-mode 1)
-  (setq consult-org-roam-grep-func #'consult-ripgrep)
-  )
-(use-package! org-roam
-  :bind (("C-c n r c" . consult-org-roam-search)))
-#+end_src
-** org-habits-stats
-#+begin_src emacs-lisp :tangle packages.el
-(package! org-habit-stats)
-#+end_src
-#+begin_src emacs-lisp :tangle config.el
-(use-package! org-habit-stats
-  :bind
-  (("C-c h" . org-habit-stats-view-habit-at-point)
-  :map org-agenda-mode-map
-         ("H" . org-habit-stats-view-habit-at-point-agenda)))
 (after! org
-  (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
+  (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
+  (setq org-super-agenda-groups
+        '((:log t)
+          (:name "Schedule"
+           :time-grid t)
+          (:name "Habit: ora"
+           :and (:habit t
+                 :tag "PRAYER")
+           )
+          (:name "Habit: corpus"
+           :and (:habit t
+                 :tag "LICHAAM")
+           )
+          (:habit t)
+          (:name "Today: labora"
+           :and (:scheduled today
+                 :todo ("TODO")
+                 :tag "WORK"))
+          (:name "Today: other"
+            :and (:scheduled today
+                 :todo ("TODO"))
+            )
+          (:name "Due today"
+           :deadline today)
+          (:name "Overdue"
+           :and
+           (:todo ("TODO")
+            :deadline past))
+          (:name "Scheduled earlier"
+           :and (:scheduled past
+                 :todo ("TODO")))
+          (:name "Due soon"
+           :deadline future)
+          (:discard (:anything))
+          )
+        )
+  (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
+  (setq org-super-agenda-header-separator "\n---\n")
+  (add-to-list 'warning-suppress-types '(org-element org-element-parser))
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  )
 #+end_src
-** calendar (WIP)
+
+*** calendar (WIP)
 #+begin_src emacs-lisp :tangle no
 (package! org-timeblock)
 #+end_src
@@ -394,6 +278,115 @@ Capture files from browser bookmarklet
 #+end_src
 
 
+*** org-habits-stats
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-habit-stats)
+#+end_src
+#+begin_src emacs-lisp :tangle config.el
+(use-package! org-habit-stats
+  :after (org org-agenda)
+  :bind
+  (("C-c h" . org-habit-stats-view-habit-at-point)
+  :map org-agenda-mode-map
+         ("H" . org-habit-stats-view-habit-at-point-agenda)))
+(after! org
+  (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
+#+end_src
+** Org-roam & Knowledge Management
+*** files
+#+begin_src elisp :tangle config.el
+(after! org
+  (defun roam-extra:todo-p ()
+    "Return non-nil if current buffer has any TODO entry."
+    (org-element-map (org-element-parse-buffer 'headline) 'headline
+      (lambda (h) (eq (org-element-property :todo-type h) 'todo))
+      nil 'first-match))
+  
+  (defun roam-extra:update-todo-tag ()
+    "Update TODO tag in the current buffer."
+    (when (and (not (active-minibuffer-window))
+               (org-roam-file-p))
+      (let* ((tags (roam-extra:get-filetags))
+             (is-todo (roam-extra:todo-p)))
+        (cond ((and is-todo (not (seq-contains-p tags "todo")))
+               (roam-extra:add-filetag "todo"))
+              ((and (not is-todo) (seq-contains-p tags "todo"))
+               (roam-extra:del-filetag "todo"))))))
+  
+  (defun roam-extra:get-filetags ()
+    (split-string (or (org-roam-get-keyword "filetags") "")))
+  
+  (defun roam-extra:add-filetag (tag)
+    (let* ((new-tags (cons tag (roam-extra:get-filetags)))
+           (new-tags-str (combine-and-quote-strings new-tags)))
+      (org-roam-set-keyword "filetags" new-tags-str)))
+  
+  (defun roam-extra:del-filetag (tag)
+    (let* ((new-tags (seq-difference (roam-extra:get-filetags) `(,tag)))
+           (new-tags-str (combine-and-quote-strings new-tags)))
+      (org-roam-set-keyword "filetags" new-tags-str)))
+  
+  (defun roam-extra:todo-files ()
+    "Return a list of roam files containing todo tag."
+    (org-roam-db-sync)
+    (let ((todo-nodes (seq-filter (lambda (n) (seq-contains-p (org-roam-node-tags n) "todo"))
+                                  (org-roam-node-list))))
+      (seq-uniq (seq-map #'org-roam-node-file todo-nodes))))
+  
+  (defun roam-extra:update-todo-files (&rest _)
+    "Update the value of `org-agenda-files'.
+Includes roam files with todo tag and specific additional files."
+    (setq org-agenda-files
+          (append (roam-extra:todo-files)
+                  (mapcar (lambda (file) (expand-file-name file org-directory))
+                          default-org-agenda-files))))
+  
+  (defvar default-org-agenda-files '("9e_work.org" "cal.org" "aheymans_cal.org" "gedeelde_cal.org"))
+  
+  (add-hook 'find-file-hook #'roam-extra:update-todo-tag)
+  (add-hook 'before-save-hook #'roam-extra:update-todo-tag)
+  (advice-add 'org-agenda :before #'roam-extra:update-todo-files)
+  (setq org-agenda-hide-tags-regexp "todo")
+  )
+#+end_src
+
+*** roam-ref
+Capture files from browser bookmarklet
+#+begin_src elisp :tangle config.el
+(after! org
+  (setq org-roam-capture-ref-templates
+        '(("r" "ref" plain "%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)
+          ("n" "node" entry "* ${title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:END:\n%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)))
+  )
+#+end_src
+
+*** roam-dailies meeting
+#+begin_src elisp :tangle config.el
+(after! org
+  (setq org-roam-dailies-directory "daily"
+        org-roam-dailies-capture-templates
+        '(("d" "default" entry "* %?" :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))
+          ("m" "meeting" plain
+          "* Meeting: %^{Meeting Title|microsoft_daily|9elements}\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants|Arthur Heymans}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
+          :target (file+head "%<%Y-%m-%d>-meeting-%^{Meeting Title|microsoft_daily|9elements}.org" "#+title: %<%Y-%m-%d>\n")
+           :unnarrowed t)
+          )
+        )
+  )
+#+end_src
+** consult-org-roam
+#+begin_src elisp :tangle packages.el
+(package! consult-org-roam)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(after! org-roam
+  (consult-org-roam-mode 1)
+  (setq consult-org-roam-grep-func #'consult-ripgrep)
+  )
+(use-package! org-roam
+  :bind (("C-c n r c" . consult-org-roam-search)))
+#+end_src
 * Development
 ** Language Support
 *** Rust
