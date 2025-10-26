@@ -659,7 +659,7 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 
 *** ECA
 #+begin_src elisp :tangle packages.el
-(package! eca :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")) :pin "31c1fc73d058daedb52eb7b51fea6b4fb94c2fab")
+(package! eca :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")) :pin "ab59bdb340ab6ca74d6973bd83ab9a52c009d24f")
 #+end_src
 *** Whisper
 #+begin_src elisp :tangle packages.el
