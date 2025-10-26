@@ -1,0 +1,18 @@
+{
+  "mcpServers" : {
+    "emacs" : {
+      "command" : "socat",
+      "args" : ["-", "UNIX-CONNECT:/home/arthur/.config/emacs-mcp/emacs-mcp-server.sock"]
+    }
+  },
+  "toolCall": {
+    "approval": {
+      // "byDefault": "ask", not needed as it's eca default
+      "allow": {
+        "eca": {},
+        "emacs": {},
+        "fetch": {}
+      }
+    }
+  }
+}
