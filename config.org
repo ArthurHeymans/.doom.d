@@ -881,6 +881,10 @@ Don't use htop
    '(custom user pid ppid sess tree pcpu pmem rss start time state (args comm)))
   (setq-default proced-format 'custom))
 #+end_src
+** App launcher in OS
+#+begin_src emacs-lisp :tangle packages.el
+(package! app-launcher :recipe (:host github :repo "SebastienWae/app-launcher") :pin "d5015e394b0a666a8c7c4d4bdf786266e773b145")
+#+end_src
 
 * Terminal & Shell
 ** Terminal Emulators
