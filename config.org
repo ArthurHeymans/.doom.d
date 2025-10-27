@@ -648,7 +648,7 @@ Connect to external MCP servers from Emacs using mcp.el
 **** MCP Server
 Turn Emacs into an MCP server that LLMs can connect to
 #+begin_src elisp :tangle packages.el
-(package! mcp-server :recipe (:host github :repo "rhblind/emacs-mcp-server" :files ("*.el" "mcp-wrapper.py" "mcp-wrapper.sh")))
+(package! mcp-server :recipe (:host github :repo "rhblind/emacs-mcp-server" :files ("*.el" "mcp-wrapper.py" "mcp-wrapper.sh")) :pin "e5edc3e064ed6d8d6a0921f43ca577f7e7a17856")
 #+end_src
 
 #+begin_src elisp :tangle config.el
