@@ -655,6 +655,7 @@ Turn Emacs into an MCP server that LLMs can connect to
 ;; Start Emacs MCP Server on startup
 (use-package! mcp-server
   :config
+  (setq mcp-server-socket-directory "~/.config/emacs-mcp")
   (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
 #+end_src
 *** Agent-shell
