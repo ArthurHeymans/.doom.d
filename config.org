@@ -245,7 +245,7 @@ longer than LEN."
                  :todo ("TODO")))
           (:name "Due soon"
            :deadline future)
-          (:discard (:anything))
+          (:discard (:todo "HOLD"))
           )
         )
   (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
