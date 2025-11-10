@@ -38,6 +38,10 @@ Don't do init.el
 #+begin_src elisp :tangle config.el
 (setq grep-save-buffers nil)
 #+end_src
+*** Don't ask to close buffers
+#+begin_src elisp tangle config.el
+(setq confirm-kill-processes nil)
+#+end_src
 
 * Appearance & UI
 ** Theme and Fonts
@@ -113,7 +117,6 @@ make "src" blocks look really good.
 #+begin_src emacs-lisp :tangle config.el
 (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
 #+end_src
-
 
 ** Export & Integration
 *** Org ol-gnus
