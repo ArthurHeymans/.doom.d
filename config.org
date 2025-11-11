@@ -399,6 +399,43 @@ Capture files from browser bookmarklet
 (use-package! ob-async
   :after (org))
 #+end_src
+
+*** detached
+detached allows running shell commands detached from Emacs using dtach.
+Commands continue running even if Emacs crashes, with full output history.
+
+#+begin_src elisp :tangle packages.el
+(package! detached)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! detached
+  :init
+  (detached-init)
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
+#+end_src
+
+**** Usage with org-babel
+[[https://sr.ht/~niklaseklund/detached.el/#org-babel][org-babel docs]]
+Add =:detached t= header argument to shell source blocks:
+
+#+begin_example
+,#+begin_src sh :detached t
+  # Long running command
+  sleep 60 && echo "Done!"
+,#+end_src
+
+,#+RESULTS:
+: [detached]
+#+end_example
 * Development
 ** General
 *** Rainbow delimiters
