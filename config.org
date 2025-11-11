@@ -404,8 +404,9 @@ Capture files from browser bookmarklet
 detached allows running shell commands detached from Emacs using dtach.
 Commands continue running even if Emacs crashes, with full output history.
 
+Fix consult
 #+begin_src elisp :tangle packages.el
-(package! detached)
+(package! detached :recipe (:host sourcehut :repo "avph/detached.el") :pin "25897ccb0202d87328b12d9a5f740aee4a0509c9")
 #+end_src
 
 #+begin_src elisp :tangle config.el
