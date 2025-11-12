@@ -42,6 +42,14 @@ Don't do init.el
 #+begin_src elisp tangle config.el
 (setq confirm-kill-processes nil)
 #+end_src
+*** Don't ignore .bin files (I'm a firmware dev)
+#+begin_src elisp :tangle config.el
+(setq completion-ignored-extensions
+      (delete ".bin" completion-ignored-extensions))
+(after! dired-omit-mode
+  (setq dired-omit-extensions
+        (delete ".bin" dired-omit-extensions)))
+#+end_src
 
 * Appearance & UI
 ** Theme and Fonts
