@@ -263,6 +263,8 @@ longer than LEN."
   (setq org-super-agenda-header-separator "\n---\n")
   (add-to-list 'warning-suppress-types '(org-element org-element-parser))
   (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  ;; Hide done habits to not clutter up the view
+  (setq org-habit-show-all-today nil)
   )
 #+end_src
 
