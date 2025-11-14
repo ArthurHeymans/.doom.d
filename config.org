@@ -410,6 +410,16 @@ Capture files from browser bookmarklet
   :after (org))
 #+end_src
 
+*** ob-gptel
+Use gptel in org-babel source blocks
+#+begin_src elisp :tangle packages.el
+(package! ob-gptel :recipe (:host github :repo "ArthurHeymans/ob-gptel") :pin "def94fe7210a3170dbe2b447454399b610a11787")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! ob-gptel
+  :after (org gptel))
+#+end_src
+
 *** detached
 detached allows running shell commands detached from Emacs using dtach.
 Commands continue running even if Emacs crashes, with full output history.
