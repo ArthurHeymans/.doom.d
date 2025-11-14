@@ -420,16 +420,16 @@ Use gptel in org-babel source blocks
   :after (org gptel))
 #+end_src
 
-*** detached
+*** detached (WIP)
 detached allows running shell commands detached from Emacs using dtach.
 Commands continue running even if Emacs crashes, with full output history.
 
 Fix consult
-#+begin_src elisp :tangle packages.el
+#+begin_src elisp :tangle no
 (package! detached :recipe (:host sourcehut :repo "avph/detached.el") :pin "e4237ea6920b642cd30a460d532cff9ff84cf3e0")
 #+end_src
 
-#+begin_src elisp :tangle config.el
+#+begin_src elisp :tangle no
 (use-package! detached
   :init
   (detached-init)
