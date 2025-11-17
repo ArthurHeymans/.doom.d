@@ -750,6 +750,34 @@ Turn Emacs into an MCP server that LLMs can connect to
   (setq mcp-server-socket-directory "~/.config/emacs-mcp")
   (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
 #+end_src
+**** gptel-magit
+#+begin_src elisp :tangle packages.el
+
+#+end_src
+#+begin_src elisp :tangle config.el
+(setq gptel-magit-commit-prompt
+"You are an expert at writing Git commits. Your job is to write a short clear commit message that summarizes the changes.
+
+The commit message should be structured as follows:
+
+    <type>(<optional scope>): <description>
+
+    [optional body]
+
+- Commits MUST be prefixed with a type, which consists of one of the followings words: build, chore, ci, docs, feat, fix, perf, refactor, style, test
+- The type feat MUST be used when a commit adds a new feature
+- The type fix MUST be used when a commit represents a bug fix
+- An optional scope MAY be provided after a type. A scope is a phrase describing a section of the codebase enclosed in parenthesis, e.g., fix(parser):
+- A description MUST immediately follow the type/scope prefix. The description is a short description of the code changes, e.g., fix: array parsing issue when multiple spaces were contained in string.
+- Try to limit the whole subject line to 60 characters
+- Capitalize the subject line
+- Do not end the subject line with any punctuation
+- A longer commit body MAY be provided after the short description, providing additional contextual information about the code changes. The body MUST begin one blank line after the description.
+- Use the imperative mood in the subject line
+- Keep the body short and concise (omit it entirely if not useful)
+- Do NEVER EVER add markdown quote around the commit or justification for the commit. ONLY the commit itself
+)")
+#+end_src
 *** Agent-shell
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
 #+begin_src elisp :tangle packages.el
