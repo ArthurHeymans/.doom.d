@@ -286,7 +286,8 @@ longer than LEN."
                                       ("b6d6c10e3c9438a60cfa53c3c2c3a3b86fc81ee390a6d221445b79738c569488@group.calendar.google.com" . "~/org/gedeelde_cal.org"))))
   (setq plstore-cache-passphrase-for-symmetric-encryption t)
   :config
-  (run-at-time nil (* 1 60 60) #'org-gcal-fetch)
+  (setq org-gcal-remove-cancelled-events t)
+  (run-at-time nil (* 1 60 60) (lambda () (async-start (org-gcal-sync t t))))
   )
 #+end_src
 
