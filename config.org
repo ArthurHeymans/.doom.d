@@ -458,10 +458,6 @@ Add =:detached t= header argument to shell source blocks:
 ,#+RESULTS:
 : [detached]
 #+end_example
-** org-mime
-#+begin_src elisp :tangle packages.el
-(package! org-mime)
-#+end_src
 * Development
 ** General
 *** Rainbow delimiters
