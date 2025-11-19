@@ -886,6 +886,50 @@ Do socials like neckbears
             :channels ("#flashprog")))))
 #+end_src
 
+*** Slack
+Slack client for Emacs
+#+begin_src elisp :tangle packages.el
+(package! slack)
+(package! emojify)
+(package! alert)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! slack
+  :commands (slack-start)
+  :init
+  (setq slack-buffer-emojify t
+        slack-prefer-current-team t)
+  :config
+  ;; Configure your Slack teams here
+  ;; Example configuration (uncomment and fill in your details):
+  ;; (slack-register-team
+  ;;  :name "your-team-name"
+  ;;  :token (get-auth-info :user "token" :host "slack-your-team")
+  ;;  :cookie (get-auth-info :user "cookie" :host "slack-your-team")
+  ;;  :subscribed-channels '(general random)
+  ;;  :full-and-display-names t)
+  )
+
+(use-package! alert
+  :commands (alert)
+  :init
+  (setq alert-default-style 'libnotify))
+
+(after! emojify
+  (add-hook 'slack-mode-hook #'emojify-mode))
+
+;; Keybindings
+(map! :leader
+       (:prefix ("S" . "slack")
+        :desc "Start Slack" "s" #'slack-start
+        :desc "Select rooms" "r" #'slack-select-rooms
+        :desc "Select unreads" "u" #'slack-select-unread-rooms
+        :desc "IM list" "i" #'slack-im-select
+        :desc "Channel list" "c" #'slack-channel-select
+        :desc "Group list" "g" #'slack-group-select))
+#+end_src
+
 *** Matrix
 #+begin_src elisp :tangle packages.el
 (package! ement)
@@ -904,14 +948,14 @@ Do socials like neckbears
         gif-screencast-args '()))
 #+end_src
 
-*** Spotify
+*** Spotify (disabled, does not work well enough)
 Do spotify from emacs
-#+begin_src elisp :tangle packages.el
+#+begin_src elisp :tangle no
 ;; Override for oauth fix, keep track of https://github.com/danielfm/smudge/pull/106/commits
 (package! smudge :recipe (:host github :repo "JoaoZPalma/smudge") :pin "6be8d1eaa800200f2547c90844e5c198b22277e9")
 #+end_src
 
-#+begin_src elisp :tangle config.el
+#+begin_src elisp :tangle no
 (map! :leader
       :desc "Spotify" "S" #'smudge-command-map)
 (use-package! smudge
