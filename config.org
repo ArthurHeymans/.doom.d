@@ -775,6 +775,16 @@ The commit message should be structured as follows:
 - Do NEVER EVER add markdown quote around the commit or justification for the commit. ONLY the commit itself
 )")
 #+end_src
+**** gptel-agent
+#+begin_src elisp :tangle packages.el
+(package! gptel-agent)
+(package! consult :pin "c2caf93d597ea57db86c0cbf7ff50114a57d74f6") ; TODO: Remove consult pinning once doom has it right
+(package! gptel :pin "9d6313ce7c6eb71bfb24a8d1edcd60fe4534eea3")
+#+end_src
+#+begin_src elisp :tangle config.el
+(after! gptel-agent
+  (gptel-agent-update))
+#+end_src
 *** Agent-shell
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
 #+begin_src elisp :tangle packages.el
