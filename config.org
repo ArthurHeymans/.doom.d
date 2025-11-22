@@ -1018,6 +1018,11 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
 (after! reddigg
   (setq reddigg-subs '(emacs localllama rust chatgptcoding researchchemicals)))
 #+end_src
+** rss
+Add elfeed from org mode
+#+begin_src elisp :tangle config.el
+(setq rmh-elfeed-org-files (list "~/org/elfeed.org"))
+#+end_src
 
 * System Integration
 ** Security
