@@ -727,19 +727,19 @@ Connect to external MCP servers from Emacs using mcp.el
                       :args ("run" "-i" "--rm" "-e" "GITHUB_PERSONAL_ACCESS_TOKEN" "ghcr.io/github/github-mcp-server")
                       :env (:GITHUB_PERSONAL_ACCESS_TOKEN ,(get-auth-info :user "secret" :host "github-token"))))
         ("OSM" . (:command "uvx" :args ("osm-mcp-server")))
-        ("emacs" . (:command "socat" :args ("-" "UNIX-CONNECT:/home/arthur/.config/emacs-mcp/emacs-mcp-server.sock")))
+        ; ("emacs" . (:command "socat" :args ("-" "UNIX-CONNECT:/home/arthur/.config/emacs-mcp/emacs-mcp-server.sock")))
         ("HA-hamelstraat" . (:command "mcp-proxy"
                               :env (:SSE_URL "https://hamelstraat.duckdns.org:8123/mcp_server/sse"
                                     :API_ACCESS_TOKEN ,(get-auth-info :user "token" :host "hamelstraat"))))))
 #+end_src
 
-**** MCP Server
+**** MCP Server (disabled)
 Turn Emacs into an MCP server that LLMs can connect to
-#+begin_src elisp :tangle packages.el
+#+begin_src elisp :tangle no
 (package! mcp-server :recipe (:host github :repo "rhblind/emacs-mcp-server" :files ("*.el" "mcp-wrapper.py" "mcp-wrapper.sh")) :pin "e5edc3e064ed6d8d6a0921f43ca577f7e7a17856")
 #+end_src
 
-#+begin_src elisp :tangle config.el
+#+begin_src elisp :tangle no
 ;; Start Emacs MCP Server on startup
 (use-package! mcp-server
   :config
