@@ -20,7 +20,10 @@ Don't do init.el
 
 ** Helper Functions
 *** Helper for authinfo
-This section was removed - now using built-in ~auth-source-pick-first-password~
+#+begin_src elisp :tangle config.el
+(require 'auth-source)
+#+end_src
+Required for using built-in ~auth-source-pick-first-password~
 
 ** Basic Settings
 *** Grep no ask for save
