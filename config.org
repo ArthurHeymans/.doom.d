@@ -466,8 +466,7 @@ Add =:detached t= header argument to shell source blocks:
 #+end_src
 #+begin_src emacs-lisp :tangle config.el
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-(after! rainbow-delimiters-mode
-  (custom-set-faces
+(custom-set-faces
  '(rainbow-delimiters-depth-1-face ((t (:foreground "dark orange"))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "deep pink"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "chartreuse"))))
@@ -475,7 +474,7 @@ Add =:detached t= header argument to shell source blocks:
  '(rainbow-delimiters-depth-5-face ((t (:foreground "yellow"))))
  '(rainbow-delimiters-depth-6-face ((t (:foreground "orchid"))))
  '(rainbow-delimiters-depth-7-face ((t (:foreground "spring green"))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "sienna1"))))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "sienna1")))))
 #+end_src
 
 ** Language Support
