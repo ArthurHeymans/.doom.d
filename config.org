@@ -1131,6 +1131,41 @@ Make colors more readable
 
 
 * Navigation & Search
+** Popup Management
+*** Popper
+Popup buffer management - toggle and cycle through ephemeral windows like REPLs, help, compilation buffers, etc.
+
+#+begin_src elisp :tangle packages.el
+(package! popper)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! popper
+  :bind (("C-`"   . popper-toggle)
+         ("M-`"   . popper-cycle)
+         ("C-M-`" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          "\\*Warnings\\*"
+          help-mode
+          compilation-mode
+          "^\\*eshell.*\\*$" eshell-mode
+          "^\\*shell.*\\*$"  shell-mode
+          "^\\*vterm.*\\*$"  vterm-mode
+          "^\\*eat.*\\*$"    eat-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
+(map! :leader
+      (:prefix ("p" . "popper")
+       :desc "Toggle popup" "t" #'popper-toggle
+       :desc "Cycle popups" "c" #'popper-cycle
+       :desc "Toggle type" "T" #'popper-toggle-type))
+#+end_src
+
 ** Search Tools
 *** Consult
 #+begin_src elisp :tangle config.el
