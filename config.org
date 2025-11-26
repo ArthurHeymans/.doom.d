@@ -72,6 +72,15 @@ Week starts at monday here, despite what the Bible says.
    indent-bars-display-on-blank-lines t)
   )
 #+end_src
+** Modeline config
+Display battery and time in the modeline using the common european time notation
+
+#+begin_src elisp :tange config.el
+(require 'battery)
+(setq display-battery-mode t)
+(setq display-time-mode t)
+(setq display-time-24hr-format t)
+#+end_src
 
 * Org Mode
 ** Basic Configuration
