@@ -1024,6 +1024,10 @@ Add elfeed from org mode
 #+begin_src elisp :tangle config.el
 (setq rmh-elfeed-org-files (list "~/org/elfeed.org"))
 #+end_src
+** hacker news
+#+begin_src elisp :tangle packages.el
+(package! hnreader)
+#+end_src
 
 * System Integration
 ** Security
@@ -1141,7 +1145,6 @@ Make colors more readable
   (setq vterm-titles t)
   (setq vterm-always-compile-module t))
   #+end_src
-
 
 * Navigation & Search
 ** Popup Management
