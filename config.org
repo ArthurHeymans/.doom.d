@@ -798,8 +798,8 @@ The commit message should be structured as follows:
 *** Agent-shell
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
 #+begin_src elisp :tangle packages.el
-(package! acp :recipe (:host github :repo "xenodium/acp.el") :pin "3c6a39c09684145b82721b506b80fa857664258a")
-(package! agent-shell :recipe (:host github :repo "xenodium/agent-shell") :pin "086d316836687f3c3e59201e8a2e213fe6951550")
+(package! acp :recipe (:host github :repo "xenodium/acp.el"))
+(package! agent-shell :recipe (:host github :repo "xenodium/agent-shell"))
 #+end_src
 
 #+begin_src elisp :tangle config.el
