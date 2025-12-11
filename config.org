@@ -554,7 +554,7 @@ Fix issue with code review on latest emacs
 (package! gptel-commit)
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "29760a7f38df0584580848bef089ab553cfe6b81")
 #+end_src
-#+begin_src emacs-lisp :tangle config.el
+#+begin_src elisp :tangle config.el
 (after! magit
   (setq transient-default-level 6)
   (setq git-commit-summary-max-length 72)
