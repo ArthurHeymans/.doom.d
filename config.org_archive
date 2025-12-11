@@ -140,3 +140,14 @@ Add path to include aider installed from PIP
 #+end_src
 
 ## Voice Input
+
+* emacs-pr-review
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-12-11 Thu 12:11
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: Development/Development Tools/Version Control
+:ARCHIVE_CATEGORY: config
+:END:
+#+begin_src elisp :tangle packages.el
+(package! pr-review)
+#+end_src
