@@ -795,6 +795,29 @@ The commit message should be structured as follows:
 (after! gptel-agent
   (gptel-agent-update))
 #+end_src
+**** gptel generate commands for use in eat
+#+begin_src elisp :tangle config.el
+(defun my-gptel-eat-command ()
+  "Generate a shell command with gptel and insert it into eat."
+  (interactive)
+  (unless (derived-mode-p 'eat-mode)
+    (user-error "Not in an eat buffer"))
+  (let ((prompt (read-string "Describe the command you need: ")))
+    (gptel-request
+     (format "Generate ONLY the shell command (no explanation, no markdown, no code blocks) for: %s" prompt)
+     :buffer (current-buffer)
+     :callback
+     (lambda (response info)
+       (if (not response)
+           (message "gptel failed: %s" (plist-get info :status))
+         (let ((command (string-trim response)))
+           ;; Send as if typed by user
+           (dolist (char (string-to-list command))
+             (eat-self-input 1 char))
+           (message "Command inserted: %s" command)))))))
+(with-eval-after-load 'eat
+  (define-key eat-mode-map (kbd "C-c C-g") #'my-gptel-eat-command))
+#+end_src
 *** Agent-shell
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
 #+begin_src elisp :tangle packages.el
