@@ -562,9 +562,17 @@ Fix issue with code review on latest emacs
 ;;  (magit-delta-mode +1)
   )
 #+end_src
-**** emacs-pr-review
+**** forge
+Add package to use LLM to create PR messages
 #+begin_src elisp :tangle packages.el
-(package! pr-review)
+(package! gptel-forge :recipe (:host github :repo "ArthurHeymans/gptel-forge") :pin "77ad9d49cfb68c679b4421fbc7aada1da29de59c")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! gptel-forge
+  :after forge
+  :config
+  (gptel-forge-install))
 #+end_src
 
 * AI & Assistance
