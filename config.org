@@ -565,7 +565,7 @@ Fix issue with code review on latest emacs
 **** forge
 Add package to use LLM to create PR messages
 #+begin_src elisp :tangle packages.el
-(package! gptel-forge :recipe (:host github :repo "ArthurHeymans/gptel-forge") :pin "77ad9d49cfb68c679b4421fbc7aada1da29de59c")
+(package! gptel-forge :recipe (:host github :repo "ArthurHeymans/gptel-forge") :pin "03157fd2eab639911ab2f1b59f8cd9e98c9b3062")
 #+end_src
 
 #+begin_src elisp :tangle config.el
