@@ -78,7 +78,7 @@ Display battery and time in the modeline using the common european time notation
 #+begin_src elisp :tange config.el
 (require 'battery)
 (setq display-battery-mode t)
-(setq display-time-mode t)
+(display-time-mode +1)
 (setq display-time-24hr-format t)
 #+end_src
 
