@@ -823,8 +823,8 @@ The commit message should be structured as follows:
 *** Agent-shell
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
 #+begin_src elisp :tangle packages.el
-(package! acp :recipe (:host github :repo "xenodium/acp.el"))
-(package! agent-shell :recipe (:host github :repo "xenodium/agent-shell"))
+(package! acp)
+(package! agent-shell)
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -840,7 +840,7 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 
 *** ECA
 #+begin_src elisp :tangle packages.el
-(package! eca :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")) :pin "25e9f5762e4bbf1d2f2189d738a01ab0c172b446")
+(package! eca)
 #+end_src
 #+begin_src emacs-lisp :tangle config.el
 (after! eca
@@ -1224,5 +1224,5 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
 #+end_src
 * Temporary fixes
 #+begin_src elisp :tangle packages.el
-(package! centered-window :recipe (:host github :repo "emacsmirror/centered-window") :pin "701f56cd1d2b68352d29914f05ca1b0037bb2595")
+(package! centered-window)
 #+end_src
