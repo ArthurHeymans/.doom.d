@@ -582,6 +582,8 @@ Add package to use LLM to create PR messages
   (setenv "OPENAI_API_KEY" (auth-source-pick-first-password :host "api.openai.com" :user "apikey")))
 (unless (getenv "ANTHROPIC_API_KEY")
   (setenv "ANTHROPIC_API_KEY" (auth-source-pick-first-password :host "api.anthropic.com" :user "apikey")))
+(unless (getenv "ANTHROPIC_API_KEY_9E")
+  (setenv "ANTHROPIC_API_KEY_9E" (auth-source-pick-first-password :host "api.anthropic.com" :user "9eapikey")))
 (unless (getenv "DEEPSEEK_API_KEY")
   (setenv "DEEPSEEK_API_KEY" (auth-source-pick-first-password :host "api.deepseek.com" :user "apikey")))
 (unless (getenv "OPENROUTER_API_KEY")
