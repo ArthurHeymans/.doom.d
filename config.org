@@ -563,6 +563,33 @@ Fix issue with code review on latest emacs
   )
 #+end_src
 **** forge
+***** Forge settings
+Show who posted the PR or issue
+
+#+begin_src elisp :tangle config.el
+(after! forge
+  (defun my-forge--format-topic-line (topic &optional width)
+  "Custom format that includes author."
+  (concat
+   (and (or (and (derived-mode-p 'forge-notifications-mode)
+                 (eq forge-notifications-display-style 'flat))
+            (and (derived-mode-p 'forge-topics-mode)
+                 (oref forge--buffer-topics-spec global)
+                 (not (oref forge--buffer-topics-spec grouped))))
+        (concat (truncate-string-to-width
+                 (oref (forge-get-repository topic) slug)
+                 forge-topic-repository-slug-width
+                 nil ?\s t)
+                " "))
+   (string-pad (forge--format-topic-slug topic) (or width 5))
+   " "
+   (propertize (format "@%-14s " (oref topic author)) 'face 'forge-post-author)
+   (forge--format-topic-title topic)))
+
+  (advice-add 'forge--format-topic-line :override #'my-forge--format-topic-line))
+#+end_src
+
+***** gptel-forge
 Add package to use LLM to create PR messages
 #+begin_src elisp :tangle packages.el
 (package! gptel-forge :recipe (:host github :repo "ArthurHeymans/gptel-forge") :pin "c18e4b5b5e8546f3c7acf824ed67755720a977c0")
