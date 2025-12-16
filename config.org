@@ -961,6 +961,10 @@ Do socials like neckbears
             :sasl-username "avph"
             :sasl-password my-nickserv-password
             :channels ("#flashprog")))))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (save-window-excursion
+              (circe "Libera Chat"))))
 #+end_src
 
 *** Slack
