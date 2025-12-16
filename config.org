@@ -1107,6 +1107,11 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 #+begin_src elisp :tangle packages.el
 (package! pinentry)
 #+end_src
+*** authinfo sources
+Set the first one to a local .authinfo.gpg
+#+begin_src elisp :tangle config.el
+(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
+#+end_src
 
 *** SOPS
 #+begin_src elisp :tangle packages.el
