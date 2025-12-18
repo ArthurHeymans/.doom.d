@@ -126,6 +126,11 @@ make "src" blocks look really good.
 #+begin_src emacs-lisp :tangle config.el
 (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
 #+end_src
+*** autorevert for use with remote
+#+begin_src emacs-lisp :tangle config.el
+(after! org-mode
+  (add-hook 'org-mode-hook #'auto-revert-mode))
+#+end_src
 
 ** Export & Integration
 *** Org ol-gnus
