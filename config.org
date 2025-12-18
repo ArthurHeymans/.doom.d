@@ -601,6 +601,11 @@ Add package to use LLM to create PR messages
   :config
   (gptel-forge-install))
 #+end_src
+**** code-review
+#+begin_src elisp :tangle config.el
+(after! code-review
+  (setq code-review-auth-login-marker 'forge))
+#+end_src
 
 * AI & Assistance
 ** API keys
