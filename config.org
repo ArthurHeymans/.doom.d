@@ -983,20 +983,25 @@ Slack client for Emacs
 #+end_src
 
 #+begin_src elisp :tangle config.el
-(use-package! slack
-  :commands (slack-start)
-  :init
-  (setq slack-buffer-emojify t
-        slack-prefer-current-team t)
-  :config
+(after! slack
+  ;; :init
+  ;; (setq slack-buffer-emojify t
+  ;;       slack-prefer-current-team t)
+  ;; :config
   ;; Configure your Slack teams here
-  ;; Example configuration (uncomment and fill in your details):
-  ;; (slack-register-team
-  ;;  :name "your-team-name"
-  ;;  :token (auth-source-pick-first-password :host "slack-your-team" :user "token")
-  ;;  :cookie (auth-source-pick-first-password :host "slack-your-team" :user "cookie")
-  ;;  :subscribed-channels '(general random)
-  ;;  :full-and-display-names t)
+  (slack-register-team
+   :name "9elements"
+   :token (auth-source-pick-first-password :host "9elementsslack" :user "token")
+   :cookie (auth-source-pick-first-password :host "9elementsslack" :user "cookie")
+   :subscribed-channels '(coreboot-dev general cybersecurity cyber-offtopic cyber-hello)
+   :full-and-display-names t)
+
+  (slack-register-team
+   :name "caliptraworkspace"
+   :token (auth-source-pick-first-password :host "caliptraworkspaceslack" :user "token")
+   :cookie (auth-source-pick-first-password :host "caliptraworkspaceslack" :user "cookie")
+   :subscribed-channels '(firmware firmware-internal)
+   :full-and-display-names t)
   )
 
 (use-package! alert
