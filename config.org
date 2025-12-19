@@ -1235,6 +1235,10 @@ Make colors more readable
   (setq vterm-titles t)
   (setq vterm-always-compile-module t))
   #+end_src
+*** alacritty
+#+begin_src elisp :tangle packages.el
+(package! alacritty :recipe (:host github :repo "ArthurHeymans/emacs-alacritty" :files ("*.el" "Cargo.toml" "Cargo.lock" "src")) :pin "549b423b85fb67cd641aa10c9c2bc29468f3c8ab")
+#+end_src
 
 * Navigation & Search
 ** Popup Management
