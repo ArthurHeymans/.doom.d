@@ -512,6 +512,11 @@ Syntax highlight for systemRDL
 #+begin_src elisp :tangle packages.el
 (package! dts-mode)
 #+end_src
+*** RON
+Rust object notation
+#+begin_src elisp :tangle packages.el
+(package! ron-mode)
+#+end_src
 ** Development Tools
 *** Unsafe local settings
 This allows us to set cargo lsp features in .dir-locals.el
