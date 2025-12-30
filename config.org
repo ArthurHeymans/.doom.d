@@ -1241,8 +1241,22 @@ Make colors more readable
   (setq vterm-always-compile-module t))
   #+end_src
 *** alacritty
-#+begin_src elisp :tangle packages.el
-(package! alacritty :recipe (:host github :repo "ArthurHeymans/emacs-alacritty" :files ("*.el" "Cargo.toml" "Cargo.lock" "src")) :pin "549b423b85fb67cd641aa10c9c2bc29468f3c8ab")
+#+begin_src elisp :tangle no
+(package! alacritty :recipe (:host github :repo "ArthurHeymans/emacs-alacritty" :files ("*.el" "Cargo.toml" "Cargo.lock" "src")) :pin "f07ef347df29c900773e97b9f32f7597eb64fb5f")
+#+end_src
+#+begin_src emacs-lisp :tangle no
+(after! alacritty
+  (custom-set-faces
+    `(alacritty-color-default ((t (:foreground ,(doom-color 'fg)))))
+    `(alacritty-color-black   ((t (:foreground "#0d0d0d" :background "#0d0d0d"))))
+    `(alacritty-color-red     ((t (:foreground "#FF301B" :background "#FF4352"))))
+    `(alacritty-color-green   ((t (:foreground "#A0E521" :background "#B8E466"))))
+    `(alacritty-color-yellow  ((t (:foreground "#FFC620" :background "#FFD750"))))
+    `(alacritty-color-blue    ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
+    `(alacritty-color-bright-blue ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
+    `(alacritty-color-magenta ((t (:foreground "#8763B8" :background "#A578EA"))))
+    `(alacritty-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
+    `(alacritty-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8"))))))
 #+end_src
 
 * Navigation & Search
