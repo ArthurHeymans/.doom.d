@@ -1162,6 +1162,11 @@ Don't use htop
 #+begin_src emacs-lisp :tangle packages.el
 (package! app-launcher :recipe (:host github :repo "SebastienWae/app-launcher") :pin "d5015e394b0a666a8c7c4d4bdf786266e773b145")
 #+end_src
+** tmr
+Set timers
+#+begin_src elisp :tangle packages.el
+(package! tmr)
+#+end_src
 
 * Terminal & Shell
 ** Terminal Emulators
