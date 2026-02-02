@@ -197,13 +197,16 @@ longer than LEN."
     (let* ((file-name (when buffer-file-name
                         (file-name-sans-extension
                          (file-name-nondirectory buffer-file-name))))
-           (title (org-with-point-at 1
-                    (when (re-search-forward (concat "^#\\+title: \\(.*\\)")
-                                             (point-max) t)
-                      (buffer-substring-no-properties
-                       (match-beginning 1)
-                       (match-end 1)))))
-           (category (org-get-category))
+           (title (when (derived-mode-p 'org-mode)
+                    (org-with-point-at 1
+                      (when (re-search-forward (concat "^#\\+title: \\(.*\\)")
+                                               (point-max) t)
+                        (buffer-substring-no-properties
+                         (match-beginning 1)
+                         (match-end 1))))))
+           (category (if (derived-mode-p 'org-mode)
+                         (org-get-category)
+                       file-name))
            (result
             (or (if (and title
                          (string-equal category file-name))
@@ -318,9 +321,10 @@ longer than LEN."
 (after! org
   (defun roam-extra:todo-p ()
     "Return non-nil if current buffer has any TODO entry."
-    (org-element-map (org-element-parse-buffer 'headline) 'headline
-      (lambda (h) (eq (org-element-property :todo-type h) 'todo))
-      nil 'first-match))
+    (when (derived-mode-p 'org-mode)
+      (org-element-map (org-element-parse-buffer 'headline) 'headline
+        (lambda (h) (eq (org-element-property :todo-type h) 'todo))
+        nil 'first-match)))
   
   (defun roam-extra:update-todo-tag ()
     "Update TODO tag in the current buffer."
