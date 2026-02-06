@@ -519,7 +519,25 @@ Syntax highlight for systemRDL
 *** RON
 Rust object notation
 #+begin_src elisp :tangle packages.el
-(package! ron-mode)
+(package! ron-mode
+  :recipe (:host github :repo "ArthurHeymans/ron-mode")
+  :pin "ea1ce4b110f1a277941293c71f365adc58ccefd4")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! ron-mode
+  :mode "\\.ron\\'")
+(use-package! ron-ts-mode
+  :when (and (treesit-available-p)
+             (treesit-language-available-p 'ron))
+  :mode "\\.ron\\'")
+#+end_src
+Install the tree-sitter RON grammar with:
+=M-x treesit-install-language-grammar RET ron RET=
+after adding the source:
+#+begin_src elisp :tangle config.el
+(after! treesit
+  (add-to-list 'treesit-language-source-alist
+               '(ron "https://github.com/tree-sitter-grammars/tree-sitter-ron")))
 #+end_src
 ** Development Tools
 *** Unsafe local settings
