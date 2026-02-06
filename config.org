@@ -582,11 +582,11 @@ magit-delta is too buggy for now.
 Fix issue with code review on latest emacs
 #+begin_src elisp :tangle packages.el
 ;; (package! magit-delta :recipe (:host github :repo "dandavison/magit-delta") :pin "5fc7dbddcfacfe46d3fd876172ad02a9ab6ac616")
-(package! magit :recipe
-  (:host github
-   :repo "ArthurHeymans/magit"
-   :branch "syntax-fixes"
-   :files ("lisp/*.el")) :pin "e65e0ad2e9187308c370e4c9045f9c47eb224723")
+;; (package! magit :recipe
+;;   (:host github
+;;    :repo "magit/magit"
+;;    :branch "syntax"
+;;    :files ("lisp/*.el")) :pin "db3aded27c3c07b124fa3a51121a1525521ddf1d")
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "42dc0836d9d7fd4066696c8a31c685ee8bb2f663")
 (package! gptel-commit)
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "29760a7f38df0584580848bef089ab553cfe6b81")
