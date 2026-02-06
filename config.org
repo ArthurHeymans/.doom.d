@@ -1272,6 +1272,16 @@ Make colors more readable
     `(alacritty-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
     `(alacritty-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8"))))))
 #+end_src
+** Tramp
+*** tramp-rpc
+
+#+begin_src elisp :tangle packages.el
+(package! tramp-rpc
+  :recipe (:host github
+           :repo "ArthurHeymans/emacs-tramp-rpc"
+           :files ("lisp/*.el"))
+  :pin "4f63e64896f164e84f51352e96225ab9bd2be65c")
+#+end_src
 
 * Navigation & Search
 ** Popup Management
