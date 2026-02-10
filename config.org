@@ -930,7 +930,7 @@ Emacs interface to opencode
   :recipe (:type git
            :repo "https://codeberg.org/sczi/opencode.el.git"
            :branch "main"
-           :files ("tree-sitter-indent.el"))
+           :files ("*.el"))
   :pin "0b6d1ad49ed061d69deef50663715ae3a93d69ac")
 
 #+end_src
