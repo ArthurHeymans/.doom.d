@@ -916,12 +916,18 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 
 *** ECA
 #+begin_src elisp :tangle packages.el
-(package! eca)
+;(package! eca)
 #+end_src
 #+begin_src emacs-lisp :tangle config.el
-(after! eca
-  (setq eca-chat-use-side-window nil))
+;(after! eca
+;  (setq eca-chat-use-side-window nil))
 #+end_src
+*** OpenCode
+Emacs interface to opencode
+#+begin_src elisp :tangle packages.el
+(package! opencode :recipe (:host codeberg :repo "sczi/opencode.el"))
+#+end_src
+
 *** Whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el" "whisper-languages.el"))
