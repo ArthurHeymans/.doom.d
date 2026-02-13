@@ -662,52 +662,60 @@ Add package to use LLM to create PR messages
 #+end_src
 
 ** LLM Clients
-*** Helpers to fetch all models
+*** OpenRouter model cache
+Uses curl (url.el can't reach OpenRouter) and caches models to a file,
+refreshing when the cache is missing or older than a day.
+
 #+begin_src elisp :tangle config.el
 (require 'json)
-(require 'url)
-(defvar my--openai-models-cache (make-hash-table :test 'equal)
-  "Cache for fetched OpenAI-compatible model lists.")
 
-(defun fetch-openai-compatible-models (url)
-  "Fetch models from an OpenAI-compatible API at URL.
-Returns a list of model ID strings, or nil on failure.
-Results are cached; use `my/refresh-openai-models' to clear."
-  (or (gethash url my--openai-models-cache)
-      (condition-case err
-          (let* ((url-parsed (url-generic-parse-url url))
-                 (hostname (url-host url-parsed))
-                 (auth (auth-source-search :host hostname :user "apikey" :max 1))
-                 (token (funcall (plist-get (car auth) :secret)))
-                 (buf (let ((url-request-extra-headers
-                             `(("Authorization" . ,(concat "Bearer " token)))))
-                        (url-retrieve-synchronously (concat url "/models") nil nil 5))))
-            (when buf
-              (unwind-protect
-                  (with-current-buffer buf
-                    (goto-char url-http-end-of-headers)
-                    (let* ((json-object-type 'alist)
-                           (json-data (json-read))
-                           (models (alist-get 'data json-data))
-                           (result (mapcar (lambda (model)
-                                             (or (alist-get 'id model)
-                                                 (alist-get 'name model)))
-                                           models)))
-                      (puthash url result my--openai-models-cache)
-                      result))
-                (kill-buffer buf))))
-        (error
-         (message "Warning: Failed to fetch models from %s: %s" url (error-message-string err))
-         nil))))
+(defvar my--openrouter-cache-file
+  (expand-file-name "openrouter-models.el" doom-cache-dir)
+  "File cache for OpenRouter model list.")
 
-(defun my/refresh-openai-models ()
-  "Clear the model cache and re-fetch all cached endpoints."
-  (interactive)
-  (let ((urls (hash-table-keys my--openai-models-cache)))
-    (clrhash my--openai-models-cache)
-    (dolist (url urls)
-      (fetch-openai-compatible-models url))
-    (message "Refreshed models for %d endpoints" (length urls))))
+(defun my--openrouter-cache-stale-p ()
+  "Return non-nil if the OpenRouter cache is missing or older than 24h."
+  (or (not (file-exists-p my--openrouter-cache-file))
+      (> (float-time (time-subtract
+                      (current-time)
+                      (file-attribute-modification-time
+                       (file-attributes my--openrouter-cache-file))))
+         86400)))
+
+(defun my--openrouter-fetch-models ()
+  "Fetch model list from OpenRouter using curl and write to cache file.
+Returns the model list, or nil on failure."
+  (condition-case err
+      (let* ((token (auth-source-pick-first-password :host "openrouter.ai" :user "apikey"))
+             (args (append '("--silent" "--max-time" "10"
+                             "https://openrouter.ai/api/v1/models")
+                           (when token
+                             (list "-H" (concat "Authorization: Bearer " token)))))
+             (output (with-temp-buffer
+                       (when (zerop (apply #'call-process "curl" nil t nil args))
+                         (buffer-string)))))
+        (when output
+          (let* ((json-object-type 'alist)
+                 (models (mapcar (lambda (m) (alist-get 'id m))
+                                 (alist-get 'data (json-read-from-string output)))))
+            (when models
+              (with-temp-file my--openrouter-cache-file
+                (prin1 models (current-buffer)))
+              models))))
+    (error
+     (message "Warning: Failed to fetch OpenRouter models: %s"
+              (error-message-string err))
+     nil)))
+
+(defun my--openrouter-models ()
+  "Return OpenRouter models from cache, fetching if stale or missing."
+  (when (my--openrouter-cache-stale-p)
+    (my--openrouter-fetch-models))
+  (condition-case nil
+      (with-temp-buffer
+        (insert-file-contents my--openrouter-cache-file)
+        (read (current-buffer)))
+    (error '("anthropic/claude-sonnet-4-5-20250929"))))
 #+end_src
 
 *** Ellama (disabled)
@@ -782,26 +790,23 @@ Returns nil if ollama is not running."
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "* @user: ")
   (setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n")
-  ;; Register backends with static fallback models (full lists loaded lazily)
-  (gptel-make-openai "DeepSeek"
-    :host "api.deepseek.com"
-    :endpoint "/chat/completions"
+  ;; Register backends
+  (gptel-make-deepseek "DeepSeek"
     :stream t
-    :key (auth-source-pick-first-password :host "api.deepseek.com")
-    :models '("deepseek-chat" "deepseek-reasoner"))
+    :key (auth-source-pick-first-password :host "api.deepseek.com"))
   (gptel-make-openai "OpenRouter"
     :host "openrouter.ai"
     :endpoint "/api/v1/chat/completions"
     :stream t
     :key (auth-source-pick-first-password :host "openrouter.ai")
-    :models '("anthropic/claude-sonnet-4-5-20250929"))
+    :models (my--openrouter-models))
   (gptel-make-openai "OpenAI"
     :host "api.openai.com"
     :endpoint "/v1/chat/completions"
     :stream t
     :key (auth-source-pick-first-password :host "api.openai.com")
     :models '("gpt-4o"))
-  (gptel-make-anthropic "Claude"
+  (gptel-make-anthropic "Claude Personal"
     :stream t
     :key (auth-source-pick-first-password :host "api.anthropic.com" :user "apikey"))
   (gptel-make-anthropic "9e Claude"
@@ -813,21 +818,7 @@ Returns nil if ollama is not running."
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
-    :models nil)
-  ;; Lazy-load full model lists after Emacs is idle
-  (run-with-idle-timer 5 nil
-    (lambda ()
-      (dolist (entry '(("OpenRouter" . "https://openrouter.ai/api/v1")
-                       ("OpenAI" . "https://api.openai.com/v1")))
-        (when-let* ((models (fetch-openai-compatible-models (cdr entry)))
-                    (backend (alist-get (car entry) gptel--known-backends
-                                        nil nil #'equal)))
-          (setf (gptel-backend-models backend) models)))
-      (when-let* ((models (get-ollama-models))
-                  (backend (alist-get "Ollama" gptel--known-backends
-                                      nil nil #'equal)))
-        (setf (gptel-backend-models backend) models))
-      (message "gptel: model lists refreshed")))
+    :models (get-ollama-models))
   )
 (map! :leader
       (:prefix ("G" . "gptel")
