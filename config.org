@@ -944,11 +944,11 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 
 *** ECA
 #+begin_src elisp :tangle packages.el
-;(package! eca)
+(package! eca)
 #+end_src
 #+begin_src emacs-lisp :tangle config.el
-;(after! eca
-;  (setq eca-chat-use-side-window nil))
+(after! eca
+  (setq eca-chat-use-side-window nil))
 #+end_src
 *** OpenCode
 Emacs interface to opencode
