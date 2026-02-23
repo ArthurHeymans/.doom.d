@@ -31,7 +31,7 @@ Required for using built-in ~auth-source-pick-first-password~
 (setq grep-save-buffers nil)
 #+end_src
 *** Don't ask to close buffers
-#+begin_src elisp tangle config.el
+#+begin_src elisp :tangle config.el
 (setq confirm-kill-processes nil)
 #+end_src
 *** Don't ignore .bin files (I'm a firmware dev)
@@ -75,7 +75,7 @@ Week starts at monday here, despite what the Bible says.
 ** Modeline config
 Display battery and time in the modeline using the common european time notation
 
-#+begin_src elisp :tange config.el
+#+begin_src elisp :tangle config.el
 (require 'battery)
 (setq display-battery-mode t)
 (display-time-mode +1)
