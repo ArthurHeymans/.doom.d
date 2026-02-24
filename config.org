@@ -1374,7 +1374,7 @@ Make colors more readable
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "dc86ab1d80cffa2ba525aecf221570fa07790c42")
+  :pin "a652673bd6281394133f81248ef0f58c18382685")
 #+end_src
 
 * Navigation & Search
