@@ -990,8 +990,8 @@ Emacs interface to opencode
 #+begin_src elisp :tangle packages.el
 ;(package! opencode :recipe (:host codeberg :repo "sczi/opencode.el") :pin "0b6d1ad49ed061d69deef50663715ae3a93d69ac")
 (package! opencode
-  :recipe (:type git
-           :repo "https://codeberg.org/sczi/opencode.el.git"
+  :recipe (:host codeberg
+           :repo "sczi/opencode.el"
            :branch "main"
            :files ("*.el"))
   :pin "0b6d1ad49ed061d69deef50663715ae3a93d69ac")
