@@ -112,7 +112,9 @@ Display battery and time in the modeline using the common european time notation
 #+begin_src elisp :tangle config.el
 (after! ewm
   (setq ewm-xkb-options "caps:ctrl_modifier")
-  (add-to-list 'ewm-intercept-prefixes "M-:"))
+  (add-to-list 'ewm-intercept-prefixes "M-:")
+  (setq ewm-output-config '(("HDMI-A-1" :enabled t :transform 1)
+                            ("DP-3" :enabled t))))
 (after! ewm-consult
   (setq ewm-consult-annotate-application-buffers t)
   (setq ewm-consult-separate-application-source t))
