@@ -57,23 +57,6 @@ Week starts at monday here, despite what the Bible says.
 ;(doom/set-frame-opacity 85 't)
 #+end_src
 
-** EWM daemon fix
-EWM creates frames directly via ~make-frame~, not through emacsclient, so
-~server-after-make-frame-hook~ never fires. Doom relies on that hook in daemon
-mode to apply fonts, theme, and run deferred hooks. Fire it once on the first
-graphical frame.
-
-#+begin_src elisp :tangle config.el
-(when (daemonp)
-  (add-hook 'after-make-frame-functions
-            (defun +ewm-trigger-server-hooks-h (frame)
-              (when (display-graphic-p frame)
-                (remove-hook 'after-make-frame-functions #'+ewm-trigger-server-hooks-h)
-                (with-selected-frame frame
-                  (run-hooks 'server-after-make-frame-hook))))))
-#+end_src
-
-
 ** Visual Enhancements
 *** Indent bars
 #+begin_src elisp :tangle config.el
@@ -119,6 +102,23 @@ Display battery and time in the modeline using the common european time notation
   (setq ewm-consult-annotate-application-buffers t)
   (setq ewm-consult-separate-application-source t))
 #+end_src
+** EWM daemon fix
+EWM creates frames directly via ~make-frame~, not through emacsclient, so
+~server-after-make-frame-hook~ never fires. Doom relies on that hook in daemon
+mode to apply fonts, theme, and run deferred hooks. Fire it once on the first
+graphical frame.
+
+#+begin_src elisp :tangle config.el
+(when (daemonp)
+  (add-hook 'after-make-frame-functions
+            (defun +ewm-trigger-server-hooks-h (frame)
+              (when (display-graphic-p frame)
+                (remove-hook 'after-make-frame-functions #'+ewm-trigger-server-hooks-h)
+                (with-selected-frame frame
+                  (run-hooks 'server-after-make-frame-hook))))))
+#+end_src
+
+
 * Org Mode
 ** Basic Configuration
 *** org-mode dirs
