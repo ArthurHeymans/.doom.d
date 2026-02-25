@@ -90,7 +90,7 @@ Display battery and time in the modeline using the common european time notation
            :files ("lisp/*.el"))
   :pin "7c860d1cc21d7932731a346ec110e7c5230318de")
 (package! ewm-consult :recipe (:host github :repo "ArthurHeymans/ewm-consult")
-  :pin "f42cf45ac6bfb68d7b5a698d7ec0a5050ee39a92")
+  :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! ewm
