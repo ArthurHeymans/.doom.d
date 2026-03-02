@@ -816,8 +816,9 @@ Returns nil if ollama is not running."
 (after! gptel
   (setq!
          gptel-default-mode 'org-mode
-         gptel-magit-model 'claude-sonnet-4-5-20250929
-         gptel-model 'claude-sonnet-4-5-20250929
+         gptel-magit-model 'claude-sonnet-4-6
+         gptel-model 'claude-sonnet-4-6
+         gptel-api-key (auth-source-pick-first-password :host "api.openai.com")
          gptel-backend
          (gptel-make-anthropic "Claude"          ;Any name you want
            :stream t                             ;Streaming responses
@@ -837,12 +838,6 @@ Returns nil if ollama is not running."
     :stream t
     :key (auth-source-pick-first-password :host "openrouter.ai")
     :models (my--openrouter-models))
-  (gptel-make-openai "OpenAI"
-    :host "api.openai.com"
-    :endpoint "/v1/chat/completions"
-    :stream t
-    :key (auth-source-pick-first-password :host "api.openai.com")
-    :models '("gpt-4o"))
   (gptel-make-anthropic "Claude Personal"
     :stream t
     :key (auth-source-pick-first-password :host "api.anthropic.com" :user "apikey"))
