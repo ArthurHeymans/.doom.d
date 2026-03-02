@@ -83,21 +83,30 @@ Display battery and time in the modeline using the common european time notation
 #+end_src
 * ewm
 #+begin_src elisp :tangle packages.el
-(package! ewm
-  :recipe (:host codeberg
-           :repo "avph/ewm"
-           :branch "Flake"
-           :files ("lisp/*.el"))
-  :pin "7c860d1cc21d7932731a346ec110e7c5230318de")
+;; (package! ewm
+;;   :recipe (:host codeberg
+;;            :repo "avph/ewm"
+;;            :branch "Flake"
+;;            :files ("lisp/*.el"))
+;;   :pin "7c860d1cc21d7932731a346ec110e7c5230318de")
 (package! ewm-consult :recipe (:host github :repo "ArthurHeymans/ewm-consult")
   :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
 #+end_src
 #+begin_src elisp :tangle config.el
-(after! ewm
-  (setq ewm-xkb-options "caps:ctrl_modifier")
-  (add-to-list 'ewm-intercept-prefixes "M-:")
+(use-package ewm
+  :init
+  (setq ewm-input-config
+        '((touchpad :natural-scroll nil :dwt t)
+          (trackpoint :accel-speed 1.0)
+          (keyboard :xkb-layouts "us"
+                    :xkb-options "caps:ctrl_modifier")
+          ("tpps/2-ibm-trackpoint" :accel-speed 1.0)))
+  (setq ewm-mouse-follows-focus t)
   (setq ewm-output-config '(("HDMI-A-1" :enabled t :transform 1)
-                            ("DP-3" :enabled t))))
+                             ("DP-3" :enabled t)))
+  :config
+  (add-to-list 'ewm-intercept-prefixes ?\M-:))
+
 (after! ewm-consult
   (setq ewm-consult-annotate-application-buffers t)
   (setq ewm-consult-separate-application-source t))
