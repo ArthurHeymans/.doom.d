@@ -104,6 +104,18 @@ Display battery and time in the modeline using the common european time notation
   (setq ewm-mouse-follows-focus t)
   (setq ewm-output-config '(("HDMI-A-1" :enabled t :transform 1)
                              ("DP-3" :enabled t)))
+  :bind (:map ewm-mode-map
+         ("<AudioRaiseVolume>" . (lambda () (interactive) (start-process "vol+" nil "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+")))
+         ("<AudioLowerVolume>" . (lambda () (interactive) (start-process "vol-" nil "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-")))
+         ("<AudioMute>" . (lambda () (interactive) (start-process "mute" nil "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle")))
+         ("<AudioMicMute>" . (lambda () (interactive) (start-process "mic-mute" nil "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle")))
+         ("<MonBrightnessUp>" . (lambda () (interactive) (start-process "bri+" nil "brightnessctl" "s" "10%+")))
+         ("<MonBrightnessDown>" . (lambda () (interactive) (start-process "bri-" nil "brightnessctl" "s" "10%-")))
+         ("<AudioPlay>" . (lambda () (interactive) (start-process "play" nil "playerctl" "play-pause")))
+         ("<AudioPause>" . (lambda () (interactive) (start-process "pause" nil "playerctl" "play-pause")))
+         ("<AudioNext>" . (lambda () (interactive) (start-process "next" nil "playerctl" "next")))
+         ("<AudioPrev>" . (lambda () (interactive) (start-process "prev" nil "playerctl" "previous")))
+         ("C-S-SPC" . (lambda () (interactive) (start-process "mako-dismiss" nil "makoctl" "dismiss" "--all"))))
   :config
   (add-to-list 'ewm-intercept-prefixes ?\M-:))
 
