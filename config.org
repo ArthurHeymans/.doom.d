@@ -117,7 +117,9 @@ Display battery and time in the modeline using the common european time notation
          ("<AudioPrev>" . (lambda () (interactive) (start-process "prev" nil "playerctl" "previous")))
          ("C-S-SPC" . (lambda () (interactive) (start-process "mako-dismiss" nil "makoctl" "dismiss" "--all"))))
   :config
-  (add-to-list 'ewm-intercept-prefixes ?\M-:))
+  (add-to-list 'ewm-intercept-prefixes ?\M-:)
+  (add-to-list 'ewm-intercept-prefixes ?\M-`)
+  (add-to-list 'ewm-intercept-prefixes ?\M-&))
 
 (after! ewm-consult
   (setq ewm-consult-annotate-application-buffers t)
