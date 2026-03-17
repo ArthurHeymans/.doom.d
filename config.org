@@ -93,7 +93,7 @@ Display battery and time in the modeline using the common european time notation
   :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
 #+end_src
 #+begin_src elisp :tangle config.el
-(use-package ewm
+(use-package! ewm
   :init
   (setq ewm-input-config
         '((touchpad :natural-scroll nil :dwt t)
