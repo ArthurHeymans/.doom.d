@@ -647,7 +647,7 @@ Fix issue with code review on latest emacs
 ;;    :repo "magit/magit"
 ;;    :branch "syntax"
 ;;    :files ("lisp/*.el")) :pin "db3aded27c3c07b124fa3a51121a1525521ddf1d")
-(package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "42dc0836d9d7fd4066696c8a31c685ee8bb2f663")
+(package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "8eb2038a0d0f7f57af62766f98495cac0ce6c48a")
 (package! gptel-commit)
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "29760a7f38df0584580848bef089ab553cfe6b81")
 #+end_src
@@ -689,14 +689,14 @@ Show who posted the PR or issue
 ***** gptel-forge
 Add package to use LLM to create PR messages
 #+begin_src elisp :tangle packages.el
-(package! gptel-forge :recipe (:host github :repo "ArthurHeymans/gptel-forge") :pin "c18e4b5b5e8546f3c7acf824ed67755720a977c0")
+(package! gptel-forge-prs)
 #+end_src
 
 #+begin_src elisp :tangle config.el
-(use-package! gptel-forge
+(use-package! gptel-forge-prs
   :after forge
   :config
-  (gptel-forge-install))
+  (gptel-forge-prs-install))
 #+end_src
 **** code-review
 #+begin_src elisp :tangle config.el
