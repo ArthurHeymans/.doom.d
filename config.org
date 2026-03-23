@@ -921,9 +921,6 @@ Turn Emacs into an MCP server that LLMs can connect to
   (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
 #+end_src
 **** gptel-magit
-#+begin_src elisp :tangle packages.el
-
-#+end_src
 #+begin_src elisp :tangle config.el
 (setq gptel-magit-commit-prompt
 "You are an expert at writing Git commits. Your job is to write a short clear commit message that summarizes the changes.
