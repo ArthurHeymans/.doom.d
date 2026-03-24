@@ -1013,7 +1013,7 @@ Emacs interface to opencode
            :repo "sczi/opencode.el"
            :branch "main"
            :files ("*.el"))
-  :pin "0b6d1ad49ed061d69deef50663715ae3a93d69ac")
+  :pin "0b5b538c73fd4c163b5e04c01b468ba7106cf96b")
 
 #+end_src
 
