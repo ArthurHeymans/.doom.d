@@ -140,7 +140,10 @@ graphical frame.
               (when (display-graphic-p frame)
                 (remove-hook 'after-make-frame-functions #'+ewm-trigger-server-hooks-h)
                 (with-selected-frame frame
-                  (run-hooks 'server-after-make-frame-hook))))))
+                  (condition-case err
+                      (run-hooks 'server-after-make-frame-hook)
+                    (error
+                     (message "+ewm: error in server-after-make-frame-hook: %S" err))))))))
 #+end_src
 
 
