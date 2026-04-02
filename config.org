@@ -133,17 +133,40 @@ EWM creates frames directly via ~make-frame~, not through emacsclient, so
 mode to apply fonts, theme, and run deferred hooks. Fire it once on the first
 graphical frame.
 
+~doom-modeline-update-battery-status~ crashes with ~(args-out-of-range "" 0 -1)~
+when battery data is unavailable during daemon init: the icon is not displayable
+and the text is empty, so ~(substring "" 0 -1)~ is called. This aborts the
+entire ~doom-after-init-hook~ chain, preventing the dashboard from loading.
+Advise it to survive the empty-string edge case.
+
 #+begin_src elisp :tangle config.el
+(advice-add 'doom-modeline-update-battery-status :around
+            (defun +ewm-safe-battery-update-a (fn &rest args)
+              "Prevent args-out-of-range on empty battery string."
+              (condition-case nil
+                  (apply fn args)
+                (args-out-of-range nil))))
+
 (when (daemonp)
   (add-hook 'after-make-frame-functions
             (defun +ewm-trigger-server-hooks-h (frame)
               (when (display-graphic-p frame)
                 (remove-hook 'after-make-frame-functions #'+ewm-trigger-server-hooks-h)
                 (with-selected-frame frame
-                  (condition-case err
-                      (run-hooks 'server-after-make-frame-hook)
-                    (error
-                     (message "+ewm: error in server-after-make-frame-hook: %S" err))))))))
+                  (run-hooks 'server-after-make-frame-hook)
+                  ;; Sync frame background from theme and force pgtk to repaint.
+                  ;; doom-fix-frame-color-parameters-h runs before the theme loads
+                  ;; and only fixes "black" colors, so white persists.
+                  (when-let* ((bg (face-background 'default nil t)))
+                    (set-frame-parameter frame 'background-color bg))
+                  ;; make-frame doesn't consult initial-buffer-choice, so the
+                  ;; frame shows *scratch* instead of the Doom dashboard.
+                  ;; Switch explicitly and force a render.
+                  (when (fboundp 'doom-fallback-buffer)
+                    (switch-to-buffer (doom-fallback-buffer))
+                    (when (fboundp '+doom-dashboard-reload)
+                      (+doom-dashboard-reload t)))
+                  (redisplay t))))))
 #+end_src
 
 
