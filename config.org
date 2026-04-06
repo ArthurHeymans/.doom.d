@@ -77,7 +77,7 @@ Display battery and time in the modeline using the common european time notation
 
 #+begin_src elisp :tangle config.el
 (require 'battery)
-(setq display-battery-mode t)
+(display-battery-mode 1)
 (display-time-mode +1)
 (setq display-time-24hr-format t)
 #+end_src
@@ -865,7 +865,7 @@ Returns nil if ollama is not running."
     (error nil)))
 
 (after! gptel
-  (setq!
+  (setopt
          gptel-default-mode 'org-mode
          gptel-magit-model 'claude-sonnet-4-6
          gptel-model 'claude-sonnet-4-6
