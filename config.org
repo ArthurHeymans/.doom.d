@@ -1393,6 +1393,18 @@ Make colors more readable
   (setq vterm-titles t)
   (setq vterm-always-compile-module t))
   #+end_src
+*** ghostel
+#+begin_src elisp :tangle packages.el
+(package! ghostel :recipe (:host github :repo "dakra/ghostel")
+  :pin "6075b647913576949fc925e50f37de384a035420")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! ghostel
+  :commands (ghostel)
+  :init
+  ;; Native module is provided by Nix; skip auto-install prompt.
+  (setq ghostel-module-auto-install nil))
+#+end_src
 *** alacritty
 #+begin_src elisp :tangle no
 (package! alacritty :recipe (:host github :repo "ArthurHeymans/emacs-alacritty" :files ("*.el" "Cargo.toml" "Cargo.lock" "src")) :pin "f07ef347df29c900773e97b9f32f7597eb64fb5f")
