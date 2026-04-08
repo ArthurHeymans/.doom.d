@@ -687,6 +687,27 @@ Fix issue with code review on latest emacs
 ;;  (magit-delta-mode +1)
   )
 #+end_src
+Add Gerrit refspecs as completion candidates when using ~r~ (explicit refspecs)
+in the push transient, by prepending them to the collection table.
+#+begin_src elisp :tangle config.el
+(after! magit-push
+  (defun magit-push-refspecs (remote refspecs args)
+    "Push one or multiple REFSPECS to a REMOTE.
+Both the REMOTE and the REFSPECS are read in the minibuffer.  To
+use multiple REFSPECS, separate them with commas.  Completion is
+only available for the part before the colon, or when no colon
+is used."
+    (interactive
+      (list (magit-read-remote "Push to remote")
+            (magit-completing-read-multiple
+             "Push refspec,s: "
+             (append '("HEAD:refs/for/master" "HEAD:refs/for/main")
+                     (cons "HEAD" (magit-list-local-branch-names)))
+             nil 'any nil 'magit-push-refspecs-history)
+            (magit-push-arguments)))
+    (run-hooks 'magit-credential-hook)
+    (magit-run-git-async "push" "-v" args remote refspecs)))
+#+end_src
 **** forge
 ***** Forge settings
 Show who posted the PR or issue
