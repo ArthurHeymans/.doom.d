@@ -117,7 +117,8 @@ Display battery and time in the modeline using the common european time notation
          ("<AudioPrev>" . (lambda () (interactive) (start-process "prev" nil "playerctl" "previous")))
          ("C-S-SPC" . (lambda () (interactive) (start-process "mako-dismiss" nil "makoctl" "dismiss" "--all")))
          ("s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot" nil "grim ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
-         ("S-s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot-region" nil "slurp | grim -g - ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png"))))
+         ("S-s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot-region" nil "slurp | grim -g - ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
+         ("s-;" . (lambda () (interactive) (start-process "voxtype" nil "voxtype" "record" "toggle"))))
   :config
   (add-to-list 'ewm-intercept-prefixes ?\M-:)
   (add-to-list 'ewm-intercept-prefixes ?\M-`)
