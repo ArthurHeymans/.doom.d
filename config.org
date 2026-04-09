@@ -122,7 +122,13 @@ Display battery and time in the modeline using the common european time notation
   :config
   (add-to-list 'ewm-intercept-prefixes ?\M-:)
   (add-to-list 'ewm-intercept-prefixes ?\M-`)
-  (add-to-list 'ewm-intercept-prefixes ?\M-&))
+  (add-to-list 'ewm-intercept-prefixes ?\M-&)
+  ;; spawn-at-startup equivalent: start awww-daemon after compositor is ready
+  ;; ewm-mode-hook fires before the compositor is ready, so advise
+  ;; ewm-start-module instead — it only returns after compositor init succeeds
+  (advice-add 'ewm-start-module :after
+              (defun +ewm-spawn-startup-daemons-a (&rest _)
+                (start-process "awww-daemon" nil "awww-daemon"))))
 
 (after! ewm-consult
   (setq ewm-consult-annotate-application-buffers t)
