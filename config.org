@@ -89,8 +89,8 @@ Display battery and time in the modeline using the common european time notation
 ;;            :branch "Flake"
 ;;            :files ("lisp/*.el"))
 ;;   :pin "7c860d1cc21d7932731a346ec110e7c5230318de")
-(package! ewm-consult :recipe (:host github :repo "ArthurHeymans/ewm-consult")
-  :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
+;(package! ewm-consult :recipe (:host github :repo "ArthurHeymans/ewm-consult")
+;  :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ewm
@@ -128,11 +128,25 @@ Display battery and time in the modeline using the common european time notation
   ;; ewm-start-module instead — it only returns after compositor init succeeds
   (advice-add 'ewm-start-module :after
               (defun +ewm-spawn-startup-daemons-a (&rest _)
-                (start-process "awww-daemon" nil "awww-daemon"))))
+                (start-process "awww-daemon" nil "awww-daemon")))
+  (defvar consult-source-xdg-apps
+  `(:name "Apps"
+          :narrow ?a
+          :category app
+          :items ,(lambda ()
+                    (mapcar #'car (ewm-list-xdg-apps)))
+          :action ,#'ewm-launch-xdg-command))
+  (setq consult-buffer-sources
+      '(
+        consult-source-buffer
+        consult-source-hidden-buffer
+        consult-source-modified-buffer
+        consult-source-recent-file
+        consult-source-xdg-apps)))
 
-(after! ewm-consult
-  (setq ewm-consult-annotate-application-buffers t)
-  (setq ewm-consult-separate-application-source t))
+;(after! ewm-consult
+;  (setq ewm-consult-annotate-application-buffers t)
+;  (setq ewm-consult-separate-application-source t))
 #+end_src
 ** EWM daemon fix
 EWM creates frames directly via ~make-frame~, not through emacsclient, so
