@@ -1176,7 +1176,10 @@ Emacs interface to opencode
            :branch "main"
            :files ("*.el"))
   :pin "0b5b538c73fd4c163b5e04c01b468ba7106cf96b")
-
+#+end_src
+#+begin_src elisp :tangle config.el
+(after! opencode
+  (setq opencode-server-password (auth-source-pick-first-password :host "opencode" :user "password")))
 #+end_src
 
 *** Whisper
