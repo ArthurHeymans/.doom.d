@@ -506,36 +506,72 @@ Includes org files with todo filetag and specific additional files."
   )
 #+end_src
 
-*** roam-ref
-Capture files from browser bookmarklet
+*** capture templates
+Capture into ID-nodes via vanilla =org-capture= with =org-node-capture-target=.
+
 #+begin_src elisp :tangle config.el
 (after! org
-  (setq org-roam-capture-ref-templates
-        '(("r" "ref" plain "%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)
-          ("n" "node" entry "* ${title}\n:PROPERTIES:\n:ID: %(org-id-new)\n:END:\n%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}") :unnarrowed t)))
-  )
+  (setq org-capture-templates
+        (append org-capture-templates
+                '(("n" "New node" plain (function org-node-capture-target)
+                   nil :empty-lines-after 1)
+                  ("r" "Capture into node" entry (function org-node-capture-target)
+                   "* %?")))))
 #+end_src
 
-*** roam-dailies meeting
+*** dailies & meetings
+Daily notes and meeting captures using plain =org-capture=.
+Files land in =~/org/roam/daily/= to keep the existing directory layout.
+New files get an org-id so org-node indexes them automatically.
+
 #+begin_src elisp :tangle config.el
 (after! org
-  (setq org-roam-dailies-directory "daily"
-        org-roam-dailies-capture-templates
-        '(("d" "default" entry "* %?" :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))
-          ("m" "meeting" plain
-          "* Meeting: %^{Meeting Title|microsoft_daily|9elements}\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants|Arthur Heymans}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
-          :target (file+head "%<%Y-%m-%d>-meeting-%^{Meeting Title|microsoft_daily|9elements}.org" "#+title: %<%Y-%m-%d>\n")
-           :unnarrowed t)
-          )
-        )
-  )
+  (defvar my/daily-directory "~/org/roam/daily/"
+    "Directory for daily and meeting notes.")
+
+  (defun my/daily-capture-target ()
+    "Capture target for daily notes."
+    (let ((file (expand-file-name (format-time-string "%Y-%m-%d.org")
+                                  my/daily-directory)))
+      (set-buffer (org-capture-target-buffer file))
+      (unless (file-exists-p file)
+        (goto-char (point-min))
+        (insert (format ":PROPERTIES:\n:ID:       %s\n:END:\n#+title: %s\n\n"
+                        (org-id-new) (format-time-string "%Y-%m-%d"))))
+      (goto-char (point-max))))
+
+  (defvar my/meeting-title nil
+    "Temporary meeting title for capture template expansion.")
+
+  (defun my/meeting-capture-target ()
+    "Capture target for meeting notes.  Prompts for meeting name
+and uses it in the filename."
+    (setq my/meeting-title (read-string "Meeting: " "microsoft_daily"))
+    (let ((file (expand-file-name
+                 (format-time-string
+                  (format "%%Y-%%m-%%d-meeting-%s.org" my/meeting-title))
+                 my/daily-directory)))
+      (set-buffer (org-capture-target-buffer file))
+      (unless (file-exists-p file)
+        (goto-char (point-min))
+        (insert (format ":PROPERTIES:\n:ID:       %s\n:END:\n#+title: %s\n\n"
+                        (org-id-new) (format-time-string "%Y-%m-%d"))))
+      (goto-char (point-max))))
+
+  (setq org-capture-templates
+        (append org-capture-templates
+                '(("d" "Daily note" entry (function my/daily-capture-target)
+                   "* %?" :unnarrowed t)
+                  ("m" "Meeting note" plain (function my/meeting-capture-target)
+                   "* Meeting: %(or my/meeting-title \"\")\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants|Arthur Heymans}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
+                   :unnarrowed t)))))
 #+end_src
-** consult-org-roam
-#+begin_src elisp :tangle packages.el
+** consult-org-roam (disabled, replaced by org-node-grep)
+#+begin_src elisp :tangle no
 (package! consult-org-roam)
 #+end_src
 
-#+begin_src emacs-lisp :tangle config.el
+#+begin_src emacs-lisp :tangle no
 (after! org-roam
   (consult-org-roam-mode 1)
   (setq consult-org-roam-grep-func #'consult-ripgrep)
@@ -544,9 +580,7 @@ Capture files from browser bookmarklet
   :bind (("C-c n r c" . consult-org-roam-search)))
 #+end_src
 ** org-node
-Try org-node alongside org-roam for faster node indexing and no SQLite DB
-(better for Syncthing sync). Enables =org-node-roam-accelerator-mode= to
-speed up org-roam's backlink buffer while both coexist.
+Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
 
 #+begin_src elisp :tangle packages.el
 (package! org-node)
@@ -561,13 +595,11 @@ speed up org-roam's backlink buffer while both coexist.
   (org-mem-updater-mode))
 
 (use-package! org-node
-  :after org-roam
+  :after org
   :config
   (org-node-cache-mode)
-  ;; Speed up org-roam's backlink buffer using org-node's faster index
-  (org-node-roam-accelerator-mode)
-  ;; Use roam-capture for node creation so existing templates still work
-  (setq org-node-creation-fn #'org-node-new-via-roam-capture)
+  ;; Use org-capture for node creation
+  (setq org-node-creation-fn #'org-capture)
   ;; Match org-roam's default filename style
   (setq org-node-file-slug-fn #'org-node-slugify-like-roam-default)
   (setq org-node-file-timestamp-format "%Y%m%d%H%M%S-"))
