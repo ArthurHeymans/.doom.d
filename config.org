@@ -1424,14 +1424,15 @@ Make colors more readable
 *** ghostel
 #+begin_src elisp :tangle packages.el
 (package! ghostel :recipe (:host github :repo "ArthurHeymans/ghostel")
-  :pin "f51f7750e0f34104f07fa0ab9642dac5e8247633")
+  :pin "6254227bc3f75c20c431ad7dde89ae3784be8193")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ghostel
   :commands (ghostel)
   :init
   ;; Native module is provided by Nix; skip auto-install prompt.
-  (setq ghostel-module-auto-install nil))
+  (setq ghostel-module-auto-install nil)
+  (setq ghostel-tramp-default-method "rpc"))
 #+end_src
 *** alacritty
 #+begin_src elisp :tangle no
