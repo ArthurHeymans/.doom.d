@@ -412,56 +412,93 @@ longer than LEN."
 #+end_src
 ** Org-roam & Knowledge Management
 *** files
+Auto-tag org files with =todo= filetag when they contain TODO entries, then
+use those tags to build =org-agenda-files= dynamically.  No org-roam
+dependency -- uses plain org keyword manipulation and file-header scanning.
+
 #+begin_src elisp :tangle config.el
 (after! org
+  ;; ---- helpers to read/write #+KEYWORD without org-roam ----
+  (defun my/org-get-keyword (keyword)
+    "Return the value of #+KEYWORD in the current buffer, or nil."
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward
+             (format "^#\\+%s:[ \t]*\\(.*\\)" (regexp-quote keyword))
+             nil t)
+        (string-trim (match-string-no-properties 1)))))
+
+  (defun my/org-set-keyword (keyword value)
+    "Set #+KEYWORD to VALUE in the current buffer.
+Insert a new keyword line when none exists yet."
+    (save-excursion
+      (goto-char (point-min))
+      (if (re-search-forward
+           (format "^#\\+%s:.*$" (regexp-quote keyword))
+           nil t)
+          (replace-match (format "#+%s: %s" keyword value))
+        ;; Insert after the block of existing keywords at the top
+        (goto-char (point-min))
+        (while (and (not (eobp)) (looking-at "^[#:]"))
+          (forward-line))
+        (insert (format "#+%s: %s\n" keyword value)))))
+
+  ;; ---- todo-tag management (org-roam-free) ----
   (defun roam-extra:todo-p ()
     "Return non-nil if current buffer has any TODO entry."
     (when (derived-mode-p 'org-mode)
       (org-element-map (org-element-parse-buffer 'headline) 'headline
         (lambda (h) (eq (org-element-property :todo-type h) 'todo))
         nil 'first-match)))
-  
+
   (defun roam-extra:update-todo-tag ()
     "Update TODO tag in the current buffer."
     (when (and (not (active-minibuffer-window))
-               (org-roam-file-p))
+               buffer-file-name
+               (file-in-directory-p buffer-file-name org-directory))
       (let* ((tags (roam-extra:get-filetags))
              (is-todo (roam-extra:todo-p)))
         (cond ((and is-todo (not (seq-contains-p tags "todo")))
                (roam-extra:add-filetag "todo"))
               ((and (not is-todo) (seq-contains-p tags "todo"))
                (roam-extra:del-filetag "todo"))))))
-  
+
   (defun roam-extra:get-filetags ()
-    (split-string (or (org-roam-get-keyword "filetags") "")))
-  
+    (split-string (or (my/org-get-keyword "filetags") "")))
+
   (defun roam-extra:add-filetag (tag)
     (let* ((new-tags (cons tag (roam-extra:get-filetags)))
            (new-tags-str (combine-and-quote-strings new-tags)))
-      (org-roam-set-keyword "filetags" new-tags-str)))
-  
+      (my/org-set-keyword "filetags" new-tags-str)))
+
   (defun roam-extra:del-filetag (tag)
     (let* ((new-tags (seq-difference (roam-extra:get-filetags) `(,tag)))
            (new-tags-str (combine-and-quote-strings new-tags)))
-      (org-roam-set-keyword "filetags" new-tags-str)))
-  
+      (my/org-set-keyword "filetags" new-tags-str)))
+
+  ;; ---- agenda file collection (no SQLite, Syncthing-safe) ----
   (defun roam-extra:todo-files ()
-    "Return a list of roam files containing todo tag."
-    (org-roam-db-sync)
-    (let ((todo-nodes (seq-filter (lambda (n) (seq-contains-p (org-roam-node-tags n) "todo"))
-                                  (org-roam-node-list))))
-      (seq-uniq (seq-map #'org-roam-node-file todo-nodes))))
-  
+    "Return a list of org files under `org-directory' whose header
+contains a \"todo\" filetag.  Only the first 2 KB of each file is
+read, so this stays fast even with thousands of notes."
+    (let (files)
+      (dolist (f (directory-files-recursively org-directory "\\.org$"))
+        (with-temp-buffer
+          (insert-file-contents f nil 0 2048)
+          (when (re-search-forward "^#\\+filetags:.*\\btodo\\b" nil t)
+            (push f files))))
+      (nreverse files)))
+
   (defun roam-extra:update-todo-files (&rest _)
     "Update the value of `org-agenda-files'.
-Includes roam files with todo tag and specific additional files."
+Includes org files with todo filetag and specific additional files."
     (setq org-agenda-files
           (append (roam-extra:todo-files)
                   (mapcar (lambda (file) (expand-file-name file org-directory))
                           default-org-agenda-files))))
-  
+
   (defvar default-org-agenda-files '("9e_work.org" "cal.org" "aheymans_cal.org" "gedeelde_cal.org"))
-  
+
   (add-hook 'find-file-hook #'roam-extra:update-todo-tag)
   (add-hook 'before-save-hook #'roam-extra:update-todo-tag)
   (advice-add 'org-agenda :before #'roam-extra:update-todo-files)
@@ -506,6 +543,44 @@ Capture files from browser bookmarklet
 (use-package! org-roam
   :bind (("C-c n r c" . consult-org-roam-search)))
 #+end_src
+** org-node
+Try org-node alongside org-roam for faster node indexing and no SQLite DB
+(better for Syncthing sync). Enables =org-node-roam-accelerator-mode= to
+speed up org-roam's backlink buffer while both coexist.
+
+#+begin_src elisp :tangle packages.el
+(package! org-node)
+(package! org-mem)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! org-mem
+  :config
+  (setq org-mem-watch-dirs
+        (list "~/org/"))
+  (org-mem-updater-mode))
+
+(use-package! org-node
+  :after org-roam
+  :config
+  (org-node-cache-mode)
+  ;; Speed up org-roam's backlink buffer using org-node's faster index
+  (org-node-roam-accelerator-mode)
+  ;; Use roam-capture for node creation so existing templates still work
+  (setq org-node-creation-fn #'org-node-new-via-roam-capture)
+  ;; Match org-roam's default filename style
+  (setq org-node-file-slug-fn #'org-node-slugify-like-roam-default)
+  (setq org-node-file-timestamp-format "%Y%m%d%H%M%S-"))
+
+(map! :leader
+      (:prefix ("N" . "org-node")
+       :desc "Find node" "f" #'org-node-find
+       :desc "Insert link" "i" #'org-node-insert-link
+       :desc "Grep nodes" "g" #'org-node-grep
+       :desc "Backlinks" "b" #'org-node-context-dwim
+       :desc "Random node" "r" #'org-node-visit-random))
+#+end_src
+
 ** org-babel
 *** ob-async
 #+begin_src elisp :tangle packages.el
@@ -1034,12 +1109,13 @@ The commit message should be structured as follows:
 #+end_src
 *** Agent-shell (disabled)
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
-#+begin_src elisp :tangle no
+#+begin_src elisp :tangle packages.el
+(package! shell-maker)
 (package! acp)
 (package! agent-shell)
 #+end_src
 
-#+begin_src elisp :tangle no
+#+begin_src elisp :tangle config.el
 (after! agent-shell
   (require 'acp)
   (require 'agent-shell)
@@ -1424,7 +1500,7 @@ Make colors more readable
 *** ghostel
 #+begin_src elisp :tangle packages.el
 (package! ghostel :recipe (:host github :repo "ArthurHeymans/ghostel")
-  :pin "6254227bc3f75c20c431ad7dde89ae3784be8193")
+  :pin "537ada97890649c9710fff0feaea5f8664950c3b")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ghostel
