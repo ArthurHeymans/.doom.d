@@ -1424,7 +1424,7 @@ Make colors more readable
 *** ghostel
 #+begin_src elisp :tangle packages.el
 (package! ghostel :recipe (:host github :repo "dakra/ghostel")
-  :pin "6075b647913576949fc925e50f37de384a035420")
+  :pin "f16d7b8b9fb98e359ff988c1e4e061837e443a45")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ghostel
