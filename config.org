@@ -103,7 +103,8 @@ Display battery and time in the modeline using the common european time notation
           ("tpps/2-ibm-trackpoint" :accel-speed 1.0)))
   (setq ewm-mouse-follows-focus t)
   (setq ewm-output-config '(("HDMI-A-1" :enabled t :transform 1)
-                             ("DP-3" :enabled t)))
+                             ("DP-3" :enabled t)
+                             ("InfoVision Optoelectronics (Kunshan) Co.,Ltd China 0x057D Unknown" :scale 1.2)))
   :bind (:map ewm-mode-map
          ("<AudioRaiseVolume>" . (lambda () (interactive) (start-process "vol+" nil "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+")))
          ("<AudioLowerVolume>" . (lambda () (interactive) (start-process "vol-" nil "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-")))
