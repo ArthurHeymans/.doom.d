@@ -756,6 +756,55 @@ after adding the source:
   (add-to-list 'treesit-language-source-alist
                '(ron "https://github.com/tree-sitter-grammars/tree-sitter-ron")))
 #+end_src
+*** ADA/SPARK
+Tree-sitter based Ada/SPARK support via ~ada-ts-mode~ (=.ads=, =.adb= files) and
+~gpr-ts-mode~ (=.gpr= project files).  LSP is provided by ~ada_language_server~;
+install it from your GNAT toolchain or via Alire and ensure it is on ~$PATH~.
+Tree-sitter grammars are downloaded and compiled automatically on first file visit.
+
+For per-project ALS settings (e.g. selecting the =.gpr= file or scenario variables)
+add a =.dir-locals.el= at the project root:
+#+begin_example
+((nil . ((eglot-workspace-configuration
+          . (:ada (:projectFile "my_project.gpr"
+                  :scenarioVariables (:BUILD_MODE "DEBUG")))))))
+#+end_example
+
+#+begin_src elisp :tangle packages.el
+(package! ada-ts-mode)
+(package! gpr-ts-mode)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! ada-ts-mode
+  :when (treesit-available-p)
+  :defer t
+  :custom
+  (ada-ts-mode-grammar-install 'auto)
+  :hook
+  ((ada-ts-mode . ada-ts-auto-case-mode)
+   (ada-ts-mode . eglot-ensure)))
+
+(use-package! gpr-ts-mode
+  :when (treesit-available-p)
+  :defer t
+  :custom
+  (gpr-ts-mode-grammar-install 'auto)
+  :hook
+  ((gpr-ts-mode . gpr-ts-auto-case-mode)
+   (gpr-ts-mode . gpr-ts-auto-align-mode)
+   (gpr-ts-mode . eglot-ensure)))
+
+;; Fix \r\n line endings in ALS hover documentation
+;; https://github.com/AdaCore/ada_language_server/issues/1204
+(after! eglot
+  (defun +ada-fix-eol/eglot--format-markup (value)
+    "Strip carriage returns from ALS markup responses."
+    (string-join (split-string value "[\r\n]+") "\n"))
+  (advice-add 'eglot--format-markup
+              :filter-return #'+ada-fix-eol/eglot--format-markup))
+#+end_src
+
 ** Development Tools
 *** Unsafe local settings
 This allows us to set cargo lsp features in .dir-locals.el
