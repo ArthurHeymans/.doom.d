@@ -1598,15 +1598,15 @@ Make colors more readable
   #+end_src
 *** ghostel
 #+begin_src elisp :tangle packages.el
-(package! ghostel)
+;(package! ghostel)
 #+end_src
 #+begin_src elisp :tangle config.el
-(use-package! ghostel
-  :commands (ghostel)
-  :init
-  ;; Native module is provided by Nix; skip auto-install prompt.
-  (setq ghostel-module-auto-install nil)
-  (setq ghostel-tramp-default-method "rpc"))
+;; (use-package! ghostel
+;;   :commands (ghostel)
+;;   :init
+;;   ;; Native module is provided by Nix; skip auto-install prompt.
+;;   (setq ghostel-module-auto-install nil)
+;;   (setq ghostel-tramp-default-method "rpc"))
 #+end_src
 *** alacritty
 #+begin_src elisp :tangle no
