@@ -1598,8 +1598,7 @@ Make colors more readable
   #+end_src
 *** ghostel
 #+begin_src elisp :tangle packages.el
-(package! ghostel :recipe (:host github :repo "ArthurHeymans/ghostel")
-  :pin "537ada97890649c9710fff0feaea5f8664950c3b")
+(package! ghostel)
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ghostel
