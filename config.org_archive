@@ -151,3 +151,28 @@ Add path to include aider installed from PIP
 #+begin_src elisp :tangle packages.el
 (package! pr-review)
 #+end_src
+
+* aweshell
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-04-17 Fri 13:31
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: Terminal & Shell/Terminal Emulators
+:ARCHIVE_CATEGORY: config
+:END:
+#+begin_src elisp :tangle packages.el
+(package! aweshell :recipe (:host github :repo "manateelazycat/aweshell")
+  :pin "db495f29eef9013cf6b3796c3797e0ec76352e3f")
+#+end_src
+#+begin_
+#+begin_src elisp :tangle config.el
+(use-package! aweshell
+  :bind (("C-c t n" . aweshell-new)
+         ("C-c t p" . aweshell-prev)
+         ("C-c t t" . aweshell-next)
+         ("C-c t c" . aweshell-clear-buffer)
+         ("C-c t s" . aweshell-sudo-toggle)
+         ("C-c t d" . aweshell-dedicated-toggle))
+  :config
+  (setq aweshell-use-exec-path-from-shell t
+        aweshell-dedicated-window-height 30))
+#+end_src
