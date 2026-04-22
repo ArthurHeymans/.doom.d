@@ -155,6 +155,13 @@ EWM creates frames directly via ~make-frame~, not through emacsclient, so
 mode to apply fonts, theme, and run deferred hooks. Fire it once on the first
 graphical frame.
 
+Unlike emacsclient, EWM creates *all* output frames via ~make-frame~, so the
+hook must run for every frame (background color, dashboard), not just the first.
+Server hooks themselves are guarded by a flag to run exactly once.
+
+The dashboard switch is deferred with ~run-at-time~ because frames are created
+before Doom finishes loading (~doom-fallback-buffer~ isn't available yet).
+
 ~doom-modeline-update-battery-status~ crashes with ~(args-out-of-range "" 0 -1)~
 when battery data is unavailable during daemon init: the icon is not displayable
 and the text is empty, so ~(substring "" 0 -1)~ is called. This aborts the
@@ -170,12 +177,17 @@ Advise it to survive the empty-string edge case.
                 (args-out-of-range nil))))
 
 (when (daemonp)
+  ;; Track whether server hooks have been triggered (once-only).
+  (defvar +ewm--server-hooks-triggered nil)
+
   (add-hook 'after-make-frame-functions
             (defun +ewm-trigger-server-hooks-h (frame)
               (when (display-graphic-p frame)
-                (remove-hook 'after-make-frame-functions #'+ewm-trigger-server-hooks-h)
                 (with-selected-frame frame
-                  (run-hooks 'server-after-make-frame-hook)
+                  ;; Run server hooks exactly once (for the first graphic frame).
+                  (unless +ewm--server-hooks-triggered
+                    (setq +ewm--server-hooks-triggered t)
+                    (run-hooks 'server-after-make-frame-hook))
                   ;; Sync frame background from theme and force pgtk to repaint.
                   ;; doom-fix-frame-color-parameters-h runs before the theme loads
                   ;; and only fixes "black" colors, so white persists.
@@ -183,11 +195,18 @@ Advise it to survive the empty-string edge case.
                     (set-frame-parameter frame 'background-color bg))
                   ;; make-frame doesn't consult initial-buffer-choice, so the
                   ;; frame shows *scratch* instead of the Doom dashboard.
-                  ;; Switch explicitly and force a render.
-                  (when (fboundp 'doom-fallback-buffer)
-                    (switch-to-buffer (doom-fallback-buffer))
-                    (when (fboundp '+doom-dashboard-reload)
-                      (+doom-dashboard-reload t)))
+                  ;; Defer until after Doom is fully loaded so doom-fallback-buffer
+                  ;; and +doom-dashboard-reload are available.
+                  (let ((f frame))
+                    (run-at-time 0.5 nil
+                                 (lambda ()
+                                   (when (frame-live-p f)
+                                     (with-selected-frame f
+                                       (when (and (fboundp 'doom-fallback-buffer)
+                                                  (string= (buffer-name) "*scratch*"))
+                                         (switch-to-buffer (doom-fallback-buffer))
+                                         (when (fboundp '+doom-dashboard-reload)
+                                           (+doom-dashboard-reload t))))))))
                   (redisplay t))))))
 #+end_src
 
@@ -1258,6 +1277,15 @@ Emacs interface to opencode
   )
 (map! "C-S-h" #'whisper-run)
 #+end_src
+*** pi-coding-agent
+#+begin_src elisp :tangle packages.el
+(package! pi-coding-agent :pin "a07e1d0a3a2dbbac6f1d2a92656d2239f0dcb2c7")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! pi-coding-agent
+  :commands (pi-coding-agent)
+  :init (defalias 'pi 'pi-coding-agent))
+#+end_src
 * Communication & Social
 ** Email
 *** Mu4e
@@ -1589,6 +1617,18 @@ Make colors more readable
 ;;   (setq ghostel-module-auto-install nil)
 ;;   (setq ghostel-tramp-default-method "rpc"))
 #+end_src
+*** el-be-back
+#+begin_src elisp :tangle packages.el
+(package! el-be-back
+  :recipe (:host github
+           :repo "ArthurHeymans/el-be-back"
+           :files ("*.el" "Cargo.toml" "Cargo.lock" "src" "build.sh" "flake.nix"))
+  :pin "8e32f760b54a4179ac80a7bba9fecce50fb203c0")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! el-be-back
+  :commands (ebb))
+#+end_src
 *** alacritty
 #+begin_src elisp :tangle no
 (package! alacritty :recipe (:host github :repo "ArthurHeymans/emacs-alacritty" :files ("*.el" "Cargo.toml" "Cargo.lock" "src")) :pin "f07ef347df29c900773e97b9f32f7597eb64fb5f")
@@ -1615,7 +1655,7 @@ Make colors more readable
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "14fb9741be4d7d52bdbde3f00555a28d0b701ad4")
+  :pin "6fffdc2c9b6fff414cd53ce65b10eaa63756c237")
 #+end_src
 
 * Navigation & Search
