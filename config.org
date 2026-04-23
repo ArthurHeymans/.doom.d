@@ -206,7 +206,11 @@ Advise it to survive the empty-string edge case.
                                                   (string= (buffer-name) "*scratch*"))
                                          (switch-to-buffer (doom-fallback-buffer))
                                          (when (fboundp '+doom-dashboard-reload)
-                                           (+doom-dashboard-reload t))))))))
+                                           (+doom-dashboard-reload t)))
+                                       ;; Force PGTK to flush the buffer switch to the
+                                       ;; Wayland surface.  Without this the frame shows
+                                       ;; *scratch* until an input event triggers a repaint.
+                                       (redisplay t))))))
                   (redisplay t))))))
 #+end_src
 
