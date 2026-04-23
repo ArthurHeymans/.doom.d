@@ -1705,4 +1705,5 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
 * Temporary fixes
 #+begin_src elisp :tangle packages.el
 (package! centered-window)
+(package! nerd-icons-completion :pin "45b585d972192a3eaeb239e15e55de7f46f8920a")
 #+end_src
