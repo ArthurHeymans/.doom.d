@@ -1304,7 +1304,8 @@ Show account in view.
 (setq mu4e-maildir-shortcuts
   '((:maildir "/aheymans/coreboot" :key  ?c)
     (:maildir "/aheymans/gerrit"   :key  ?i)
-    (:maildir "/aheymans/github"   :key  ?g)))
+    (:maildir "/aheymans/github"   :key  ?g)
+    (:maildir "/aheymans/emacs"    :key  ?e)))
 (after! mu4e
   (setq mu4e-update-interval (* 15 60)))
 (setq user-full-name "Arthur Heymans"
