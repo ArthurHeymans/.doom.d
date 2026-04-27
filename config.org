@@ -1704,6 +1704,35 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
       "gr" #'consult-ripgrep)
 #+end_src
 * Temporary fixes
+** nerd-icons-completion killed buffer candidates
+~consult-buffer~ stores the original buffer object in the candidate's
+~multi-category~ property.  If that buffer is killed while Vertico is still
+rendering the candidate list, ~nerd-icons-completion~ receives a killed buffer
+object.  ~(get-buffer KILLED-BUFFER)~ returns that same killed buffer, so the
+upstream nil check is not enough and ~with-current-buffer~ signals
+~Selecting deleted buffer~.
+
+#+begin_src elisp :tangle config.el
+(after! nerd-icons-completion
+  (cl-defmethod nerd-icons-completion-get-icon (cand (_cat (eql buffer)))
+    "Return an icon for live buffer candidate CAND; ignore stale buffers."
+    (let ((buf (cond ((bufferp cand) cand)
+                     ((stringp cand) (get-buffer cand)))))
+      (if (buffer-live-p buf)
+          (condition-case nil
+              (let ((icon (with-current-buffer buf
+                            (nerd-icons-icon-for-buffer
+                             :height nerd-icons-completion-icon-size))))
+                (concat
+                 (if (symbolp icon)
+                     (nerd-icons-faicon "nf-fa-sticky_note_o"
+                                        :height nerd-icons-completion-icon-size)
+                   icon)
+                 " "))
+            (error ""))
+        ""))))
+#+end_src
+
 #+begin_src elisp :tangle packages.el
 (package! centered-window)
 (package! nerd-icons-completion :pin "45b585d972192a3eaeb239e15e55de7f46f8920a")
