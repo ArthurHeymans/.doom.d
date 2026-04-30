@@ -1656,12 +1656,11 @@ Make colors more readable
 *** tramp-rpc
 
 #+begin_src elisp :tangle packages.el
-(package! tramp :pin "0e8d05b0fb183d9245aa44f4e2ce2b76ed2b0cd1")
 (package! tramp-rpc
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "2ed84e6831eddf68aa208424cbecdd6f94e580c3")
+  :pin "79141bca5aabe5f500127ceda250c42bed7298c9")
 #+end_src
 
 * Navigation & Search
