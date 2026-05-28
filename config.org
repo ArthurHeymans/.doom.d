@@ -1299,7 +1299,40 @@ Emacs interface to opencode
 #+begin_src elisp :tangle config.el
 (use-package! pi-coding-agent
   :commands (pi-coding-agent)
-  :init (defalias 'pi 'pi-coding-agent))
+  :init (defalias 'pi 'pi-coding-agent)
+  :config
+  ;; Work around Emacs 30.2/tree-sitter runtime 0.26 rejecting Emacs'
+  ;; native query predicate spelling (`#match').  `md-ts-mode' has one
+  ;; predicate in its paragraph/prepend query for blockquote continuations;
+  ;; pi chat buffers derive from `md-ts-mode', so redisplay repeatedly logs
+  ;; `treesit-query-error' unless that query is replaced with an equivalent
+  ;; predicate-free version.
+  (defun my/pi-coding-agent-fix-md-ts-predicate-query ()
+    (when (and (boundp 'treesit-font-lock-settings)
+               (fboundp 'treesit-query-language)
+               (treesit-language-available-p 'markdown))
+      (setq-local treesit-font-lock-settings
+                  (mapcar
+                   (lambda (setting)
+                     (if (and (eq (ignore-errors
+                                    (treesit-query-language (car setting)))
+                                  'markdown)
+                              (eq (nth 2 setting) 'paragraph)
+                              (eq (nth 3 setting) 'prepend))
+                         (list (treesit-query-compile
+                                'markdown
+                                '((block_quote) @md-ts-block-quote
+                                  (block_quote_marker) @md-ts--fontify-delimiter
+                                  (block_continuation) @md-ts--fontify-delimiter
+                                  (fenced_code_block) @md-ts--fontify-fenced-code-block)
+                                t)
+                               (nth 1 setting) (nth 2 setting) (nth 3 setting))
+                       setting))
+                   treesit-font-lock-settings))
+      (when (fboundp 'treesit-font-lock-recompute-features)
+        (treesit-font-lock-recompute-features '(paragraph) nil 'markdown))))
+  (add-hook 'pi-coding-agent-chat-mode-hook
+            #'my/pi-coding-agent-fix-md-ts-predicate-query))
 #+end_src
 * Communication & Social
 ** Email
