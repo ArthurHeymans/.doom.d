@@ -1294,7 +1294,7 @@ Emacs interface to opencode
 #+end_src
 *** pi-coding-agent
 #+begin_src elisp :tangle packages.el
-(package! pi-coding-agent :pin "a07e1d0a3a2dbbac6f1d2a92656d2239f0dcb2c7")
+(package! pi-coding-agent :pin "2ce94c0979a050a01bb39ca25ebc8ea4e4425305")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! pi-coding-agent
