@@ -852,6 +852,17 @@ Show types in lsp and allow for larger projects without being bothered all the t
   (setq lsp-inlay-hint-enable t
         lsp-file-watch-threshold 6000)
   )
+
+(defun my/disable-c-eglot-on-type-formatting ()
+  "Disable Eglot on-type formatting in C/C++ buffers."
+  (let ((capability :documentOnTypeFormattingProvider)
+        (ignored (and (boundp 'eglot-ignored-server-capabilities)
+                      eglot-ignored-server-capabilities)))
+    (setq-local eglot-ignored-server-capabilities
+                (cons capability (remove capability ignored)))))
+
+(dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
+  (add-hook hook #'my/disable-c-eglot-on-type-formatting))
 #+end_src
 
 *** Build Tools
