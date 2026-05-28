@@ -636,10 +636,8 @@ Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
   :after org
   :config
   (org-node-cache-mode)
-  ;; Use org-capture for node creation
-  (setq org-node-creation-fn #'org-capture)
-  ;; Match org-roam's default filename style
-  (setq org-node-file-slug-fn #'org-node-slugify-like-roam-default)
+  ;(setq org-node-creation-fn #'org-node-new-via-roam-capture)
+  ;(setq org-node-file-slug-fn #'org-node-slugify-like-roam-default)
   (setq org-node-file-timestamp-format "%Y%m%d%H%M%S-"))
 
 (map! :leader
