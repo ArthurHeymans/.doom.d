@@ -838,7 +838,8 @@ This allows us to set cargo lsp features in .dir-locals.el
 *** Rust feature setter
 #+begin_src elisp :tangle packages.el
 (package! tomlparse)
-(package! lsp-cargo-feature-switcher :recipe (:host github :repo "ArthurHeymans/lsp-cargo-feature-switcher") :pin "a2b290933ad9915f76c9b0ca819d2545c039d773")
+(package! lsp-cargo-feature-switcher :recipe (:host github :repo "ArthurHeymans/lsp-cargo-feature-switcher")
+  :pin "a2b290933ad9915f76c9b0ca819d2545c039d773")
 #+end_src
 
 *** LSP Configuration
