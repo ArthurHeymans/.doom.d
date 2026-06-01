@@ -176,3 +176,111 @@ Add path to include aider installed from PIP
   (setq aweshell-use-exec-path-from-shell t
         aweshell-dedicated-window-height 30))
 #+end_src
+
+* detached (WIP)
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-06-01 Mon 19:32
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: Org Mode/org-babel
+:ARCHIVE_CATEGORY: config
+:END:
+detached allows running shell commands detached from Emacs using dtach.
+Commands continue running even if Emacs crashes, with full output history.
+
+Fix consult
+#+begin_src elisp :tangle no
+(package! detached :recipe (:host sourcehut :repo "avph/detached.el") :pin "e4237ea6920b642cd30a460d532cff9ff84cf3e0")
+#+end_src
+
+#+begin_src elisp :tangle no
+(use-package! detached
+  :init
+  (detached-init)
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
+#+end_src
+
+** Usage with org-babel
+[[https://sr.ht/~niklaseklund/detached.el/#org-babel][org-babel docs]]
+Add =:detached t= header argument to shell source blocks:
+
+#+begin_example
+,#+begin_src sh :detached t
+  # Long running command
+  sleep 60 && echo "Done!"
+,#+end_src
+
+,#+RESULTS:
+: [detached]
+#+end_example
+
+* MCP Server (disabled)
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-06-01 Mon 19:35
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: AI & Assistance/LLM Clients/GPTEL
+:ARCHIVE_CATEGORY: config
+:END:
+Turn Emacs into an MCP server that LLMs can connect to
+#+begin_src elisp :tangle no
+(package! mcp-server :recipe (:host github :repo "rhblind/emacs-mcp-server" :files ("*.el" "mcp-wrapper.py" "mcp-wrapper.sh")) :pin "e5edc3e064ed6d8d6a0921f43ca577f7e7a17856")
+#+end_src
+
+#+begin_src elisp :tangle no
+;; Start Emacs MCP Server on startup
+(use-package! mcp-server
+  :config
+  (setq mcp-server-socket-directory "~/.config/emacs-mcp")
+  (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
+#+end_src
+
+* el-be-back
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-06-01 Mon 19:39
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: Terminal & Shell/Terminal Emulators
+:ARCHIVE_CATEGORY: config
+:END:
+#+begin_src elisp :tangle packages.el
+(package! el-be-back
+  :recipe (:host github
+           :repo "ArthurHeymans/el-be-back"
+           :files ("*.el" "Cargo.toml" "Cargo.lock" "src" "build.sh" "flake.nix"))
+  :pin "8e32f760b54a4179ac80a7bba9fecce50fb203c0")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! el-be-back
+  :commands (ebb))
+#+end_src
+
+* alacritty
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-06-01 Mon 19:39
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: Terminal & Shell/Terminal Emulators
+:ARCHIVE_CATEGORY: config
+:END:
+#+begin_src elisp :tangle no
+(package! alacritty :recipe (:host github :repo "ArthurHeymans/emacs-alacritty" :files ("*.el" "Cargo.toml" "Cargo.lock" "src")) :pin "f07ef347df29c900773e97b9f32f7597eb64fb5f")
+#+end_src
+#+begin_src emacs-lisp :tangle no
+(after! alacritty
+  (custom-set-faces
+    `(alacritty-color-default ((t (:foreground ,(doom-color 'fg)))))
+    `(alacritty-color-black   ((t (:foreground "#0d0d0d" :background "#0d0d0d"))))
+    `(alacritty-color-red     ((t (:foreground "#FF301B" :background "#FF4352"))))
+    `(alacritty-color-green   ((t (:foreground "#A0E521" :background "#B8E466"))))
+    `(alacritty-color-yellow  ((t (:foreground "#FFC620" :background "#FFD750"))))
+    `(alacritty-color-blue    ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
+    `(alacritty-color-bright-blue ((t (:foreground "#1BA6FA" :background "#1BA6FA"))))
+    `(alacritty-color-magenta ((t (:foreground "#8763B8" :background "#A578EA"))))
+    `(alacritty-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
+    `(alacritty-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8"))))))
+#+end_src
