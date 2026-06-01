@@ -628,8 +628,8 @@ Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
 #+begin_src elisp :tangle config.el
 (use-package! org-mem
   :config
-  (setq org-mem-watch-dirs
-        (list "~/org/"))
+  (setq org-mem-do-look-everywhere nil
+        org-mem-watch-dirs (list (expand-file-name "~/org/")))
   (org-mem-updater-mode))
 
 (use-package! org-node
