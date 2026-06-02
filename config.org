@@ -1531,7 +1531,7 @@ Don't use htop
 #+end_src
 ** App launcher in OS
 #+begin_src emacs-lisp :tangle packages.el
-(package! app-launcher :recipe (:host github :repo "emacs-exwm/xdg-launcher") :pin "78c591df0a87cbabcfd65788546233dca6f2018d")
+(package! xdg-launcher :recipe (:host github :repo "emacs-exwm/xdg-launcher") :pin "78c591df0a87cbabcfd65788546233dca6f2018d")
 #+end_src
 ** tmr
 Set timers
