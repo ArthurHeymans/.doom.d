@@ -143,7 +143,8 @@ Display battery and time in the modeline using the common european time notation
         consult-source-hidden-buffer
         consult-source-modified-buffer
         consult-source-recent-file
-        consult-source-xdg-apps)))
+        consult-source-xdg-apps))
+        (setq ewm-idle 600)) ;; blank monitor after 10
 
 ;(after! ewm-consult
 ;  (setq ewm-consult-annotate-application-buffers t)
