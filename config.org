@@ -1515,6 +1515,20 @@ Set the first one to a local .authinfo.gpg
 #+end_src
 
 ** Desktop Integration
+*** Bluetooth
+#+begin_src elisp :tangle packages.el
+(package! bluetooth)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! bluetooth
+  :commands (bluetooth-list-devices bluetooth-init)
+  :init
+  (map! :leader
+        (:prefix ("C" . "network")
+         :desc "Bluetooth devices" "B" #'bluetooth-list-devices)))
+#+end_src
+
 *** KDE Connect
 #+begin_src elisp :tangle packages.el
 (package! kdeconnect)
