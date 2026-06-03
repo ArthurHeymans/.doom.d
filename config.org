@@ -847,8 +847,16 @@ Show types in lsp and allow for larger projects without being bothered all the t
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "8eb2038a0d0f7f57af62766f98495cac0ce6c48a")
 (package! gptel-commit)
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "c036ec31104ffde746df1ae39ed49198771bcb9f")
+(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "28ebbdda02ba08cba4a576153913e1984ecdcb44")
 #+end_src
 #+begin_src elisp :tangle config.el
+(use-package! majutsu
+  :commands (majutsu majutsu-log)
+  :init
+  (map! :leader
+        :desc "Majutsu status" "g j" #'majutsu
+        :desc "Majutsu log" "g J" #'majutsu-log))
+
 (after! magit
   (setq transient-default-level 6)
   (setq git-commit-summary-max-length 72)
