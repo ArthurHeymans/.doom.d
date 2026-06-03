@@ -1607,7 +1607,25 @@ Make colors more readable
   :init
   ;; Native module is provided by Nix; skip auto-install prompt.
   (setq ghostel-module-auto-install nil)
-  (setq ghostel-tramp-default-method "rpc"))
+  (setq ghostel-tramp-default-method "rpc")
+  :config
+  (custom-set-faces
+   '(ghostel-color-black         ((t (:foreground "#0d0d0d"))))
+   '(ghostel-color-red           ((t (:foreground "#FF301B"))))
+   '(ghostel-color-green         ((t (:foreground "#A0E521"))))
+   '(ghostel-color-yellow        ((t (:foreground "#FFC620"))))
+   '(ghostel-color-blue          ((t (:foreground "#1BA6FA"))))
+   '(ghostel-color-magenta       ((t (:foreground "#8763B8"))))
+   '(ghostel-color-cyan          ((t (:foreground "#21DEEF"))))
+   '(ghostel-color-white         ((t (:foreground "#EBEBEB"))))
+   '(ghostel-color-bright-black  ((t (:foreground "#0d0d0d"))))
+   '(ghostel-color-bright-red    ((t (:foreground "#FF4352"))))
+   '(ghostel-color-bright-green  ((t (:foreground "#B8E466"))))
+   '(ghostel-color-bright-yellow ((t (:foreground "#FFD750"))))
+   '(ghostel-color-bright-blue   ((t (:foreground "#1BA6FA"))))
+   '(ghostel-color-bright-magenta ((t (:foreground "#A578EA"))))
+   '(ghostel-color-bright-cyan   ((t (:foreground "#73FBF1"))))
+   '(ghostel-color-bright-white  ((t (:foreground "#FEFEF8"))))))
 #+end_src
 ** Tramp
 *** tramp-rpc
