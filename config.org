@@ -842,6 +842,7 @@ Show types in lsp and allow for larger projects without being bothered all the t
 **** Magit
 #+begin_src elisp :tangle packages.el
 (package! magit :pin "c8845987fa6ccb2d89369386766b68d8a6f093d0")
+(package! forge :pin "a8af709bc15e973804af776bba66b4205540bd73")
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "8eb2038a0d0f7f57af62766f98495cac0ce6c48a")
 (package! gptel-commit)
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "c036ec31104ffde746df1ae39ed49198771bcb9f")
