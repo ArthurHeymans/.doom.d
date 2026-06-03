@@ -1515,6 +1515,38 @@ Set the first one to a local .authinfo.gpg
 #+end_src
 
 ** Desktop Integration
+*** NetworkManager
+#+begin_src elisp :tangle packages.el
+(package! emacs-nm
+  :recipe (:host github
+           :repo "Kodkollektivet/emacs-nm"
+           :files ("nm.el"))
+  :pin "a4971155ff7e59bcb08223bb62a142c3c34851fb")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! nm
+  :commands (nm/list-access-points
+             nm/list-active-connections
+             nm/show-wifi-status
+             nm/set-interface
+             nm/connect-basic
+             nm/connect-with-profile
+             nm/connect-vpn-profile
+             nm/toggle-radio)
+  :init
+  (map! :leader
+        (:prefix ("C" . "network")
+         :desc "Access points" "a" #'nm/list-access-points
+         :desc "Active connections" "c" #'nm/list-active-connections
+         :desc "WiFi status" "s" #'nm/show-wifi-status
+         :desc "Set interface" "i" #'nm/set-interface
+         :desc "Connect basic" "b" #'nm/connect-basic
+         :desc "Connect profile" "p" #'nm/connect-with-profile
+         :desc "Connect VPN" "v" #'nm/connect-vpn-profile
+         :desc "Toggle radio" "r" #'nm/toggle-radio)))
+#+end_src
+
 *** Bluetooth
 #+begin_src elisp :tangle packages.el
 (package! bluetooth)
