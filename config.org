@@ -178,6 +178,17 @@ Advise it to survive the empty-string edge case.
                 (args-out-of-range nil))))
 
 (when (daemonp)
+  ;; `emacs --fg-daemon --eval "(ewm-start-module)"' enters EWM before
+  ;; Emacs' daemon command-line code gets a chance to create the normal
+  ;; emacsclient socket.  Start it explicitly here so `emacsclient' and the
+  ;; `ewm-editor' wrapper can connect to an EWM session.
+  (require 'server)
+  (when-let* ((name (or (getenv "EMACS_SERVER_NAME")
+                        (and (stringp (daemonp)) (daemonp)))))
+    (setq server-name name))
+  (unless (server-running-p)
+    (server-start))
+
   ;; Track whether server hooks have been triggered (once-only).
   (defvar +ewm--server-hooks-triggered nil)
 
