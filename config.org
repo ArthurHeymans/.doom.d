@@ -1527,7 +1527,7 @@ Set the first one to a local .authinfo.gpg
 ** Desktop Integration
 *** NetworkManager
 #+begin_src elisp :tangle packages.el
-(package! emacs-nm
+(package! nm
   :recipe (:host github
            :repo "Kodkollektivet/emacs-nm"
            :files ("nm.el"))
