@@ -215,6 +215,52 @@ Advise it to survive the empty-string edge case.
                   (redisplay t))))))
 #+end_src
 
+** EWM shell editor frames
+The shell ~EDITOR~ wrapper in the Nix config uses ~emacsclient --create-frame~
+and marks those client frames with an ~ewm-editor~ frame parameter.  After
+~C-x #~ / ~server-edit~ finishes the client edit, close that temporary editor
+frame instead of leaving an empty Emacs window in EWM.
+
+#+begin_src elisp :tangle config.el
+(after! server
+  (defun +ewm-server-window (buffer)
+    "Display emacsclient BUFFER in a new EWM frame.
+
+Plain `emacsclient --create-frame' creates a PGTK frame without EWM's
+`ewm-output' parameter, so EWM considers it unmanaged and drops it.  Create the
+frame through EWM instead, on the currently focused output."
+    (if (and (bound-and-true-p ewm-mode)
+             (fboundp 'ewm--focused-frame)
+             (fboundp 'ewm--create-frame-for-output))
+        (let* ((current-frame (ewm--focused-frame))
+               (output (frame-parameter current-frame 'ewm-output))
+               (frame (if output
+                          (ewm--create-frame-for-output
+                           output current-frame
+                           '((ewm-editor . t)
+                             (ewm-focus-on-create . t)
+                             (name . "EWM Editor")))
+                        (selected-frame)))
+               (window (frame-selected-window frame)))
+          (set-window-buffer window buffer)
+          (select-frame-set-input-focus frame)
+          (select-window window)
+          window)
+      (pop-to-buffer buffer)))
+
+  (setq server-window #'+ewm-server-window)
+
+  (defun +ewm-delete-editor-frame-after-server-edit-h ()
+    "Delete temporary EWM editor frames after `server-edit'."
+    (when (and (display-graphic-p)
+               (frame-parameter nil 'ewm-editor)
+               ;; Do not delete the only remaining frame.
+               (cdr (frame-list)))
+      (delete-frame nil t)))
+
+  (add-hook 'server-done-hook #'+ewm-delete-editor-frame-after-server-edit-h))
+#+end_src
+
 
 * Org Mode
 ** Basic Configuration
