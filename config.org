@@ -858,8 +858,7 @@ This allows us to set cargo lsp features in .dir-locals.el
 #+begin_src elisp :tangle config.el
 (put 'lsp-rust-features 'safe-local-variable #'vectorp)
 (put 'lsp-rust-no-default-features 'safe-local-variable #'booleanp)
-(setq safe-local-variable-values '((eval run-with-timer 0.1 nil #'sops-edit-file)
-                                   (eval add-to-list 'mcp-hub-servers '("nix" :command "nix" :args ("run" "github:utensils/mcp-nixos" "--")))))
+(setq safe-local-variable-values '((eval add-to-list 'mcp-hub-servers '("nix" :command "nix" :args ("run" "github:utensils/mcp-nixos" "--")))))
 #+end_src
 *** Rust feature setter
 #+begin_src elisp :tangle packages.el
@@ -1454,6 +1453,15 @@ Slack client for Emacs
    :cookie (auth-source-pick-first-password :host "caliptraworkspaceslack" :user "cookie")
    :subscribed-channels '(firmware firmware-internal)
    :full-and-display-names t)
+
+  ;; Upstream `slack-refresh-token' calls `(slack-stop)' without the required
+  ;; FORCE argument.  Drop this guard once emacs-slack makes FORCE optional or
+  ;; passes nil from `slack-refresh-token'.
+  (defun +slack-stop-allow-empty-force-arg (args)
+    (if args args '(nil)))
+  (when (and (equal (func-arity #'slack-stop) '(1 . 1))
+             (not (advice-member-p #'+slack-stop-allow-empty-force-arg 'slack-stop)))
+    (advice-add 'slack-stop :filter-args #'+slack-stop-allow-empty-force-arg))
   )
 
 (use-package! alert
@@ -1584,6 +1592,17 @@ Set the first one to a local .authinfo.gpg
 *** SOPS
 #+begin_src elisp :tangle packages.el
 (package! sops)
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! sops
+  :init
+  ;; sops.el v0.2 only checks files matching `sops-prefilter-regex'.  Our
+  ;; nix-config authinfo secret intentionally has no extension, so include it
+  ;; explicitly and tell sops to treat the plaintext/ciphertext as JSON.
+  (setq sops-prefilter-regex
+        "\\(?:\\.\\(ya?ml\\|json\\|env\\|ini\\|txt\\)\\|/authinfo\\)\\'")
+  (add-to-list 'sops-input-type-overrides '("/secrets/authinfo\\'" . "json"))
+  (global-sops-mode 1))
 #+end_src
 
 ** Desktop Integration
