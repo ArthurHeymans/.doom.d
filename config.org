@@ -1416,6 +1416,15 @@ MicroVM, with the bouncer password stored in auth-source as:
     (or (auth-source-pick-first-password :host host :user user)
         (error "Password not found for %s/%s" host user)))
 
+  (defun my-soju-client-name ()
+    "Return a stable soju client name derived from this host."
+    (replace-regexp-in-string
+     "[^[:alnum:]._-]" "-"
+     (downcase (car (split-string (system-name) "\\.")))))
+
+  (defun my-soju-username ()
+    (format "avph/irc.libera.chat@%s" (my-soju-client-name)))
+
   (defun my-nickserv-password (_server)
     (my/auth-source-password "irc.libera.chat" "avph"))
 
@@ -1423,12 +1432,13 @@ MicroVM, with the bouncer password stored in auth-source as:
     (my/auth-source-password "soju" "avph"))
 
   (setq circe-network-options
-        '(("Libera Chat"
+        `(("Libera Chat"
            :host "192.168.0.7"
            :port 6667
            :tls nil
            :nick "avph"
-           :sasl-username "avph/irc.libera.chat@emacs"
+           :user ,(my-soju-username)
+           :sasl-username ,(my-soju-username)
            :sasl-password my-soju-password
            :nickserv-password my-nickserv-password
            :channels ("#flashprog" "#coreboot" "#gnuboot" "#coreboot")))))
