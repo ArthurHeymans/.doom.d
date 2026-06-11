@@ -1713,23 +1713,129 @@ Set timers
 * Terminal & Shell
 ** Terminal Emulators
 *** eshell
+#+begin_src elisp :tangle packages.el
+(package! capf-autosuggest)
+#+end_src
 #+begin_src elisp :tangle config.el
-(add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
-(setq eshell-prompt-function
-      (lambda ()
-        (concat
-         (propertize "┌─[" 'face `(:foreground "green"))
-         (propertize (user-login-name) 'face `(:foreground "red"))
-         (propertize "@" 'face `(:foreground "green"))
-         (propertize (system-name) 'face `(:foreground "blue"))
-         (propertize "]──[" 'face `(:foreground "green"))
-         (propertize (format-time-string "%H:%M" (current-time)) 'face `(:foreground "yellow"))
-         (propertize "]──[" 'face `(:foreground "green"))
-         (propertize (concat (eshell/pwd)) 'face `(:foreground "white"))
-         (propertize "]\n" 'face `(:foreground "green"))
-         (propertize "└─>" 'face `(:foreground "green"))
-         (propertize (if (= (user-uid) 0) " # " " $ ") 'face `(:foreground "white"))
-         )))
+(defun my/eshell-apply-settings ()
+  "Apply my Eshell settings after Doom's Eshell defaults."
+  (setq eshell-scroll-to-bottom-on-input t
+        eshell-history-size 10000
+        eshell-save-history-on-exit t
+        eshell-hist-ignoredups t))
+
+(defvar my/eshell-history-fontify-cache (make-hash-table :test #'equal)
+  "Cache for syntax-highlighted Eshell history candidates.")
+
+(defun my/eshell--font-lock-face-to-face ()
+  "Copy `font-lock-face' properties to `face' in the current buffer."
+  (let ((pos (point-min)) next face)
+    (while (< pos (point-max))
+      (setq next (next-single-property-change pos 'font-lock-face nil (point-max))
+            face (get-text-property pos 'font-lock-face))
+      (when face
+        (put-text-property pos next 'face face))
+      (setq pos next))))
+
+(defun my/eshell-fontify-history-candidate (command)
+  "Return COMMAND highlighted like Eshell input in the current directory."
+  (let* ((source-dir default-directory)
+         ;; `eshell-syntax-highlighting' checks whether commands, directories,
+         ;; and file arguments exist.  In a broken TRAMP directory that can block
+         ;; history search, so fontify against a local directory instead.
+         (fontify-dir (if (file-remote-p source-dir)
+                          temporary-file-directory
+                        source-dir))
+         (key (list fontify-dir command)))
+    (or (gethash key my/eshell-history-fontify-cache)
+        (puthash key
+                 (with-temp-buffer
+                   (let ((default-directory fontify-dir)
+                         (non-essential t))
+                     (require 'eshell-syntax-highlighting)
+                     ;; `eshell-syntax-highlighting' works in Eshell buffers and
+                     ;; uses Eshell variables/aliases plus `default-directory' to
+                     ;; classify commands, options, directories, and files.
+                     (delay-mode-hooks (eshell-mode))
+                     (let ((inhibit-read-only t))
+                       (erase-buffer)
+                       (insert command)
+                       (goto-char (point-min))
+                       (eshell-syntax-highlighting--parse-and-highlight
+                        'command (point-max))
+                       (my/eshell--font-lock-face-to-face)
+                       (buffer-string))))
+                 my/eshell-history-fontify-cache))))
+
+(defun my/eshell-consult-history ()
+  "Insert an Eshell history entry using Consult with syntax-highlighted candidates."
+  (interactive)
+  (require 'consult)
+  (require 'ring)
+  (let* ((history (consult--remove-dups (ring-elements eshell-history-ring)))
+         (beg (save-excursion (eshell-bol) (point)))
+         (end (pos-eol))
+         (candidates (mapcar #'my/eshell-fontify-history-candidate history))
+         (selection
+          (consult--local-let ((enable-recursive-minibuffers t))
+            (consult--read
+             (or candidates (user-error "History is empty"))
+             :prompt "History: "
+             :history t
+             :sort nil
+             :initial (buffer-substring-no-properties beg end)
+             :lookup #'consult--lookup-member
+             :state (consult--insertion-preview beg end)))))
+    (delete-region beg end)
+    (insert (substring-no-properties selection))))
+
+(defun my/eshell-hook ()
+  "Set up Eshell completions."
+  (my/eshell-apply-settings)
+  (setq-local completion-styles '(basic partial-completion)
+              corfu-auto t
+              tab-always-indent 'complete
+              ;; Use only Eshell's pcomplete for popup completion.  History is
+              ;; available through `my/eshell-consult-history' on M-r and through
+              ;; `capf-autosuggest' inline suggestions.
+              completion-at-point-functions
+              (list #'pcomplete-completions-at-point))
+  (corfu-mode 1))
+
+(defun aweshell-cat-with-syntax-highlight (filename)
+  "Like cat(1) but with syntax highlighting."
+  (let ((existing-buffer (get-file-buffer filename))
+        (buffer (find-file-noselect filename)))
+    (eshell-print
+     (with-current-buffer buffer
+       (if (fboundp 'font-lock-ensure)
+           (font-lock-ensure)
+         (with-no-warnings
+           (font-lock-fontify-buffer)))
+       (let ((contents (buffer-string)))
+         (remove-text-properties 0 (length contents) '(read-only nil) contents)
+         contents)))
+    (unless existing-buffer
+      (kill-buffer buffer))
+    nil))
+
+(advice-add 'eshell/cat :override #'aweshell-cat-with-syntax-highlight)
+
+;; Doom's Eshell module configures its own defaults in `after! eshell'.  Apply
+;; these settings both after `eshell' loads and from `eshell-mode-hook' so they
+;; win regardless of load order, including daemon sessions with lazy loading.
+(my/eshell-apply-settings)
+(after! eshell
+  (my/eshell-apply-settings))
+
+(add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")) t)
+(add-hook 'eshell-mode-hook #'my/eshell-hook t)
+
+(after! em-hist
+  (define-key eshell-hist-mode-map (kbd "M-r") #'my/eshell-consult-history))
+
+(use-package! capf-autosuggest
+  :hook (eshell-mode . capf-autosuggest-mode))
 #+end_src
 
 *** eat
