@@ -1407,18 +1407,31 @@ Show account in view.
 
 ** Chat
 *** IRC
-Do socials like neckbears
+Do socials like neckbears.  Connect Circe to the Soju bouncer on the gmktec-g3
+MicroVM, with the bouncer password stored in auth-source as:
+=machine soju login avph password ...=
 #+begin_src elisp :tangle config.el
 (after! circe
-  (defun my-nickserv-password (server)
-    (auth-source-pick-first-password :host "irc.libera.chat" :user "avph"))
+  (defun my/auth-source-password (host user)
+    (or (auth-source-pick-first-password :host host :user user)
+        (error "Password not found for %s/%s" host user)))
+
+  (defun my-nickserv-password (_server)
+    (my/auth-source-password "irc.libera.chat" "avph"))
+
+  (defun my-soju-password (_server)
+    (my/auth-source-password "soju" "avph"))
 
   (setq circe-network-options
-         '(("Libera Chat"
-            :nick "avph"
-            :sasl-username "avph"
-            :sasl-password my-nickserv-password
-            :channels ("#flashprog")))))
+        '(("Libera Chat"
+           :host "192.168.0.7"
+           :port 6667
+           :tls nil
+           :nick "avph"
+           :sasl-username "avph/irc.libera.chat@emacs"
+           :sasl-password my-soju-password
+           :nickserv-password my-nickserv-password
+           :channels ("#flashprog" "#coreboot" "#gnuboot" "#coreboot")))))
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (save-window-excursion
@@ -1629,13 +1642,14 @@ Set the first one to a local .authinfo.gpg
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! sops
-  :init
+  :config
   ;; sops.el v0.2 only checks files matching `sops-prefilter-regex'.  Our
   ;; nix-config authinfo secret intentionally has no extension, so include it
-  ;; explicitly and tell sops to treat the plaintext/ciphertext as JSON.
+  ;; explicitly.
   (setq sops-prefilter-regex
         "\\(?:\\.\\(ya?ml\\|json\\|env\\|ini\\|txt\\)\\|/authinfo\\)\\'")
-  (add-to-list 'sops-input-type-overrides '("/secrets/authinfo\\'" . "json"))
+  (defvar sops-input-type-overrides nil)
+  (add-to-list 'sops-input-type-overrides '("/secrets/authinfo\\'" . ""))
   (global-sops-mode 1))
 #+end_src
 
