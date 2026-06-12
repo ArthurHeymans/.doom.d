@@ -1929,6 +1929,126 @@ Make colors more readable
    '(ghostel-color-bright-white  ((t (:foreground "#FEFEF8"))))))
 #+end_src
 ** Tramp
+*** Remote shell environments
+TRAMP deliberately starts a small POSIX shell with a conservative ~PATH~ for
+file operations.  On NixOS this means terminal buffers opened from a remote
+~sshx~ directory can otherwise fall back to ~/bin/sh~ and miss the user's Nix
+profiles.  Keep TRAMP's file-operation shell alone, but make interactive remote
+terminals use the remote login shell and teach TRAMP about user profile paths
+when resolving remote programs.
+
+#+begin_src elisp :tangle config.el
+(defconst my/tramp-nixos-profile-sentinel-vars
+  '("__NIXOS_SET_ENVIRONMENT_DONE" "__ETC_PROFILE_DONE" "__HM_SESS_VARS_SOURCED")
+  "Remote NixOS profile guards to unset before starting login shells via TRAMP.")
+
+(defconst my/tramp-nixos-login-shell-command
+  (concat "env "
+          (mapconcat (lambda (var) (concat "-u " var))
+                     my/tramp-nixos-profile-sentinel-vars
+                     " ")
+          " ${SHELL:-/bin/sh} -l")
+  "Shell command that re-enters the remote user's NixOS login shell.")
+
+(after! tramp
+  (require 'seq)
+  ;; Include paths that are normally added by NixOS login/profile setup when
+  ;; TRAMP searches for remote programs.  `tramp-own-remote-path' asks TRAMP to
+  ;; read the user's remote profile path; the explicit Nix paths cover common
+  ;; NixOS profile locations even when that detection is incomplete.
+  (setq tramp-remote-path
+        (append (list 'tramp-own-remote-path
+                      "~/.nix-profile/bin"
+                      "~/.local/state/nix/profile/bin"
+                      "/nix/profile/bin"
+                      "/nix/var/nix/profiles/default/bin"
+                      "/run/wrappers/bin"
+                      "/run/current-system/sw/bin")
+                (seq-difference tramp-remote-path
+                                '(tramp-own-remote-path
+                                  "~/.nix-profile/bin"
+                                  "~/.local/state/nix/profile/bin"
+                                  "/nix/profile/bin"
+                                  "/nix/var/nix/profiles/default/bin"
+                                  "/run/wrappers/bin"
+                                  "/run/current-system/sw/bin")
+                                #'equal))))
+
+(after! vterm
+  ;; vterm's `login-shell' sentinel selects the user's shell path but does not
+  ;; invoke it as a login shell.  Use a shell command so NixOS profiles are
+  ;; sourced by bash/zsh/fish when terminals are opened from TRAMP buffers.
+  (setq vterm-tramp-shells
+        `(("ssh" ,my/tramp-nixos-login-shell-command)
+          ("sshx" ,my/tramp-nixos-login-shell-command)
+          ("scp" ,my/tramp-nixos-login-shell-command)
+          ("rpc" ,my/tramp-nixos-login-shell-command)
+          (t ,my/tramp-nixos-login-shell-command)
+          ("docker" "/bin/sh"))))
+
+(after! eat
+  ;; Eat expects shell commands rather than a `login-shell' sentinel.
+  (setq eat-tramp-shells
+        `(("ssh" . ,(concat "exec " my/tramp-nixos-login-shell-command))
+          ("sshx" . ,(concat "exec " my/tramp-nixos-login-shell-command))
+          ("scp" . ,(concat "exec " my/tramp-nixos-login-shell-command))
+          ("rpc" . ,(concat "exec " my/tramp-nixos-login-shell-command))
+          ("docker" . "/bin/sh"))))
+
+(after! ghostel
+  (require 'cl-lib)
+
+  (defun my/ghostel-unset-nixos-profile-sentinels-h ()
+    "Let remote NixOS login shells rebuild their profile environment."
+    (when (file-remote-p default-directory)
+      (dolist (var my/tramp-nixos-profile-sentinel-vars)
+        (setq process-environment
+              (cons var
+                    (cl-remove-if
+                     (lambda (entry)
+                       (and (stringp entry)
+                            (string-prefix-p (concat var "=") entry)))
+                     process-environment))))))
+
+  (add-hook 'ghostel-pre-spawn-hook #'my/ghostel-unset-nixos-profile-sentinels-h)
+
+  (setq ghostel-tramp-shells
+        '(("ssh" login-shell)
+          ("sshx" login-shell)
+          ("scp" login-shell)
+          ("rpc" login-shell)
+          (t login-shell)
+          ("docker" "/bin/sh")))
+
+  ;; Ghostel's TRAMP shell resolver currently returns only the shell program for
+  ;; remote sessions.  Preserve its selection logic, but invoke detected login
+  ;; shells with -l so NixOS profile setup runs for interactive terminals.
+  (defun my/ghostel--tramp-shell-spec (method)
+    "Return Ghostel remote shell spec for TRAMP METHOD."
+    (let* ((specs (cdr (assoc method ghostel-tramp-shells)))
+           (first (car specs)))
+      (cond
+       ((eq first 'login-shell)
+        (when-let ((shell (ghostel--tramp-get-shell method)))
+          (list shell "-l")))
+       ((stringp first)
+        (ghostel--shell-program-and-args first)))))
+
+  (defun my/ghostel-resolve-remote-login-shell-a (fn)
+    "Make Ghostel TRAMP sessions start login shells when configured."
+    (if (file-remote-p default-directory)
+        (with-parsed-tramp-file-name default-directory nil
+          (or (my/ghostel--tramp-shell-spec method)
+              (my/ghostel--tramp-shell-spec t)
+              (cons (with-connection-local-variables shell-file-name) nil)))
+      (funcall fn)))
+
+  (unless (advice-member-p #'my/ghostel-resolve-remote-login-shell-a
+                           'ghostel--resolve-shell-spec)
+    (advice-add 'ghostel--resolve-shell-spec
+                :around #'my/ghostel-resolve-remote-login-shell-a)))
+#+end_src
+
 *** tramp-rpc
 
 #+begin_src elisp :tangle packages.el
