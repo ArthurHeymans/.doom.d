@@ -91,6 +91,7 @@ Display battery and time in the modeline using the common european time notation
 ;;   :pin "7c860d1cc21d7932731a346ec110e7c5230318de")
 ;(package! ewm-consult :recipe (:host github :repo "ArthurHeymans/ewm-consult")
 ;  :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
+(package! ednc :recipe (:host github :repo "sinic/ednc") :pin "638d73e7c3fe4ffe86199e33fb85fbaa4cf1ab7f")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ewm
@@ -119,7 +120,7 @@ Display battery and time in the modeline using the common european time notation
          ("<AudioPause>" . (lambda () (interactive) (start-process "pause" nil "playerctl" "play-pause")))
          ("<AudioNext>" . (lambda () (interactive) (start-process "next" nil "playerctl" "next")))
          ("<AudioPrev>" . (lambda () (interactive) (start-process "prev" nil "playerctl" "previous")))
-         ("C-S-SPC" . (lambda () (interactive) (start-process "mako-dismiss" nil "makoctl" "dismiss" "--all")))
+         ("C-S-SPC" . +ewm-dismiss-all-notifications)
          ("s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot" nil "grim ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("S-s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot-region" nil "slurp | grim -g - ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("s-;" . (lambda () (interactive) (start-process "voxtype" nil "voxtype" "record" "toggle"))))
@@ -129,12 +130,21 @@ Display battery and time in the modeline using the common european time notation
   (add-to-list 'ewm-intercept-prefixes ?\M-&)
   (add-to-list 'ewm-intercept-prefixes ?\M-y :fullscreen)
 
-  ;; spawn-at-startup equivalent: start awww-daemon after compositor is ready
+  (defun +ewm-dismiss-all-notifications ()
+    "Dismiss all active EDNC notifications."
+    (interactive)
+    (if (require 'ednc nil t)
+        (mapc #'ednc-dismiss-notification (ednc-notifications))
+      (user-error "EDNC is not installed; run doom sync")))
+
+  ;; spawn-at-startup equivalent: start awww-daemon and EDNC after compositor is ready
   ;; ewm-mode-hook fires before the compositor is ready, so advise
   ;; ewm-start-module instead — it only returns after compositor init succeeds
   (advice-add 'ewm-start-module :after
               (defun +ewm-spawn-startup-daemons-a (&rest _)
-                (start-process "awww-daemon" nil "awww-daemon")))
+                (start-process "awww-daemon" nil "awww-daemon")
+                (when (require 'ednc nil t)
+                  (ednc-mode 1))))
   (defvar consult-source-xdg-apps
   `(:name "Apps"
           :narrow ?a
