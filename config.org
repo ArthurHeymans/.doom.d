@@ -511,6 +511,82 @@ longer than LEN."
   (setq org-gcal-remove-cancelled-events t)
   (run-at-time nil (* 1 60 60) (lambda () (async-start (org-gcal-sync t t))))
   )
+
+(after! org
+  (defvar my/org-calendar-meeting-link-regexps nil
+    "Regexps matching video call URLs in calendar entries, in preferred order.")
+  (setq my/org-calendar-meeting-link-regexps
+        '("https://meet\\.google\\.com/[a-z]\\{3\\}-[a-z]\\{4\\}-[a-z]\\{3\\}"
+          "https://teams\\.microsoft\\.com/meet/[^][[:space:]<>\"']+"
+          "https://teams\\.microsoft\\.com/l/meetup-join/[^][[:space:]<>\"']+"))
+
+  (defun my/org-calendar--clean-meeting-url (url)
+    "Clean URL copied out of an org-gcal event body."
+    (let ((url (replace-regexp-in-string "&amp;" "&" url t t)))
+      (replace-regexp-in-string "[]).,;:]+\\'" "" url t t)))
+
+  (defun my/org-calendar--meeting-links-in-string (text)
+    "Return Google Meet and Microsoft Teams links found in TEXT."
+    (let (links)
+      (dolist (regexp my/org-calendar-meeting-link-regexps)
+        (let ((start 0))
+          (while (string-match regexp text start)
+            (let ((url (my/org-calendar--clean-meeting-url
+                        (match-string-no-properties 0 text))))
+              (unless (member url links)
+                (setq links (append links (list url)))))
+            (setq start (match-end 0)))))
+      links))
+
+  (defun my/org-calendar--current-entry-string ()
+    "Return the current Org entry as a plain string."
+    (org-with-wide-buffer
+     (save-excursion
+       (let* ((at-heading (ignore-errors (org-back-to-heading t) t))
+              (beg (if at-heading (point) (point-min)))
+              (end (if at-heading
+                       (save-excursion (org-end-of-subtree t t))
+                     (point-max))))
+         (buffer-substring-no-properties beg end)))))
+
+  (defun my/org-calendar--agenda-marker ()
+    "Return the source Org marker for the current agenda line, if any."
+    (when (derived-mode-p 'org-agenda-mode)
+      (or (and (fboundp 'org-get-at-bol)
+               (or (org-get-at-bol 'org-hd-marker)
+                   (org-get-at-bol 'org-marker)))
+          (get-text-property (point) 'org-hd-marker)
+          (get-text-property (point) 'org-marker))))
+
+  (defun my/org-calendar--entry-string-at-marker (marker)
+    "Return the Org entry at MARKER as a plain string."
+    (unless (and marker (marker-buffer marker))
+      (user-error "No source Org entry for this agenda line"))
+    (with-current-buffer (marker-buffer marker)
+      (save-excursion
+        (goto-char marker)
+        (my/org-calendar--current-entry-string))))
+
+  (defun my/org-calendar-open-meeting-link (&optional choose)
+    "Open the Google Meet or Microsoft Teams link for the current calendar entry.
+
+When called from `org-agenda-mode', inspect the source Org entry.  With
+prefix argument CHOOSE, prompt when more than one matching link is present."
+    (interactive "P")
+    (let* ((marker (my/org-calendar--agenda-marker))
+           (text (if marker
+                     (my/org-calendar--entry-string-at-marker marker)
+                   (my/org-calendar--current-entry-string)))
+           (links (my/org-calendar--meeting-links-in-string text)))
+      (unless links
+        (user-error "No Google Meet or Microsoft Teams link found here"))
+      (let ((url (if choose
+                     (completing-read "Meeting link: " links nil t)
+                   (car links))))
+        (message "Opening meeting link: %s" url)
+        (browse-url url))))
+
+  (map! :desc "Join calendar meeting" "C-c j" #'my/org-calendar-open-meeting-link))
 #+end_src
 
 
