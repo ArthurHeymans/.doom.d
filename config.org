@@ -1477,6 +1477,7 @@ MicroVM, with the bouncer password stored in auth-source as:
            :port 6667
            :tls nil
            :nick "avph"
+           :logging t
            :user ,(my-soju-username)
            :sasl-username ,(my-soju-username)
            :sasl-password my-soju-password
