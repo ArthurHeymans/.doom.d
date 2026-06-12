@@ -1526,6 +1526,30 @@ Slack client for Emacs
   (when (and (equal (func-arity #'slack-stop) '(1 . 1))
              (not (advice-member-p #'+slack-stop-allow-empty-force-arg 'slack-stop)))
     (advice-add 'slack-stop :filter-args #'+slack-stop-allow-empty-force-arg))
+
+  ;; Upstream `slack-room-names' sorts only by latest message timestamp.  Keep
+  ;; that order within each group, but put unread rooms first in room selectors.
+  (defun +slack-room-unread-first-less-p (left right team)
+    (let ((left-unread (slack-room-has-unread-p left team))
+          (right-unread (slack-room-has-unread-p right team)))
+      (cond
+       ((and left-unread (not right-unread)) t)
+       ((and right-unread (not left-unread)) nil)
+       (t (string> (or (slack-room-latest left team) "")
+                   (or (slack-room-latest right team) ""))))))
+
+  (defun +slack-room-names-unreads-first (rooms team &optional filter collecter)
+    (cl-loop for room in (cl-sort (copy-sequence (if filter
+                                                     (funcall filter rooms)
+                                                   rooms))
+                                  (lambda (left right)
+                                    (+slack-room-unread-first-less-p left right team)))
+             as label = (slack-room-label room team)
+             collect (if (functionp collecter)
+                         (funcall collecter label room)
+                       (cons label room))))
+  (unless (advice-member-p #'+slack-room-names-unreads-first 'slack-room-names)
+    (advice-add 'slack-room-names :override #'+slack-room-names-unreads-first))
   )
 
 (use-package! alert
