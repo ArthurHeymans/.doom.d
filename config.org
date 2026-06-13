@@ -1585,46 +1585,12 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
 ** Reddit
 #+begin_src elisp :tangle packages.el
 (package! reddigg)
-(package! md4rd)
 #+end_src
 
 #+begin_src elisp :tangle config.el
 (after! reddigg
   (setq reddigg-subs '(emacs localllama rust chatgptcoding)))
-
-(use-package! md4rd
-  :commands (md4rd mode-for-reddit md4rd-login md4rd-refresh-login)
-  :init
-  ;; Create a Reddit "installed app" and store its client ID + redirect URI
-  ;; in auth-source.  See the setup notes below.
-  (setq md4rd--oauth-client-id
-        (or (auth-source-pick-first-password :host "reddit.com" :user "md4rd-client-id")
-            "")
-        md4rd--oauth-redirect-uri
-        (or (auth-source-pick-first-password :host "reddit.com" :user "md4rd-redirect-uri")
-            ""))
-  :config
-  (setq md4rd-subs-active '(emacs localllama rust chatgptcoding)))
 #+end_src
-
-Setup notes for ~md4rd~ authenticated actions:
-1. Go to https://www.reddit.com/prefs/apps and create an app.
-2. Choose app type: =installed app=.
-3. Name it e.g. =md4rd=.
-4. Set the redirect URI to exactly =http://localhost:12345=, or another URI you
-   prefer; it only needs to match the value stored below.
-5. Store values in =~/.authinfo.gpg=:
-
-#+begin_example
-machine reddit.com login md4rd-client-id password YOUR_REDDIT_APP_CLIENT_ID
-machine reddit.com login md4rd-redirect-uri password http://localhost:12345
-#+end_example
-
-Then run =doom sync=, restart Emacs or reload the config, and use:
-- =M-x md4rd= to read configured subreddits.
-- =M-x md4rd-login= before voting/replying; Reddit redirects to the configured
-  URI and you paste the =code= query parameter into Emacs.
-- Optionally run =M-x md4rd-refresh-login= when the access token expires.
 ** rss
 Add elfeed from org mode
 #+begin_src elisp :tangle config.el
