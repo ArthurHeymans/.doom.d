@@ -1901,6 +1901,7 @@ Make colors more readable
 *** ghostel
 #+begin_src elisp :tangle packages.el
 (package! ghostel)
+(package! term-sessions :recipe (:host github :repo "ArthurHeymans/emacs-term-sessions"))
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ghostel
