@@ -259,8 +259,15 @@ frame through EWM instead, on the currently focused output."
                         (selected-frame)))
                (window (frame-selected-window frame)))
           (set-window-buffer window buffer)
-          (select-frame-set-input-focus frame)
-          (select-window window)
+          ;; A just-created EWM frame does not have its compositor view id yet.
+          ;; `select-frame-set-input-focus' is overridden by EWM and tries to
+          ;; focus that view id immediately, which fails with
+          ;; "Wrong type argument: integerp, nil" for emacsclient editor frames.
+          ;; `ewm-focus-on-create' above asks the compositor to focus the frame
+          ;; once it is mapped; only force focus when the id already exists.
+          (when (frame-parameter frame 'ewm-surface-id)
+            (select-frame-set-input-focus frame)
+            (select-window window))
           window)
       (pop-to-buffer buffer)))
 
