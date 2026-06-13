@@ -1908,6 +1908,31 @@ Make colors more readable
   :preface
   (defvar +ghostel--id nil)
 
+  (defvar my/ghostel-tramp-default-method-source-methods
+    '("ssh" "sshx" "scp" "scpx" "rsync" "sshfs")
+    "TRAMP methods that Ghostel may rewrite to `ghostel-tramp-default-method'.")
+
+  (defun my/ghostel-apply-tramp-default-method (dir)
+    "Rewrite ssh-like remote DIR to `ghostel-tramp-default-method'.
+
+Ghostel only uses `ghostel-tramp-default-method' when OSC 7 reports a remote
+host and there is no existing TRAMP prefix.  For ergonomics, make terminals
+opened from `/sshx:host:' buffers use my preferred Ghostel method too."
+    (if-let ((target-method (and (boundp 'ghostel-tramp-default-method)
+                                 (file-remote-p dir)
+                                 ghostel-tramp-default-method)))
+        (progn
+          (require 'tramp)
+          (let* ((vec (tramp-dissect-file-name dir))
+                 (source-method (tramp-file-name-method vec)))
+            (if (and (member source-method my/ghostel-tramp-default-method-source-methods)
+                     (not (equal source-method target-method)))
+                (progn
+                  (setf (tramp-file-name-method vec) target-method)
+                  (file-name-as-directory
+                   (tramp-make-tramp-file-name vec (tramp-file-name-localname vec))))
+              dir)))
+      dir))
 
   (defun +ghostel--configure-project-root-and-display (arg display-fn)
     "Set `default-directory' to the project root, then call DISPLAY-FN.
@@ -1917,7 +1942,8 @@ With prefix ARG, keep the current `default-directory'.  Mirrors Doom's
     (unless (fboundp 'module-load)
       (user-error "Your build of Emacs lacks dynamic modules support and cannot load ghostel"))
     (let* ((project-root (or (doom-project-root) default-directory))
-           (default-directory (if arg default-directory project-root)))
+           (target-directory (if arg default-directory project-root))
+           (default-directory (my/ghostel-apply-tramp-default-method target-directory)))
       (setenv "PROOT" project-root)
       (funcall display-fn)))
 
@@ -2004,6 +2030,30 @@ This mirrors `+vterm/here'."
   :config
   (set-popup-rule! "^\\*doom:ghostel-popup" :size 0.25 :vslot -4 :select t :quit nil :ttl 0)
 
+  (defun my/ghostel-start-process-apply-tramp-default-method-a (fn &rest args)
+    "Make all Ghostel spawns honor `ghostel-tramp-default-method'."
+    (let ((dir (my/ghostel-apply-tramp-default-method default-directory)))
+      (unless (equal dir default-directory)
+        (setq default-directory dir
+              list-buffers-directory dir))
+      (apply fn args)))
+
+  (unless (advice-member-p #'my/ghostel-start-process-apply-tramp-default-method-a
+                           'ghostel--start-process)
+    (advice-add 'ghostel--start-process
+                :around #'my/ghostel-start-process-apply-tramp-default-method-a))
+
+  (defun my/ghostel-update-directory-apply-tramp-default-method-a (&rest _)
+    "Keep OSC 7 directory tracking on `ghostel-tramp-default-method'."
+    (let ((dir (my/ghostel-apply-tramp-default-method default-directory)))
+      (unless (equal dir default-directory)
+        (setq default-directory dir
+              list-buffers-directory dir))))
+
+  (unless (advice-member-p #'my/ghostel-update-directory-apply-tramp-default-method-a
+                           'ghostel--update-directory)
+    (advice-add 'ghostel--update-directory
+                :after #'my/ghostel-update-directory-apply-tramp-default-method-a))
 
   (add-hook 'ghostel-mode-hook #'mode-line-invisible-mode)
   (map! :map ghostel-semi-char-mode-map
