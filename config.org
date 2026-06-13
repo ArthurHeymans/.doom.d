@@ -1905,11 +1905,114 @@ Make colors more readable
 #+begin_src elisp :tangle config.el
 (use-package! ghostel
   :commands (ghostel)
+  :preface
+  (defvar +ghostel--id nil)
+
+
+  (defun +ghostel--configure-project-root-and-display (arg display-fn)
+    "Set `default-directory' to the project root, then call DISPLAY-FN.
+
+With prefix ARG, keep the current `default-directory'.  Mirrors Doom's
+`+vterm--configure-project-root-and-display', including the PROOT env var."
+    (unless (fboundp 'module-load)
+      (user-error "Your build of Emacs lacks dynamic modules support and cannot load ghostel"))
+    (let* ((project-root (or (doom-project-root) default-directory))
+           (default-directory (if arg default-directory project-root)))
+      (setenv "PROOT" project-root)
+      (funcall display-fn)))
+
+  (defun +ghostel--create-and-start (buffer-name &optional same-window identity)
+    "Create BUFFER-NAME as a Ghostel terminal and start its process.
+
+When SAME-WINDOW is non-nil, display it in the selected window; otherwise use
+normal `pop-to-buffer' rules so Doom popup rules can place it.  IDENTITY is used
+for stable popup buffer reuse."
+    (require 'ghostel)
+    (ghostel--load-module t)
+    (let ((buffer (generate-new-buffer buffer-name)))
+      (condition-case err
+          (progn
+            ;; Put the buffer in `ghostel-mode' before display so popup rules can
+            ;; match on `ghostel-mode', then initialize after display so Ghostel
+            ;; observes the final window size.
+            (with-current-buffer buffer
+              (ghostel-mode))
+            (if same-window
+                (pop-to-buffer buffer (append display-buffer--same-window-action
+                                              '((category . comint))))
+              (pop-to-buffer buffer))
+            (ghostel--init-buffer buffer)
+            (with-current-buffer buffer
+              (setq-local +ghostel--id (or identity (buffer-name)))
+              (setq-local ghostel--managed-buffer-name (buffer-name))
+              (setq-local ghostel--buffer-identity (or identity (buffer-name)))
+              (ghostel--start-process))
+            buffer)
+        (error
+         (when (buffer-live-p buffer)
+           (kill-buffer buffer))
+         (signal (car err) (cdr err))))))
+
+  (defun +ghostel/toggle (arg)
+    "Toggle a Ghostel popup window at the project root.
+
+If prefix ARG is non-nil, recreate the popup in the current directory instead
+of the project root.  This intentionally mirrors `+vterm/toggle'."
+    (interactive "P")
+    (+ghostel--configure-project-root-and-display
+     arg
+     (lambda ()
+       (let* ((buffer-name
+               (format "*doom:ghostel-popup:%s*"
+                       (if (bound-and-true-p persp-mode)
+                           (safe-persp-name (get-current-persp))
+                         "main")))
+              (confirm-kill-processes nil)
+              (current-prefix-arg nil))
+         (when arg
+           (when-let ((buffer (get-buffer buffer-name)))
+             (kill-buffer buffer))
+           (when-let ((window (get-buffer-window buffer-name)))
+             (delete-window window)))
+         (if-let ((win (get-buffer-window buffer-name)))
+             (delete-window win)
+           (let ((buffer (or (cl-loop for buf in (doom-buffers-in-mode 'ghostel-mode)
+                                      if (equal (buffer-local-value '+ghostel--id buf)
+                                                buffer-name)
+                                      return buf)
+                             (get-buffer buffer-name))))
+             (if (buffer-live-p buffer)
+                 (pop-to-buffer buffer)
+               (+ghostel--create-and-start buffer-name nil buffer-name))))
+         (get-buffer buffer-name)))))
+
+  (defun +ghostel/here (arg)
+    "Open a fresh Ghostel terminal in the current window at the project root.
+
+If prefix ARG is non-nil, use `default-directory' instead of the project root.
+This mirrors `+vterm/here'."
+    (interactive "P")
+    (+ghostel--configure-project-root-and-display
+     arg
+     (lambda ()
+       (let (display-buffer-alist)
+         (+ghostel--create-and-start "*doom:ghostel*" 'same-window)))))
   :init
   ;; Native module is provided by Nix; skip auto-install prompt.
   (setq ghostel-module-auto-install nil)
   (setq ghostel-tramp-default-method "rpc")
   :config
+  (set-popup-rule! "^\\*doom:ghostel-popup" :size 0.25 :vslot -4 :select t :quit nil :ttl 0)
+
+
+  (add-hook 'ghostel-mode-hook #'mode-line-invisible-mode)
+  (map! :map ghostel-semi-char-mode-map
+        "C-q" #'ghostel-send-next-key)
+
+  (setq ghostel-kill-buffer-on-exit t
+        ghostel-query-before-killing nil
+        ghostel-max-scrollback (* 20 1024 1024))
+
   (custom-set-faces
    '(ghostel-color-black         ((t (:foreground "#0d0d0d"))))
    '(ghostel-color-red           ((t (:foreground "#FF301B"))))
@@ -1927,6 +2030,11 @@ Make colors more readable
    '(ghostel-color-bright-magenta ((t (:foreground "#A578EA"))))
    '(ghostel-color-bright-cyan   ((t (:foreground "#73FBF1"))))
    '(ghostel-color-bright-white  ((t (:foreground "#FEFEF8"))))))
+
+(map! :leader
+      (:prefix ("o" . "open")
+       :desc "Toggle ghostel popup" "g" #'+ghostel/toggle
+       :desc "Open ghostel here"    "G" #'+ghostel/here))
 #+end_src
 ** Tramp
 *** Remote shell environments
@@ -2081,6 +2189,7 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
           "^\\*eshell.*\\*$" eshell-mode
           "^\\*shell.*\\*$"  shell-mode
           "^\\*vterm.*\\*$"  vterm-mode
+          "^\\*ghostel.*\\*$" ghostel-mode
           "^\\*eat.*\\*$"    eat-mode))
   (popper-mode +1)
   (popper-echo-mode +1))
