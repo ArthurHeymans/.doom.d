@@ -2094,7 +2094,8 @@ This mirrors `+vterm/here'."
 #+end_src
 *** term-sessions
 #+begin_src elisp :tangle packages.el
-(package! term-sessions :recipe (:host github :repo "ArthurHeymans/emacs-term-sessions"))
+(package! term-sessions :recipe (:host github :repo "ArthurHeymans/emacs-term-sessions")
+                                 :pin "f9a2dc622b593eaa662fd54ece6336929eebca4d")
 #+end_src
 #+begin_src elisp :tangle config.el
 (setq term-sessions-preferred-frontend 'ghostel)
