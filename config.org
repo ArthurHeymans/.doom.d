@@ -1376,6 +1376,39 @@ Show account in view.
 (setq user-full-name "Arthur Heymans"
       user-mail-address "arthur@aheymans.xyz")
 (setq send-mail-function 'smtpmail-send-it)
+
+;; Doom's mu4e module used to provide this as an autoload, but recent Doom
+;; builds split/trim module autoloads.  Keep the small compatibility shim here
+;; so the account declarations below still produce normal mu4e contexts.
+(unless (fboundp 'set-email-account!)
+  (defvar +mu4e-personal-addresses nil)
+  (defun set-email-account! (label letvars &optional default-p)
+    "Register an email account as a mu4e context."
+    (after! mu4e
+      (when (and (boundp 'mu4e-mu-version)
+                 (version< mu4e-mu-version "1.4"))
+        (when-let* ((address (cdr (assq 'user-mail-address letvars))))
+          (add-to-list 'mu4e-user-mail-address-list address)))
+      (setq mu4e-contexts
+            (cl-loop for context in mu4e-contexts
+                     unless (string= (mu4e-context-name context) label)
+                     collect context))
+      (let ((context (make-mu4e-context
+                      :name label
+                      :enter-func (lambda () (mu4e-message "Switched to %s" label))
+                      :leave-func (lambda ()
+                                    (setq +mu4e-personal-addresses nil)
+                                    (when (fboundp 'mu4e-clear-caches)
+                                      (mu4e-clear-caches)))
+                      :match-func (lambda (msg)
+                                    (when msg
+                                      (string-prefix-p (format "/%s" label)
+                                                       (mu4e-message-field msg :maildir)
+                                                       t)))
+                      :vars letvars)))
+        (add-to-list 'mu4e-contexts context (not default-p))
+        context))))
+
 (set-email-account! "gmail"
                     '((user-mail-address      . "arthurphilippeheymans@gmail.com")
                       (user-full-name         . "Arthur Heymans")
