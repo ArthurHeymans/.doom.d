@@ -2204,9 +2204,10 @@ This mirrors `+vterm/here'."
        :desc "Open ghostel here"    "G" #'+ghostel/here))
 #+end_src
 *** term-sessions
+Persistent terminal sessions both local and remote (with tramp)
 #+begin_src elisp :tangle packages.el
 (package! term-sessions :recipe (:host github :repo "ArthurHeymans/emacs-term-sessions")
-                                 :pin "f9a2dc622b593eaa662fd54ece6336929eebca4d")
+                                 :pin "db7da5678c42587ceeb02fe24eec5d4aaeed1827")
 #+end_src
 #+begin_src elisp :tangle config.el
 (setq term-sessions-preferred-frontend 'ghostel)
