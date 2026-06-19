@@ -1001,7 +1001,7 @@ Show types in lsp and allow for larger projects without being bothered all the t
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "8eb2038a0d0f7f57af62766f98495cac0ce6c48a")
 (package! gptel-commit)
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "c036ec31104ffde746df1ae39ed49198771bcb9f")
-(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "28ebbdda02ba08cba4a576153913e1984ecdcb44")
+(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "31a0038af1f6acd59f89f95032d60058855038ed")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! majutsu
