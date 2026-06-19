@@ -1218,17 +1218,18 @@ Returns nil if ollama is not running."
     (error nil)))
 
 (after! gptel
-  (setopt
-         gptel-default-mode 'org-mode
-         gptel-magit-model 'claude-sonnet-4-6
-         gptel-model 'claude-sonnet-4-6
-         gptel-api-key (auth-source-pick-first-password :host "api.openai.com")
-         gptel-backend
-         (gptel-make-anthropic "Claude"          ;Any name you want
-           :stream t                             ;Streaming responses
-           :key (auth-source-pick-first-password :host "api.anthropic.com" :user "9eapikey"))
-         gptel-org-branching-context t
-         gptel-cache t)
+  (require 'gptel-openai-oauth)
+  (let ((openai-oauth-backend
+         (gptel-make-openai-oauth "OpenAI OAuth"
+           :stream t
+           :models '((gpt-5.5)))))
+    (setopt
+           gptel-default-mode 'org-mode
+           gptel-magit-model 'gpt-5.5
+           gptel-model 'gpt-5.5
+           gptel-backend openai-oauth-backend
+           gptel-org-branching-context t
+           gptel-cache t))
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "* @user: ")
   (setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n")
