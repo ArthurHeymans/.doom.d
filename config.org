@@ -307,6 +307,97 @@ description buffer rule) can still override `server-window'."
   (add-hook 'server-done-hook #'+ewm-delete-editor-frame-after-server-edit-h))
 #+end_src
 
+** Shell editors over TRAMP
+When a shell is started from an Emacs buffer whose ~default-directory~ is a
+TRAMP path, ~with-editor~ can make remote commands use this Emacs as their
+editor.  It does not rely on a remote ~emacsclient~ socket; for remote
+processes it installs the "sleeping editor" protocol and opens requested files
+through TRAMP.
+
+Export the common editor variables so tools with their own priority order, such
+as Git and Jujutsu, do not bypass ~with-editor~ via ~VISUAL~, ~GIT_EDITOR~, or
+~JJ_EDITOR~.  ~with-editor~ knows about ~shell~, ~eshell~, ~term~, and ~vterm~;
+~eat~ and ~ghostel~ need small adapters to inject the same environment before
+spawning and to catch the sleeping-editor marker in terminal output.
+
+#+begin_src elisp :tangle config.el
+(defconst +with-editor-editor-envvars '("EDITOR" "VISUAL" "GIT_EDITOR" "JJ_EDITOR"))
+
+(defvar with-editor--envvar)
+(defvar with-editor-sleeping-editor-regexp)
+(declare-function with-editor--setup "with-editor")
+(declare-function with-editor-export-editor "with-editor")
+(declare-function with-editor-sleeping-editor-filter "with-editor")
+
+(defun +with-editor--setup-editor-env-vars ()
+  "Add editor environment variables for child processes to `process-environment'."
+  (require 'with-editor)
+  (dolist (envvar +with-editor-editor-envvars)
+    (let ((with-editor--envvar envvar))
+      (with-editor--setup))))
+
+(defun +with-editor-export-editor-vars-h ()
+  "Use this Emacs as editor for commands run in supported shell buffers.
+
+For TRAMP-backed shell buffers, `with-editor' uses its sleeping editor so
+remote commands open files through TRAMP in this Emacs instance."
+  (require 'with-editor)
+  (dolist (envvar +with-editor-editor-envvars)
+    (with-editor-export-editor envvar)))
+
+(defun +with-editor--handle-terminal-output (process output)
+  "Handle sleeping-editor requests in PROCESS OUTPUT.
+
+Return nil only for chunks that contain a with-editor request and should be
+hidden; otherwise return OUTPUT."
+  (require 'with-editor)
+  (when-let ((buffer (process-buffer process)))
+    (with-current-buffer buffer
+      (let ((with-editor-sleeping-editor-regexp
+             ;; Terminal emulator filters receive raw chunks, so the marker can
+             ;; be preceded by prompt text or control sequences.
+             (substring with-editor-sleeping-editor-regexp 1)))
+        (with-editor-sleeping-editor-filter process output))))
+  ;; `with-editor-sleeping-editor-filter' returns nil for incomplete chunks too;
+  ;; those must still be rendered.  Only hide actual editor request lines.
+  (unless (string-match-p "WITH-EDITOR:" output)
+    output))
+
+(dolist (hook '(shell-mode-hook eshell-mode-hook term-exec-hook vterm-mode-hook))
+  (add-hook hook #'+with-editor-export-editor-vars-h))
+
+(with-eval-after-load 'eat
+  (defun +with-editor-eat-make-a (fn &rest args)
+    "Run Eat with this Emacs exported as editor."
+    (let ((process-environment process-environment))
+      (+with-editor--setup-editor-env-vars)
+      (apply fn args)))
+
+  (defun +with-editor-eat-filter-a (fn process output)
+    "Let `with-editor' intercept sleeping-editor requests before Eat renders."
+    (when-let ((output (+with-editor--handle-terminal-output process output)))
+      (funcall fn process output)))
+
+  (unless (advice-member-p #'+with-editor-eat-make-a 'eat-make)
+    (advice-add 'eat-make :around #'+with-editor-eat-make-a))
+  (unless (advice-member-p #'+with-editor-eat-filter-a 'eat--filter)
+    (advice-add 'eat--filter :around #'+with-editor-eat-filter-a)))
+
+(with-eval-after-load 'ghostel
+  (defun +with-editor-ghostel-pre-spawn-h ()
+    "Run Ghostel with this Emacs exported as editor."
+    (+with-editor--setup-editor-env-vars))
+
+  (defun +with-editor-ghostel-filter-a (fn process output)
+    "Let `with-editor' intercept sleeping-editor requests before Ghostel renders."
+    (when-let ((output (+with-editor--handle-terminal-output process output)))
+      (funcall fn process output)))
+
+  (add-hook 'ghostel-pre-spawn-hook #'+with-editor-ghostel-pre-spawn-h)
+  (unless (advice-member-p #'+with-editor-ghostel-filter-a 'ghostel--filter)
+    (advice-add 'ghostel--filter :around #'+with-editor-ghostel-filter-a)))
+#+end_src
+
 * Org Mode
 ** Basic Configuration
 *** org-mode dirs
