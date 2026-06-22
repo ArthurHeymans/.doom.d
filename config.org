@@ -1979,6 +1979,15 @@ Set timers
 (use-package! capf-autosuggest
   :hook (eshell-mode . capf-autosuggest-mode))
 #+end_src
+**** eshell-atuin
+#+begin_src elisp :tangle packages.el
+(package! eshell-atuin)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(after! eshell
+  (eshell-atuin-mode))
+#+end_src
 
 *** eat
 #+begin_src elisp :tangle packages.el
