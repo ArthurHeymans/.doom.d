@@ -96,14 +96,18 @@ Display battery and time in the modeline using the common european time notation
 #+begin_src elisp :tangle config.el
 (use-package! ewm
   :init
-  (setq ewm-input-config
-        '((touchpad :natural-scroll nil :dwt t)
-          (trackpoint :accel-speed 1.0)
-          (keyboard :xkb-layouts "us"
-                    :xkb-options "caps:ctrl_modifier")
-          ("HID 04d9:1400" :xkb-layouts "nl"
-           :xkb-options "caps:ctrl_modifier,ctrl:swap_lwin_lctl")
-          ("tpps/2-ibm-trackpoint" :accel-speed 1.0)))
+  (let ((trackpoint-accel-speed
+         (if (string= (car (split-string (system-name) "\\.")) "t480-arthur")
+             1.0
+           0.0)))
+    (setq ewm-input-config
+          `((touchpad :natural-scroll nil :dwt t)
+            (trackpoint :accel-speed ,trackpoint-accel-speed)
+            (keyboard :xkb-layouts "us"
+                      :xkb-options "caps:ctrl_modifier")
+            ("HID 04d9:1400" :xkb-layouts "nl"
+             :xkb-options "caps:ctrl_modifier,ctrl:swap_lwin_lctl")
+            ("tpps/2-ibm-trackpoint" :accel-speed ,trackpoint-accel-speed))))
   (setq ewm-mouse-follows-focus t)
   (setq ewm-output-config '(("HDMI-A-1" :enabled t :transform 1)
                              ("DP-3" :enabled t :x 0 :y 0)
