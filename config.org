@@ -2301,7 +2301,7 @@ This mirrors `+vterm/here'."
 Persistent terminal sessions both local and remote (with tramp)
 #+begin_src elisp :tangle packages.el
 (package! term-sessions :recipe (:host github :repo "ArthurHeymans/emacs-term-sessions")
-                                 :pin "db7da5678c42587ceeb02fe24eec5d4aaeed1827")
+                                 :pin "ff5e21f2fdd9c1ab0a89a0040bbbbcfc1eccd59d")
 #+end_src
 #+begin_src elisp :tangle config.el
 (setq term-sessions-preferred-frontend 'ghostel)
