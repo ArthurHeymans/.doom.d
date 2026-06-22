@@ -307,7 +307,6 @@ description buffer rule) can still override `server-window'."
   (add-hook 'server-done-hook #'+ewm-delete-editor-frame-after-server-edit-h))
 #+end_src
 
-
 * Org Mode
 ** Basic Configuration
 *** org-mode dirs
@@ -2434,7 +2433,7 @@ when resolving remote programs.
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "f3df8983465ea7e515d6a5f072f342b6a7073153")
+  :pin "2702cb53b6fb661bbaf04b7ba7cba1d809222521")
 #+end_src
 
 * Navigation & Search
