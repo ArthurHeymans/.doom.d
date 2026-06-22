@@ -1008,22 +1008,15 @@ Show types in lsp and allow for larger projects without being bothered all the t
 
 *** Version Control
 **** Magit
+***** Packages
 #+begin_src elisp :tangle packages.el
 (package! magit :pin "c8845987fa6ccb2d89369386766b68d8a6f093d0")
-(package! forge :pin "a8af709bc15e973804af776bba66b4205540bd73")
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "8eb2038a0d0f7f57af62766f98495cac0ce6c48a")
 (package! gptel-commit)
-(package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "c036ec31104ffde746df1ae39ed49198771bcb9f")
-(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "31a0038af1f6acd59f89f95032d60058855038ed")
 #+end_src
-#+begin_src elisp :tangle config.el
-(use-package! majutsu
-  :commands (majutsu majutsu-log)
-  :init
-  (map! :leader
-        :desc "Majutsu status" "g j" #'majutsu
-        :desc "Majutsu log" "g J" #'majutsu-log))
 
+***** Settings
+#+begin_src elisp :tangle config.el
 (after! magit
   (setq transient-default-level 6)
   (setq git-commit-summary-max-length 72)
@@ -1032,6 +1025,8 @@ Show types in lsp and allow for larger projects without being bothered all the t
 ;;  (magit-delta-mode +1)
   )
 #+end_src
+
+***** Gerrit push refspec completion
 Add Gerrit refspecs as completion candidates when using ~r~ (explicit refspecs)
 in the push transient, by prepending them to the collection table.
 #+begin_src elisp :tangle config.el
@@ -1053,7 +1048,13 @@ is used."
     (run-hooks 'magit-credential-hook)
     (magit-run-git-async "push" "-v" args remote refspecs)))
 #+end_src
-**** forge
+
+**** Forge
+***** Packages
+#+begin_src elisp :tangle packages.el
+(package! forge :pin "a8af709bc15e973804af776bba66b4205540bd73")
+#+end_src
+
 ***** Forge settings
 Show who posted the PR or issue
 
@@ -1092,7 +1093,27 @@ Add package to use LLM to create PR messages
   :config
   (gptel-forge-prs-install))
 #+end_src
-**** code-review
+
+**** Jujutsu
+***** Majutsu
+#+begin_src elisp :tangle packages.el
+(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "31a0038af1f6acd59f89f95032d60058855038ed")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! majutsu
+  :commands (majutsu majutsu-log)
+  :init
+  (map! :leader
+        :desc "Majutsu status" "g j" #'majutsu
+        :desc "Majutsu log" "g J" #'majutsu-log))
+#+end_src
+
+**** Code review
+#+begin_src elisp :tangle packages.el
+(package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "c036ec31104ffde746df1ae39ed49198771bcb9f")
+#+end_src
+
 #+begin_src elisp :tangle config.el
 (after! code-review
   (setq code-review-auth-login-marker 'forge))
