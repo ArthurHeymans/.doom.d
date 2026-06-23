@@ -2417,6 +2417,128 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
       "gr" #'consult-ripgrep)
 #+end_src
 * Temporary fixes
+** ibuffer deleting the final line
+Emacs 30.2's ~ibuffer-map-lines~ deletes lines with
+~(1+ (line-end-position))~.  When the final Ibuffer entry is selected and the
+buffer has no trailing newline or summary line, that end position is past
+~point-max~, so ~ibuffer-do-delete~ raises ~args-out-of-range~.
+
+Use the beginning of the next line instead; it is the same position when a
+newline is present and safely clamps to ~point-max~ on the final unterminated
+line.
+
+Also normalize Doom's current +icons Ibuffer format.  It contains
+~(vc-status 12 :left)~, which Emacs 30 reads as MIN = 12 and MAX = ~:left~;
+when the VC status is wide enough, redisplay fails with
+~wrong-type-argument number-or-marker-p, :left~.  The normalized form is
+~(vc-status 12 12 :left)~.
+
+#+begin_src elisp :tangle config.el
+(after! ibuffer
+  (defun my/ibuffer-normalize-format-entry (entry)
+    "Return ENTRY with legacy `(COLUMN MIN ALIGN ...)' syntax normalized.
+Emacs 30 expects `(COLUMN MIN MAX ALIGN ...)' when an Ibuffer column
+specifies alignment.  Doom's +icons Ibuffer format currently contains
+`(vc-status 12 :left)', which makes `:left' the MAX width and eventually
+raises `wrong-type-argument number-or-marker-p'."
+    (if (and (consp entry)
+             (integerp (nth 1 entry))
+             (keywordp (nth 2 entry)))
+        (append (list (nth 0 entry) (nth 1 entry) (nth 1 entry))
+                (nthcdr 2 entry))
+      entry))
+
+  (setq ibuffer-formats
+        (mapcar (lambda (format)
+                  (mapcar #'my/ibuffer-normalize-format-entry format))
+                ibuffer-formats)
+        ibuffer-compiled-formats nil)
+  (when (boundp 'ibuffer-compiled-filter-formats)
+    (setq ibuffer-compiled-filter-formats nil))
+
+  (defun ibuffer-map-lines (function &optional nomodify group)
+    "Call FUNCTION for each buffer.
+Set the ibuffer modification flag unless NOMODIFY is non-nil.
+
+If optional argument GROUP is non-nil, then only call FUNCTION on
+buffers in filtering group GROUP.
+
+FUNCTION is called with two arguments:
+the buffer object itself and the current mark symbol."
+    (ibuffer-assert-ibuffer-mode)
+    (ibuffer-forward-line 0)
+    (let* ((orig-target-line (1+ (count-lines (save-excursion
+                                                (goto-char (point-min))
+                                                (ibuffer-forward-line 0)
+                                                (point))
+                                              (point))))
+           (target-line-offset orig-target-line)
+           (ibuffer-map-lines-total 0)
+           (ibuffer-map-lines-count 0))
+      (unwind-protect
+          (progn
+            (setq buffer-read-only nil)
+            (goto-char (point-min))
+            (ibuffer-forward-line 0 t)
+            (while (and (not (eobp))
+                        (not (get-text-property (point) 'ibuffer-summary))
+                        (progn
+                          (ibuffer-forward-line 0 t)
+                          (and (not (eobp))
+                               (not (get-text-property (point) 'ibuffer-summary)))))
+              (let ((result
+                     (if (buffer-live-p (ibuffer-current-buffer))
+                         (when (or (null group)
+                                   (when-let ((it (get-text-property
+                                                   (point) 'ibuffer-filter-group)))
+                                     (equal group it)))
+                           (save-excursion
+                             (funcall function
+                                      (ibuffer-current-buffer)
+                                      (ibuffer-current-mark))))
+                       ;; Kill the line if the buffer is dead.
+                       'kill)))
+                ;; A given mapping function should return:
+                ;; nil if it chose not to affect the buffer
+                ;; `kill' means remove the line from the buffer list
+                ;; t otherwise
+                (cl-incf ibuffer-map-lines-total)
+                (cond ((null result)
+                       (forward-line 1))
+                      ((eq result 'kill)
+                       ;; Emacs 30.2 used (1+ (line-end-position)) here, which
+                       ;; is out of range on an unterminated final line.
+                       (delete-region (line-beginning-position)
+                                      (line-beginning-position 2))
+                       (cl-incf ibuffer-map-lines-count)
+                       (when (< ibuffer-map-lines-total
+                                orig-target-line)
+                         (cl-decf target-line-offset)))
+                      (t
+                       (cl-incf ibuffer-map-lines-count)
+                       (forward-line 1)))))
+            ;; With `ibuffer-auto-mode' enabled, `ibuffer-expert' nil
+            ;; and more than one marked buffer lines, the preceding loop
+            ;; counts the automatically popped up (and hence not
+            ;; user-marked) buffer "*Ibuffer confirmation*".  Since
+            ;; Ibuffer reports how many marked buffers lines were acted
+            ;; upon, and in this case the reported count would be too
+            ;; high by one, we decrement the count to avoid the
+            ;; confusing message (see bug#64230).
+            (if (and (featurep 'ibuf-ext) ibuffer-auto-mode
+                     (> ibuffer-map-lines-count 1)
+                     (not ibuffer-expert))
+                (1- ibuffer-map-lines-count)
+              ibuffer-map-lines-count))
+        (progn
+          (setq buffer-read-only t)
+          (unless nomodify
+            (set-buffer-modified-p nil))
+          (goto-char (point-min))
+          (ibuffer-forward-line 0)
+          (ibuffer-forward-line (1- target-line-offset)))))))
+#+end_src
+
 ** nerd-icons-completion killed buffer candidates
 ~consult-buffer~ stores the original buffer object in the candidate's
 ~multi-category~ property.  If that buffer is killed while Vertico is still
