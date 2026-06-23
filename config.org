@@ -246,19 +246,28 @@ Advise it to survive the empty-string edge case.
 #+end_src
 
 ** EWM shell editor frames
-The shell ~EDITOR~ wrapper in the Nix config uses ~emacsclient --create-frame~
-and marks those client frames with an ~ewm-editor~ frame parameter.  After
+The shell ~EDITOR~ wrapper in the Nix config uses ~emacsclient~.  For
+ordinary server edits, route those client buffers through EWM and mark the
+resulting temporary frames with an ~ewm-editor~ frame parameter.  After
 ~C-x #~ / ~server-edit~ finishes the client edit, close that temporary editor
 frame instead of leaving an empty Emacs window in EWM.
 
+Majutsu's ~jjdescription~ support registers its own ~with-editor~ display rule
+for jj description files.  Load that support before installing the general EWM
+server-window fallback so ~EDITOR=ewm-editor jj describe~ keeps using Majutsu's
+editor buffer instead of a temporary EWM frame.
+
 #+begin_src elisp :tangle config.el
 (after! server
+  (require 'majutsu-jjdescription)
+
   (defun +ewm-server-window (buffer)
     "Display emacsclient BUFFER in a new EWM frame.
 
-Plain `emacsclient --create-frame' creates a PGTK frame without EWM's
-`ewm-output' parameter, so EWM considers it unmanaged and drops it.  Create the
-frame through EWM instead, on the currently focused output."
+Generic emacsclient editor buffers need an EWM-managed frame with an
+`ewm-output' parameter.  Create that frame through EWM, on the currently focused
+output, while package-specific `with-editor' display rules (such as Majutsu's jj
+description buffer rule) can still override `server-window'."
     (if (and (bound-and-true-p ewm-mode)
              (fboundp 'ewm--focused-frame)
              (fboundp 'ewm--create-frame-for-output))
