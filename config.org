@@ -1836,6 +1836,24 @@ Set the first one to a local .authinfo.gpg
 #+begin_src elisp :tangle packages.el
 (package! kdeconnect)
 #+end_src
+
+*** Syncthing
+#+begin_src elisp :tangle packages.el
+(package! syncthing
+  :recipe (:host github
+           :repo "KeyWeeUsr/emacs-syncthing"
+           :files ("syncthing*.el"))
+  :pin "eac37ecf5458b6d554544b1ddb76e3c6fbe3cb2f")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! syncthing
+  :commands (syncthing syncthing-with-base)
+  :init
+  (map! :leader
+        (:prefix ("C" . "network")
+         :desc "Syncthing" "S" #'syncthing)))
+#+end_src
 ** proced
 Don't use htop
 #+begin_src emacs-lisp :tangle config.el
