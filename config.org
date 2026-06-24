@@ -1550,27 +1550,35 @@ Show account in view.
 Do socials like neckbears.  Connect Circe to the Soju bouncer on the gmktec-g3
 MicroVM, with the bouncer password stored in auth-source as:
 =machine soju login avph password ...=
+#+begin_src elisp :tangle packages.el
+(package! clatter
+  :recipe (:host github
+           :repo "parenworks/clatter.el"
+           :files ("*.el"))
+  :pin "8b1ae9949717da2491d4a0d869592a2c4d6ba2bf")
+#+end_src
+
 #+begin_src elisp :tangle config.el
+(defun my/auth-source-password (host user)
+  (or (auth-source-pick-first-password :host host :user user)
+      (error "Password not found for %s/%s" host user)))
+
+(defun my-soju-client-name ()
+  "Return a stable soju client name derived from this host."
+  (replace-regexp-in-string
+   "[^[:alnum:]._-]" "-"
+   (downcase (car (split-string (system-name) "\\.")))))
+
+(defun my-soju-username ()
+  (format "avph/irc.libera.chat@%s" (my-soju-client-name)))
+
+(defun my-nickserv-password (_server)
+  (my/auth-source-password "irc.libera.chat" "avph"))
+
+(defun my-soju-password (&optional _server)
+  (my/auth-source-password "soju" "avph"))
+
 (after! circe
-  (defun my/auth-source-password (host user)
-    (or (auth-source-pick-first-password :host host :user user)
-        (error "Password not found for %s/%s" host user)))
-
-  (defun my-soju-client-name ()
-    "Return a stable soju client name derived from this host."
-    (replace-regexp-in-string
-     "[^[:alnum:]._-]" "-"
-     (downcase (car (split-string (system-name) "\\.")))))
-
-  (defun my-soju-username ()
-    (format "avph/irc.libera.chat@%s" (my-soju-client-name)))
-
-  (defun my-nickserv-password (_server)
-    (my/auth-source-password "irc.libera.chat" "avph"))
-
-  (defun my-soju-password (_server)
-    (my/auth-source-password "soju" "avph"))
-
   (setq circe-network-options
         `(("Libera Chat"
            :host "192.168.0.7"
@@ -1583,6 +1591,24 @@ MicroVM, with the bouncer password stored in auth-source as:
            :sasl-password my-soju-password
            :nickserv-password my-nickserv-password
            :channels ("#flashprog" "#coreboot" "#gnuboot" "#coreboot")))))
+
+(after! clatter
+  ;; clatter's SASL PLAIN path currently authenticates as `:nick', so use
+  ;; soju's PASS/USER authentication here: PASS gets the bouncer password,
+  ;; and USER gets the network/client-qualified soju username.
+  (setq clatter-log-enable t
+        clatter-networks
+        `(("Libera Chat"
+           :server "192.168.0.7"
+           :port 6667
+           :tls nil
+           :nick "avph"
+           :username ,(my-soju-username)
+           :realname "Arthur Heymans"
+           :password ,(my-soju-password)
+           :autojoin ("#flashprog" "#coreboot" "#gnuboot" "#coreboot"))))
+  (clatter-setup))
+
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (save-window-excursion
