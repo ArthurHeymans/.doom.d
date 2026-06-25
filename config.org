@@ -1209,6 +1209,26 @@ VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+end_src
 
 **** Code review
+***** Gerrit
+#+begin_src elisp :tangle packages.el
+(package! gerrit :recipe (:host github :repo "twmr/gerrit.el"))
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! gerrit
+  :after magit
+  :custom
+  (gerrit-host "review.coreboot.org")
+  (gerrit-use-ssl t)
+  :config
+  (add-hook 'magit-status-sections-hook #'gerrit-magit-insert-status t)
+  (map! :leader
+        :desc "Gerrit dashboard" "g R d" #'gerrit-dashboard
+        :desc "Gerrit upload" "g R u" #'gerrit-upload-transient
+        :desc "Gerrit download" "g R D" #'gerrit-download-transient))
+#+end_src
+
+***** code-review
 #+begin_src elisp :tangle packages.el
 (package! code-review :recipe (:host github :repo "ArthurHeymans/code-review") :pin "c036ec31104ffde746df1ae39ed49198771bcb9f")
 #+end_src
