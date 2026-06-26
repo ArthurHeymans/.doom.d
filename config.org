@@ -549,41 +549,54 @@ longer than LEN."
 #+begin_src elisp :tangle config.el
 (after! org
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
-  (setq org-super-agenda-groups
-        '((:log t)
-          (:name "Schedule"
-           :time-grid t)
-          (:name "Habit: ora"
-           :and (:habit t
-                 :tag "PRAYER")
-           )
-          (:name "Habit: corpus"
-           :and (:habit t
-                 :tag "LICHAAM")
-           )
-          (:habit t)
-          (:name "Today: labora"
-           :and (:scheduled today
-                 :todo ("TODO")
-                 :tag "WORK"))
-          (:name "Today: other"
-            :and (:scheduled today
-                 :todo ("TODO"))
+  (let* ((excluded-todo-keywords '("HOLD" "KILL" "DONE"))
+         (todo-keywords
+          (delq nil
+                (mapcar (lambda (keyword)
+                          (when (and (stringp keyword)
+                                     (not (string= keyword "|")))
+                            (replace-regexp-in-string
+                             "\\(?:([^)]+)\\)?\\(?:\\s-+.*\\)?\\'" "" keyword)))
+                        (cdr (car org-todo-keywords)))))
+         (todo-keywords
+          (seq-remove (lambda (keyword)
+                        (member keyword excluded-todo-keywords))
+                      todo-keywords)))
+    (setq org-super-agenda-groups
+          `((:log t)
+            (:name "Schedule"
+             :time-grid t)
+            (:name "Habit: ora"
+             :and (:habit t
+                   :tag "PRAYER")
+             )
+            (:name "Habit: corpus"
+             :and (:habit t
+                   :tag "LICHAAM")
+             )
+            (:habit t)
+            (:name "Today: labora"
+             :and (:scheduled today
+                   :todo ,todo-keywords
+                   :tag "WORK"))
+            (:name "Today: other"
+             :and (:scheduled today
+                   :todo ,todo-keywords)
+             )
+            (:name "Due today"
+             :deadline today)
+            (:name "Overdue"
+             :and
+             (:todo ("TODO")
+              :deadline past))
+            (:name "Scheduled earlier"
+             :and (:scheduled past
+                   :todo ("TODO")))
+            (:name "Due soon"
+             :deadline future)
+            (:discard (:todo "HOLD"))
             )
-          (:name "Due today"
-           :deadline today)
-          (:name "Overdue"
-           :and
-           (:todo ("TODO")
-            :deadline past))
-          (:name "Scheduled earlier"
-           :and (:scheduled past
-                 :todo ("TODO")))
-          (:name "Due soon"
-           :deadline future)
-          (:discard (:todo "HOLD"))
-          )
-        )
+          ))
   (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
   (setq org-super-agenda-header-separator "\n---\n")
   (add-to-list 'warning-suppress-types '(org-element org-element-parser))
