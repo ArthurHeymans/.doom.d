@@ -2046,7 +2046,7 @@ Don't use htop
    '(custom user pid ppid sess tree pcpu pmem rss start time state (args comm)))
   (setq-default proced-format 'custom))
 #+end_src
-** App launcher in OS
+** App launcher in OS :ARCHIVE:
 #+begin_src emacs-lisp :tangle packages.el
 (package! xdg-launcher :recipe (:host github :repo "emacs-exwm/xdg-launcher") :pin "78c591df0a87cbabcfd65788546233dca6f2018d")
 #+end_src

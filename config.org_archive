@@ -284,3 +284,14 @@ Turn Emacs into an MCP server that LLMs can connect to
     `(alacritty-color-cyan    ((t (:foreground "#21DEEF" :background "#73FBF1"))))
     `(alacritty-color-white   ((t (:foreground "#EBEBEB" :background "#FEFEF8"))))))
 #+end_src
+
+* App launcher in OS
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-06-26 Fri 15:54
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: System Integration
+:ARCHIVE_CATEGORY: config
+:END:
+#+begin_src emacs-lisp :tangle packages.el
+(package! xdg-launcher :recipe (:host github :repo "emacs-exwm/xdg-launcher") :pin "78c591df0a87cbabcfd65788546233dca6f2018d")
+#+end_src
