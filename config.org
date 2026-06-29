@@ -1613,7 +1613,7 @@ Emacs interface to opencode
 My own integration to jcode: https://github.com/1jehuang/jcode
 #+begin_src elisp :tangle packages.el
 (package! jcode :recipe (:host github :repo "ArthurHeymans/emacs-jcode")
-  :pin "351c5ee7651748fc8ef07d527857195d2f6013a6")
+  :pin "8bdfbe2d013947f2873a437cf2efd713e9120de6")
 #+end_src
 * Communication & Social
 ** Email
