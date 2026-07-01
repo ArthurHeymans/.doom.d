@@ -587,11 +587,11 @@ longer than LEN."
              :deadline today)
             (:name "Overdue"
              :and
-             (:todo ("TODO")
+             (:todo ,todo-keywords
               :deadline past))
             (:name "Scheduled earlier"
              :and (:scheduled past
-                   :todo ("TODO")))
+                   :todo ,todo-keywords))
             (:name "Due soon"
              :deadline future)
             (:discard (:todo "HOLD"))
