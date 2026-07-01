@@ -1569,7 +1569,7 @@ Emacs interface to opencode
 #+end_src
 *** pi-coding-agent
 #+begin_src elisp :tangle packages.el
-(package! pi-coding-agent :recipe (:host github :repo "dnouri/pi-coding-agent") :pin "8ef61fc4bfb4c50e1cbddcd3a7d23e0a5331e6b3")
+(package! pi-coding-agent :recipe (:host github :repo "dnouri/pi-coding-agent") :pin "2b6a27feb6d224aeb9b680941a925c7c42948c59")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! pi-coding-agent
