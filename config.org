@@ -1609,10 +1609,10 @@ Emacs interface to opencode
   (add-hook 'pi-coding-agent-chat-mode-hook
             #'my/pi-coding-agent-fix-md-ts-predicate-query))
 #+end_src
-*** jcode
+*** jcode (UNUSED)
 
 My own integration to jcode: https://github.com/1jehuang/jcode
-#+begin_src elisp :tangle packages.el
+#+begin_src elisp :tangle no
 (package! jcode :recipe (:host github :repo "ArthurHeymans/emacs-jcode")
   :pin "8bdfbe2d013947f2873a437cf2efd713e9120de6")
 #+end_src
