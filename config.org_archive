@@ -295,3 +295,21 @@ Turn Emacs into an MCP server that LLMs can connect to
 #+begin_src emacs-lisp :tangle packages.el
 (package! xdg-launcher :recipe (:host github :repo "emacs-exwm/xdg-launcher") :pin "78c591df0a87cbabcfd65788546233dca6f2018d")
 #+end_src
+
+* org-window-habit (disabled)
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-07-09 Thu 14:22
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:ARCHIVE_OLPATH: Org Mode/Agenda & Scheduling
+:ARCHIVE_CATEGORY: config
+:END:
+Show habit consistency in a dedicated window while navigating agenda items.
+#+begin_src elisp :tangle no
+(package! org-window-habit :recipe (:host github :repo "colonelpanic8/org-window-habit")
+  :pin "f326697899f3c67257137dc482a52f5d1b4acc10")
+#+end_src
+#+begin_src elisp :tangle no
+(require 'org-window-habit)
+(progn (org-window-habit-mode +1))
+(setq org-window-habit-repeat-to-deadline nil)
+#+end_src

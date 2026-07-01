@@ -83,14 +83,6 @@ Display battery and time in the modeline using the common european time notation
 #+end_src
 * ewm
 #+begin_src elisp :tangle packages.el
-;; (package! ewm
-;;   :recipe (:host codeberg
-;;            :repo "avph/ewm"
-;;            :branch "Flake"
-;;            :files ("lisp/*.el"))
-;;   :pin "7c860d1cc21d7932731a346ec110e7c5230318de")
-;(package! ewm-consult :recipe (:host github :repo "ArthurHeymans/ewm-consult")
-;  :pin "db7467a655e0040ec4067ef1eef44adfd75a5c9f")
 (package! ednc :recipe (:host github :repo "sinic/ednc") :pin "638d73e7c3fe4ffe86199e33fb85fbaa4cf1ab7f")
 #+end_src
 #+begin_src elisp :tangle config.el
@@ -453,8 +445,7 @@ make "src" blocks look really good.
 Add gnus support
 #+begin_src elisp :tangle config.el
 (after! org
-  (add-to-list 'org-modules 'ol-gnus)
-  )
+  (add-to-list 'org-modules 'ol-gnus))
 #+end_src
 
 *** Org-ql
@@ -468,18 +459,7 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 #+begin_src elisp :tangle config.el
 (after! org
   (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-show-all-today t)
-  )
-#+end_src
-*** org-window-habit (disabled)
-Show habit consistency in a dedicated window while navigating agenda items.
-#+begin_src elisp :tangle no
-(package! org-window-habit :recipe (:host github :repo "colonelpanic8/org-window-habit") :pin "f326697899f3c67257137dc482a52f5d1b4acc10")
-#+end_src
-#+begin_src elisp :tangle no
-(require 'org-window-habit)
-(progn (org-window-habit-mode +1))
-(setq org-window-habit-repeat-to-deadline nil)
+  (setq org-habit-show-all-today t))
 #+end_src
 *** timer config
 Somehow emacs sound does not work. Use aplay instead.
@@ -610,6 +590,9 @@ longer than LEN."
 #+begin_src emacs-lisp :tangle no
 (package! org-timeblock)
 #+end_src
+
+*** Org-gcal
+Google calendars in emacs
 #+begin_src emacs-lisp :tangle config.el
 (use-package! org-gcal
   :commands (org-gcal-fetch org-gcal-sync)
@@ -625,9 +608,10 @@ longer than LEN."
   (setq plstore-cache-passphrase-for-symmetric-encryption t)
   :config
   (setq org-gcal-remove-cancelled-events t)
-  (run-at-time nil (* 1 60 60) (lambda () (async-start (org-gcal-sync t t))))
-  )
-
+  (run-at-time nil (* 1 60 60) (lambda () (async-start (org-gcal-sync t t)))))
+#+end_src
+Jump straigh to google or teams link
+#+begin_src emacs-lisp :tangle config.el
 (after! org
   (defvar my/org-calendar-meeting-link-regexps nil
     "Regexps matching video call URLs in calendar entries, in preferred order.")
@@ -720,7 +704,7 @@ prefix argument CHOOSE, prompt when more than one matching link is present."
 (after! org
   (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
 #+end_src
-** Org-roam & Knowledge Management
+** Org-roam & Knowledge Management (org-node now...)
 *** files
 Auto-tag org files with =todo= filetag when they contain TODO entries, then
 use those tags to build =org-agenda-files= dynamically.  No org-roam
