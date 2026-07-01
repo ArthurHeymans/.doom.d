@@ -155,7 +155,8 @@ Display battery and time in the modeline using the common european time notation
         consult-source-modified-buffer
         consult-source-recent-file
         consult-source-xdg-apps))
-        (setq ewm-idle 600)) ;; blank monitor after 10
+        (setq ewm-idle 600) ;; blank monitor after 10
+        (run-at-time "22:00" 86400 #'ewm-idle-inhibit-mode -1))
 
 ;(after! ewm-consult
 ;  (setq ewm-consult-annotate-application-buffers t)
