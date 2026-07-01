@@ -2533,57 +2533,19 @@ when resolving remote programs.
           ("docker" . "/bin/sh"))))
 
 (after! ghostel
-  (require 'cl-lib)
-
   (defun my/ghostel-unset-nixos-profile-sentinels-h ()
     "Let remote NixOS login shells rebuild their profile environment."
     (when (file-remote-p default-directory)
       (dolist (var my/tramp-nixos-profile-sentinel-vars)
-        (setq process-environment
-              (cons var
-                    (cl-remove-if
-                     (lambda (entry)
-                       (and (stringp entry)
-                            (string-prefix-p (concat var "=") entry)))
-                     process-environment))))))
+        (setenv var nil))))
 
   (add-hook 'ghostel-pre-spawn-hook #'my/ghostel-unset-nixos-profile-sentinels-h)
 
+  ;; Ghostel now detects remote login shells itself and supplies -l/-i.
   (setq ghostel-tramp-shells
-        '(("ssh" login-shell)
-          ("sshx" login-shell)
-          ("scp" login-shell)
+        '(("docker" "/bin/sh")
           ("rpc" login-shell)
-          (t login-shell)
-          ("docker" "/bin/sh")))
-
-  ;; Ghostel's TRAMP shell resolver currently returns only the shell program for
-  ;; remote sessions.  Preserve its selection logic, but invoke detected login
-  ;; shells with -l so NixOS profile setup runs for interactive terminals.
-  (defun my/ghostel--tramp-shell-spec (method)
-    "Return Ghostel remote shell spec for TRAMP METHOD."
-    (let* ((specs (cdr (assoc method ghostel-tramp-shells)))
-           (first (car specs)))
-      (cond
-       ((eq first 'login-shell)
-        (when-let ((shell (ghostel--tramp-get-shell method)))
-          (list shell "-l")))
-       ((stringp first)
-        (ghostel--shell-program-and-args first)))))
-
-  (defun my/ghostel-resolve-remote-login-shell-a (fn)
-    "Make Ghostel TRAMP sessions start login shells when configured."
-    (if (file-remote-p default-directory)
-        (with-parsed-tramp-file-name default-directory nil
-          (or (my/ghostel--tramp-shell-spec method)
-              (my/ghostel--tramp-shell-spec t)
-              (cons (with-connection-local-variables shell-file-name) nil)))
-      (funcall fn)))
-
-  (unless (advice-member-p #'my/ghostel-resolve-remote-login-shell-a
-                           'ghostel--resolve-shell-spec)
-    (advice-add 'ghostel--resolve-shell-spec
-                :around #'my/ghostel-resolve-remote-login-shell-a)))
+          (t login-shell))))
 #+end_src
 
 *** tramp-rpc
