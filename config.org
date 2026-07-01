@@ -1203,7 +1203,8 @@ Add package to use LLM to create PR messages
 **** Jujutsu
 ***** Majutsu
 #+begin_src elisp :tangle packages.el
-(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "31a0038af1f6acd59f89f95032d60058855038ed")
+;(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "31a0038af1f6acd59f89f95032d60058855038ed")
+(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "cf61c6c3f40e8de0e480b56ce70019e9c2c738a0")
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -1568,7 +1569,7 @@ Emacs interface to opencode
 #+end_src
 *** pi-coding-agent
 #+begin_src elisp :tangle packages.el
-(package! pi-coding-agent)
+(package! pi-coding-agent :recipe (:host github :repo "dnouri/pi-coding-agent") :pin "8ef61fc4bfb4c50e1cbddcd3a7d23e0a5331e6b3")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! pi-coding-agent
