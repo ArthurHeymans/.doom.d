@@ -2062,6 +2062,11 @@ Set timers
 (package! capf-autosuggest)
 #+end_src
 #+begin_src elisp :tangle config.el
+(defun eshell/dmesg (&rest args)
+  "Run dmesg with colors even though Eshell uses a pipe."
+  (throw 'eshell-replace-command
+         (eshell-parse-command "*dmesg" (cons "--color=always" args))))
+
 (defun my/eshell-apply-settings ()
   "Apply my Eshell settings after Doom's Eshell defaults."
   (setq eshell-scroll-to-bottom-on-input t
@@ -2117,10 +2122,19 @@ Set timers
   (interactive)
   (require 'consult)
   (require 'ring)
-  (let* ((history (consult--remove-dups (ring-elements eshell-history-ring)))
+  (require 'eshell-atuin)
+  (eshell-atuin--history-rotate-cache)
+  (eshell-atuin--history-update)
+  (let* ((local-history
+          (consult--remove-dups (ring-elements eshell-history-ring)))
+         (atuin-history
+          (delq nil (mapcar #'cdr (eshell-atuin--history-collection))))
          (beg (save-excursion (eshell-bol) (point)))
          (end (pos-eol))
-         (candidates (mapcar #'my/eshell-fontify-history-candidate history))
+         (candidates
+          (consult--remove-dups
+           (append (mapcar #'my/eshell-fontify-history-candidate local-history)
+                   atuin-history)))
          (selection
           (consult--local-let ((enable-recursive-minibuffers t))
             (consult--read
@@ -2190,6 +2204,14 @@ Set timers
 #+begin_src elisp :tangle config.el
 (after! eshell
   (eshell-atuin-mode))
+
+(use-package! ghostel-eshell
+  :after eshell
+  :config
+  (ghostel-eshell-visual-command-mode 1))
+
+(after! em-term
+  (add-to-list 'eshell-visual-commands "btop"))
 #+end_src
 
 *** eat
