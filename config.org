@@ -1207,6 +1207,11 @@ VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 (package! vc-jj)
 #+end_src
 
+#+begin_src elisp :tangle config.el
+(after! vc
+  (require 'vc-jj))
+#+end_src
+
 **** Code review
 ***** Gerrit
 #+begin_src elisp :tangle packages.el
@@ -2067,6 +2072,14 @@ Set timers
   (throw 'eshell-replace-command
          (eshell-parse-command "*dmesg" (cons "--color=always" args))))
 
+(defun my/eshell-vcs-prompt-a (fn)
+  "Show the JJ change instead of its colocated Git implementation branch."
+  (if (eq (ignore-errors (vc-responsible-backend default-directory)) 'JJ)
+      (if-let ((revision (vc-jj-working-revision default-directory)))
+          (format " [jj:%s]" (substring revision 0 (min 8 (length revision))))
+        "")
+    (funcall fn)))
+
 (defun my/eshell-apply-settings ()
   "Apply my Eshell settings after Doom's Eshell defaults."
   (setq eshell-scroll-to-bottom-on-input t
@@ -2185,7 +2198,11 @@ Set timers
 ;; win regardless of load order, including daemon sessions with lazy loading.
 (my/eshell-apply-settings)
 (after! eshell
-  (my/eshell-apply-settings))
+  (my/eshell-apply-settings)
+  (unless (advice-member-p #'my/eshell-vcs-prompt-a
+                           '+eshell--current-git-branch)
+    (advice-add '+eshell--current-git-branch
+                :around #'my/eshell-vcs-prompt-a)))
 
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")) t)
 (add-hook 'eshell-mode-hook #'my/eshell-hook t)
