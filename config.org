@@ -300,7 +300,7 @@ description buffer rule) can still override `server-window'."
   (add-hook 'server-done-hook #'+ewm-delete-editor-frame-after-server-edit-h))
 #+end_src
 
-** Shell editors over TRAMP
+** TODO Shell editors over TRAMP
 When a shell is started from an Emacs buffer whose ~default-directory~ is a
 TRAMP path, ~with-editor~ can make remote commands use this Emacs as their
 editor.  It does not rely on a remote ~emacsclient~ socket; for remote
@@ -313,7 +313,7 @@ as Git and Jujutsu, do not bypass ~with-editor~ via ~VISUAL~, ~GIT_EDITOR~, or
 ~eat~ and ~ghostel~ need small adapters to inject the same environment before
 spawning and to catch the sleeping-editor marker in terminal output.
 
-#+begin_src elisp :tangle config.el
+#+begin_src elisp :tangle no
 (defconst +with-editor-editor-envvars '("EDITOR" "VISUAL" "GIT_EDITOR" "JJ_EDITOR"))
 
 (defvar with-editor--envvar)
