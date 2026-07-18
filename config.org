@@ -886,7 +886,8 @@ Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
 (use-package! org-mem
   :config
   (setq org-mem-do-look-everywhere nil
-        org-mem-watch-dirs (list (expand-file-name "~/org/")))
+        org-mem-watch-dirs (list (expand-file-name "~/org/"))
+        org-mem-suffixes '(".org"))
   (org-mem-updater-mode))
 
 (use-package! org-node
