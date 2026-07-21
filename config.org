@@ -1102,7 +1102,7 @@ Show types in lsp and allow for larger projects without being bothered all the t
 **** Magit
 ***** Packages
 #+begin_src elisp :tangle packages.el
-(package! magit :pin "c8845987fa6ccb2d89369386766b68d8a6f093d0")
+(package! magit :pin "639ea6c61598f196c363c9299d21a7301b7d9fa0")
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "8eb2038a0d0f7f57af62766f98495cac0ce6c48a")
 (package! gptel-commit)
 #+end_src
@@ -1144,7 +1144,7 @@ is used."
 **** Forge
 ***** Packages
 #+begin_src elisp :tangle packages.el
-(package! forge :pin "a8af709bc15e973804af776bba66b4205540bd73")
+(package! forge :pin "9628f76740aec9270e9fb31457ff4cb38d9f3f16")
 #+end_src
 
 ***** Forge settings
@@ -1189,8 +1189,8 @@ Add package to use LLM to create PR messages
 **** Jujutsu
 ***** Majutsu
 #+begin_src elisp :tangle packages.el
-;(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "31a0038af1f6acd59f89f95032d60058855038ed")
-(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "cf61c6c3f40e8de0e480b56ce70019e9c2c738a0")
+(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "2e1861745a954446eb310209d34fba3b5ae37ea1")
+;(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "cf61c6c3f40e8de0e480b56ce70019e9c2c738a0")
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -1707,7 +1707,7 @@ MicroVM, with the bouncer password stored in auth-source as:
   :recipe (:host github
            :repo "parenworks/clatter.el"
            :files ("*.el"))
-  :pin "8b1ae9949717da2491d4a0d869592a2c4d6ba2bf")
+  :pin "cc1fdc014e9421a9c3d96929af7eb6c5149b2281")
 #+end_src
 
 #+begin_src elisp :tangle config.el
