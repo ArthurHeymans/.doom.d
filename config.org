@@ -1202,6 +1202,18 @@ Add package to use LLM to create PR messages
         :desc "Majutsu log" "g J" #'majutsu-log))
 #+end_src
 
+***** gptel-majutsu
+#+begin_src elisp :tangle packages.el
+(package! gptel-majutsu
+  :recipe (:host github :repo "ArthurHeymans/gptel-majutsu")
+  :pin "512f3d1eabc4abfe9998e4d9071b216257b333b9")
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! gptel-majutsu
+  :after majutsu)
+#+end_src
+
 ***** vc-jj
 VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+begin_src elisp :tangle packages.el
