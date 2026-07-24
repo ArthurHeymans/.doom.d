@@ -2567,7 +2567,7 @@ when resolving remote programs.
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "4e70124161489bed58876c34f7fce6dac662a517")
+  :pin "4026a12db3cf139755dbb38493b8466ab5742650")
 #+end_src
 
 * Navigation & Search
