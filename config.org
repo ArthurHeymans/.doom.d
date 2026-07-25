@@ -1190,7 +1190,7 @@ Add package to use LLM to create PR messages
 ***** Majutsu
 #+begin_src elisp :tangle packages.el
 ;(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "2e1861745a954446eb310209d34fba3b5ae37ea1")
-(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "1463b8ed3af18055b2e6e9bfd0e9dd459a496b39")
+(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "ede3412cf9539020e305156c9fdfc8e053a9926f")
 #+end_src
 
 #+begin_src elisp :tangle config.el
