@@ -1217,11 +1217,15 @@ Add package to use LLM to create PR messages
 ***** vc-jj
 VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+begin_src elisp :tangle packages.el
-(package! vc-jj)
+;; vc-jj's generated autoloads modify a variable from project.el before
+;; project.el is loaded, so load vc-jj explicitly instead.
+;; TODO remove when merged
+(package! vc-jj :recipe (:build (:not autoloads)))
 #+end_src
 
 #+begin_src elisp :tangle config.el
 (after! vc
+  (require 'project)
   (require 'vc-jj))
 #+end_src
 
