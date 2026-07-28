@@ -2488,7 +2488,7 @@ This mirrors `+vterm/here'."
            :files (:defaults
                    ("integration" . "integration")
                    ("terminfo" . "terminfo")))
-  :pin "f8e2a4e51a636603254aeb04167f0b4eec1580f1")
+  :pin "9b59dceac9292e040216e34c18ffc92694237774")
 #+end_src
 *** term-sessions
 Persistent terminal sessions both local and remote (with tramp)
