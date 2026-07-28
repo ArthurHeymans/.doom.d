@@ -2486,8 +2486,13 @@ This mirrors `+vterm/here'."
   :recipe (:host github
            :repo "ArthurHeymans/el-be-back"
            :files (:defaults
-                   ("integration" . "integration")
-                   ("terminfo" . "terminfo")))
+                   ("integration" "integration/bash" "integration/fish" "integration/zsh")
+                   ("integration/zsh-bootstrap"
+                    "integration/zsh-bootstrap/.zprofile"
+                    "integration/zsh-bootstrap/.zshenv"
+                    "integration/zsh-bootstrap/.zshrc")
+                   ("terminfo/65" "terminfo/65/eat-*")
+                   ("terminfo/e" "terminfo/e/eat-*")))
   :pin "9b59dceac9292e040216e34c18ffc92694237774")
 #+end_src
 *** term-sessions
