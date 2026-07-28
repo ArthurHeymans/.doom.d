@@ -1207,7 +1207,8 @@ Add package to use LLM to create PR messages
         :desc "Majutsu status" "g j" #'majutsu
         :desc "Majutsu log" "g J" #'majutsu-log)
   :config
-  (setq majutsu-log-commit-sections-initially-hidden t))
+  (setq majutsu-log-commit-sections-initially-hidden t)
+  (majutsu-forge-mode))
 #+end_src
 
 ***** gptel-majutsu
