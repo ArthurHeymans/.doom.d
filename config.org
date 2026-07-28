@@ -1198,7 +1198,9 @@ Add package to use LLM to create PR messages
   :init
   (map! :leader
         :desc "Majutsu status" "g j" #'majutsu
-        :desc "Majutsu log" "g J" #'majutsu-log))
+        :desc "Majutsu log" "g J" #'majutsu-log)
+  :config
+  (setq majutsu-log-commit-sections-initially-hidden t))
 #+end_src
 
 ***** gptel-majutsu
