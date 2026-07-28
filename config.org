@@ -2472,7 +2472,12 @@ This mirrors `+vterm/here'."
 #+end_src
 *** el-be-back
 #+begin_src elisp :tangle packages.el
-(package! ebb :recipe (:host github :repo "ArthurHeymans/el-be-back")
+(package! ebb
+  :recipe (:host github
+           :repo "ArthurHeymans/el-be-back"
+           :files (:defaults
+                   ("integration" . "integration")
+                   ("terminfo" . "terminfo")))
   :pin "f8e2a4e51a636603254aeb04167f0b4eec1580f1")
 #+end_src
 *** term-sessions
