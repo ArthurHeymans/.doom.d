@@ -1971,7 +1971,7 @@ Set the first one to a local .authinfo.gpg
 
 *** SOPS
 #+begin_src elisp :tangle packages.el
-(package! sops)
+(package! sops :recipe (:host github :repo "ArthurHeymans/sops") :pin "d58e6c39e54ed1483d92c937ab91ce266eabd0f6")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! sops
