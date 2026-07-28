@@ -608,7 +608,14 @@ Google calendars in emacs
   (setq plstore-cache-passphrase-for-symmetric-encryption t)
   :config
   (setq org-gcal-remove-cancelled-events t)
-  (run-at-time nil (* 1 60 60) (lambda () (async-start (org-gcal-sync t t)))))
+  (defvar my/org-gcal-sync-timer nil)
+  (defun my/org-gcal-sync ()
+    "Fetch Google Calendar updates without exporting local changes."
+    (org-gcal-sync t t))
+  (when (timerp my/org-gcal-sync-timer)
+    (cancel-timer my/org-gcal-sync-timer))
+  (setq my/org-gcal-sync-timer
+        (run-at-time nil (* 60 60) #'my/org-gcal-sync)))
 #+end_src
 Jump straigh to google or teams link
 #+begin_src emacs-lisp :tangle config.el
