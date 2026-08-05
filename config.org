@@ -1627,6 +1627,63 @@ Emacs interface to opencode
   (add-hook 'pi-coding-agent-chat-mode-hook
             #'my/pi-coding-agent-fix-md-ts-predicate-query))
 #+end_src
+**** pi buffers in ibuffer project groups
+~C-x C-b~ (ibuffer) is auto-grouped by projectile root: Doom's ~:emacs
+ibuffer~ module hooks ~ibuffer-projectile-set-filter-groups~ into
+~ibuffer-hook~.  ~ibuffer-projectile~ only assigns a group to buffers that
+visit a file, though — its ~ibuffer-projectile-root~ returns nil for any
+buffer without a ~buffer-file-name~.  pi chat/input buffers never visit a
+file, so they all fall into ibuffer's catch-all ~[ Default ]~ group instead
+of the project group of the directory the session runs in.
+
+Override ~ibuffer-projectile-root~ to classify pi buffers by their canonical
+session directory (projectile root when available, otherwise the session
+directory itself), so they group alongside the files they work on.
+
+#+begin_src elisp :tangle config.el
+(after! ibuffer-projectile
+  ;; Stopgap: pi-coding-agent now ships this integration itself
+  ;; (pi-coding-agent--ibuffer-projectile-root-around, since 2026-07-31).
+  ;; This fallback only applies to pinned versions before that commit;
+  ;; delete this block once the pin includes the package fix.
+  (unless (and (fboundp 'pi-coding-agent--ibuffer-projectile-root-around)
+               (advice-member-p #'pi-coding-agent--ibuffer-projectile-root-around
+                                'ibuffer-projectile-root))
+    (defun my/ibuffer-projectile-root-pi-aware (buf)
+      "Return the projectile root for BUF, treating pi-coding-agent chat/input
+buffers as belonging to their session directory.
+
+`ibuffer-projectile-root' only groups buffers that visit a file, so pi
+buffers (which have no `buffer-file-name') would otherwise land in ibuffer's
+catch-all `Default' group.  pi buffers carry their directory in
+`pi-coding-agent--canonical-session-directory' (falling back to
+`default-directory'); classify them there so they group with the project
+they work on."
+      (with-current-buffer buf
+        (if (or (derived-mode-p 'pi-coding-agent-chat-mode)
+                (derived-mode-p 'pi-coding-agent-input-mode))
+            (when-let* ((dir (and (fboundp 'pi-coding-agent--chat-session-directory)
+                                  (pi-coding-agent--chat-session-directory))))
+              (let* ((root (or (ignore-errors (projectile-project-root dir))
+                               dir))
+                     (name (if (string-equal (directory-file-name root)
+                                             (directory-file-name dir))
+                               (file-name-nondirectory
+                                (directory-file-name dir))
+                             (projectile-project-name root))))
+                (cons name root)))
+          (let ((file-name (ibuffer-buffer-file-name))
+                (root (ignore-errors (projectile-project-root))))
+            (when (and file-name root
+                       (or (null ibuffer-projectile-skip-if-remote)
+                           (not (file-remote-p file-name)))
+                       (funcall ibuffer-projectile-include-function file-name))
+              (cons (projectile-project-name) root))))))
+    (unless (advice-member-p #'my/ibuffer-projectile-root-pi-aware
+                             'ibuffer-projectile-root)
+      (advice-add 'ibuffer-projectile-root
+                  :override #'my/ibuffer-projectile-root-pi-aware))))
+#+end_src
 *** jcode (UNUSED)
 
 My own integration to jcode: https://github.com/1jehuang/jcode
