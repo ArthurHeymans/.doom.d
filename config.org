@@ -2233,6 +2233,36 @@ Set timers
     (advice-add '+eshell--current-git-branch
                 :around #'my/eshell-vcs-prompt-a)))
 
+(after! em-ls
+  (require 'nerd-icons)
+
+  (defun my/eshell-ls-icons-a (original fileinfo)
+    "Prefix native Eshell ls FILEINFO with a Nerd icon."
+    (let* ((name (substring-no-properties (car fileinfo)))
+           (attributes (cdr fileinfo))
+           (directory-p (eq (file-attribute-type attributes) t))
+           ;; `eshell-ls-annotate' may modify FILEINFO, so save NAME first.
+           (result (funcall original fileinfo)))
+      ;; Avoid inserting decorative characters into pipeline data.
+      (when (and (derived-mode-p 'eshell-mode)
+                 (not (and eshell-in-pipeline-p
+                           (not (eq eshell-in-pipeline-p 'last)))))
+        (let ((icon
+               (if directory-p
+                   (nerd-icons-icon-for-dir
+                    (expand-file-name name default-directory))
+                 (nerd-icons-icon-for-file name))))
+          (setcar result (concat icon " " (car result)))))
+      result))
+
+  (unless (advice-member-p #'my/eshell-ls-icons-a
+                           'eshell-ls-annotate)
+    (advice-add 'eshell-ls-annotate
+                :around #'my/eshell-ls-icons-a))
+
+  (setq eshell-ls-use-colors t
+        eshell-ls-initial-args '("-h")))
+
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")) t)
 (add-hook 'eshell-mode-hook #'my/eshell-hook t)
 
