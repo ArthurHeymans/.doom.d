@@ -1751,8 +1751,14 @@ MicroVM, with the bouncer password stored in auth-source as:
 (defun my-soju-username ()
   (format "avph/irc.libera.chat@%s" (my-soju-client-name)))
 
+(defun my-soju-oftc-username ()
+  (format "avph/irc.oftc.net@%s" (my-soju-client-name)))
+
 (defun my-nickserv-password (_server)
   (my/auth-source-password "irc.libera.chat" "avph"))
+
+(defun my-oftc-nickserv-password (_server)
+  (my/auth-source-password "irc.oftc.net" "avph"))
 
 (defun my-soju-password (&optional _server)
   (my/auth-source-password "soju" "avph"))
@@ -1769,7 +1775,18 @@ MicroVM, with the bouncer password stored in auth-source as:
            :sasl-username ,(my-soju-username)
            :sasl-password my-soju-password
            :nickserv-password my-nickserv-password
-           :channels ("#flashprog" "#coreboot" "#gnuboot" "#coreboot")))))
+           :channels ("#flashprog" "#coreboot" "#gnuboot" "#coreboot"))
+          ("OFTC"
+           :host "192.168.0.7"
+           :port 6667
+           :tls nil
+           :nick "avph"
+           :logging t
+           :user ,(my-soju-oftc-username)
+           :sasl-username ,(my-soju-oftc-username)
+           :sasl-password my-soju-password
+           :nickserv-password my-oftc-nickserv-password
+           :channels ("#linux-sunxi")))))
 
 (after! clatter
   ;; clatter's SASL PLAIN path currently authenticates as `:nick', so use
@@ -1785,7 +1802,16 @@ MicroVM, with the bouncer password stored in auth-source as:
            :username ,(my-soju-username)
            :realname "Arthur Heymans"
            :password ,(my-soju-password)
-           :autojoin ("#flashprog" "#coreboot" "#gnuboot" "#coreboot"))))
+           :autojoin ("#flashprog" "#coreboot" "#gnuboot" "#coreboot"))
+          ("OFTC"
+           :server "192.168.0.7"
+           :port 6667
+           :tls nil
+           :nick "avph"
+           :username ,(my-soju-oftc-username)
+           :realname "Arthur Heymans"
+           :password ,(my-soju-password)
+           :autojoin ("#linux-sunxi"))))
   (clatter-setup))
 
 ;; (add-hook 'emacs-startup-hook
