@@ -1586,8 +1586,8 @@ Emacs interface to opencode
 #+end_src
 *** pi-coding-agent
 #+begin_src elisp :tangle packages.el
-(package! pi-coding-agent :recipe (:host github :repo "ArthurHeymans/pi-coding-agent")
-  :pin "e2e20b2391fb04d008e19d2ccf010289a449476a")
+(package! pi-coding-agent :recipe (:host github :repo "dnouri/pi-coding-agent")
+  :pin "a7b533fb8ab5a5e2fabb6c925ad2d7385456c1bd")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! pi-coding-agent
@@ -2552,7 +2552,7 @@ This mirrors `+vterm/here'."
            ;; . "integration").  Plain strings naming a directory are
            ;; copied recursively and land at the package root.
            :files (:defaults "integration" "terminfo"))
-  :pin "9b59dceac9292e040216e34c18ffc92694237774")
+  :pin "fb33bee7a336d4f74b4c72a371b472cc967975a8")
 #+end_src
 *** term-sessions
 Persistent terminal sessions both local and remote (with tramp)
@@ -2653,7 +2653,7 @@ when resolving remote programs.
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "6341ba87f841ed5338f90bd721cec1932d1c9359")
+  :pin "e1d4632d576ecf2472c321de1e713b776ea2b78f")
 #+end_src
 
 * Navigation & Search
