@@ -1847,8 +1847,8 @@ MicroVM, with the bouncer password stored in auth-source as:
 
 (after! clatter
   ;; clatter's SASL PLAIN path currently authenticates as `:nick', so use
-  ;; soju's PASS/USER authentication here: PASS gets the bouncer password,
-  ;; and USER gets the network/client-qualified soju username.
+  ;; PASS/USER authentication here with each network's password and the
+  ;; network/client-qualified username.
   (setq clatter-log-enable t
         clatter-networks
         `(("Libera Chat"
@@ -1858,7 +1858,7 @@ MicroVM, with the bouncer password stored in auth-source as:
            :nick "avph"
            :username ,(my-soju-username)
            :realname "Arthur Heymans"
-           :password ,(my-soju-password)
+           :password ,(my-nickserv-password "Libera Chat")
            :autojoin ("#flashprog" "#coreboot" "#gnuboot" "#coreboot"))
           ("OFTC"
            :server "192.168.0.7"
@@ -1867,7 +1867,7 @@ MicroVM, with the bouncer password stored in auth-source as:
            :nick "avph"
            :username ,(my-soju-oftc-username)
            :realname "Arthur Heymans"
-           :password ,(my-soju-password)
+           :password ,(my-oftc-nickserv-password "OFTC")
            :autojoin ("#linux-sunxi"))))
   (clatter-setup))
 
