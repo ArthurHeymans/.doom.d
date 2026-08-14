@@ -34,6 +34,22 @@ Required for using built-in ~auth-source-pick-first-password~
 #+begin_src elisp :tangle config.el
 (setq confirm-kill-processes nil)
 #+end_src
+*** Skip EditorConfig for remote files
+EditorConfig's parent-directory search can loop at a TRAMP root, notably when
+using the ~sudoedit~ method.  Remote files therefore keep their existing
+indentation settings instead of consulting ~.editorconfig~ files.
+
+#+begin_src elisp :tangle config.el
+(defun my/editorconfig-local-properties (filename)
+  "Return EditorConfig properties for local FILENAME only."
+  (if (file-remote-p filename)
+      (make-hash-table)
+    (editorconfig-get-properties filename)))
+
+(after! editorconfig
+  (setq editorconfig-get-properties-function
+        #'my/editorconfig-local-properties))
+#+end_src
 *** Don't ignore .bin files (I'm a firmware dev)
 #+begin_src elisp :tangle config.el
 (setq completion-ignored-extensions
