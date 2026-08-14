@@ -1247,7 +1247,8 @@ VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 ;; vc-jj's generated autoloads modify a variable from project.el before
 ;; project.el is loaded, so load vc-jj explicitly instead.
 ;; TODO remove when merged
-(package! vc-jj :recipe (:build (:not autoloads)))
+;(package! vc-jj :recipe (:build (:not autoloads)))
+(package! vc-jj :recipe (:host codeberg :repo "avph/vc-jj.el") :pin "5033704035ba77f41b0d245821cd5da4c2f107a4")
 #+end_src
 
 #+begin_src elisp :tangle config.el
