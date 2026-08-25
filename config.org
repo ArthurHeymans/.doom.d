@@ -1983,6 +1983,24 @@ Slack client for Emacs
 (package! ement)
 #+end_src
 
+** Browser integration
+#+begin_src elisp :tangle packages.el
+(package! browser-gt)
+#+end_src
+
+#+begin_src elisp :tangle config.el
+(use-package! browser-gt
+  :demand t
+  :config
+  (require 'browser-gt-www)
+  (require 'browser-gt-chatgpt)
+  (require 'browser-gt-youtube)
+  (require 'browser-gt-babel)
+  (require 'browser-gt-tab-manager)
+  (require 'browser-gt-url-handler)
+  (browser-gt-start))
+#+end_src
+
 ** Media
 *** Gif Screencast
 #+begin_src elisp :tangle packages.el
