@@ -1212,7 +1212,7 @@ Add package to use LLM to create PR messages
 ***** Majutsu
 #+begin_src elisp :tangle packages.el
 ;(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "2e1861745a954446eb310209d34fba3b5ae37ea1")
-(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "ede3412cf9539020e305156c9fdfc8e053a9926f")
+(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "91be43e4945f624a80ccb0ad66351db5bc8a86ff")
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -2646,7 +2646,7 @@ This mirrors `+vterm/here'."
            ;; . "integration").  Plain strings naming a directory are
            ;; copied recursively and land at the package root.
            :files (:defaults "integration" "terminfo"))
-  :pin "22971e5fb5e20327d22da80778bf5631e746a0ad")
+  :pin "1373f873dc33858ef51a1ab21f92dc0851d0355f")
 #+end_src
 *** term-sessions
 Persistent terminal sessions both local and remote (with tramp)
