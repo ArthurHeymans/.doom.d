@@ -1985,7 +1985,7 @@ Slack client for Emacs
 
 ** Browser integration
 #+begin_src elisp :tangle packages.el
-(package! browser-gt)
+(package! browser-gt :recipe (:host github :repo "dmgerman/browser-gt") :pin "1a949f2abc10b44635228e017bdffd0bd44c0a03")
 #+end_src
 
 #+begin_src elisp :tangle config.el
