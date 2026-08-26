@@ -2315,7 +2315,11 @@ Set timers
 (defun my/eshell-hook ()
   "Set up Eshell completions."
   (my/eshell-apply-settings)
-  (setq-local completion-styles '(basic partial-completion)
+  ;; Use a non-shell separator for Orderless: a literal space would make
+  ;; pcomplete start completing the next Eshell argument.
+  (setq-local completion-styles '(orderless basic partial-completion)
+              corfu-separator ?,
+              orderless-component-separator '(orderless-escapable-split ?,)
               corfu-auto t
               tab-always-indent 'complete
               ;; Use only Eshell's pcomplete for popup completion.  History is
