@@ -2945,5 +2945,5 @@ upstream nil check is not enough and ~with-current-buffer~ signals
 
 #+begin_src elisp :tangle packages.el
 (package! centered-window)
-(package! nerd-icons-completion :pin "45b585d972192a3eaeb239e15e55de7f46f8920a")
+(package! nerd-icons-completion :pin "17faac7977242b470732efd417d3bcc8eb5a830e")
 #+end_src
