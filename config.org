@@ -1002,7 +1002,7 @@ Rust object notation
 #+begin_src elisp :tangle packages.el
 (package! ron-mode
   :recipe (:host github :repo "ArthurHeymans/ron-mode")
-  :pin "ea1ce4b110f1a277941293c71f365adc58ccefd4")
+  :pin "3acd295e45f212ddf24a5514b46be1e0308ee00d")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ron-mode
