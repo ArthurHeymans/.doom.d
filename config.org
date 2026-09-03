@@ -1592,7 +1592,7 @@ Emacs interface to opencode
 *** Whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el" "whisper-languages.el"))
-  :pin "fd9bf5787a99dd31a4bdf54d2bd9821aacf84e93")
+  :pin "d09b23d999ee120e98adf50fa809f8b8a5c165e6")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! whisper
