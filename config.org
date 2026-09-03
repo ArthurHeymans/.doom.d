@@ -99,7 +99,7 @@ Display battery and time in the modeline using the common european time notation
 #+end_src
 * ewm
 #+begin_src elisp :tangle packages.el
-(package! ednc :recipe (:host github :repo "ArthurHeymans/ednc") :pin "3166ab2cdf92552e4e01c21cb4f4d4d96863e51e")
+(package! ednc :recipe (:host github :repo "ArthurHeymans/ednc") :pin "4003122b267483ac62e148a81cf423bd46313f3a")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ewm
