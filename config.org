@@ -1582,7 +1582,7 @@ Emacs interface to opencode
            :repo "sczi/opencode.el"
            :branch "main"
            :files ("*.el"))
-  :pin "0b5b538c73fd4c163b5e04c01b468ba7106cf96b")
+  :pin "4fcfef79e4536a9d609a99171bd4058cb0c61f20")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! opencode
