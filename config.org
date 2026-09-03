@@ -2215,7 +2215,7 @@ Set timers
 (package! capf-autosuggest)
 (package! eshell-nix-shell
   :recipe (:host github :repo "ArthurHeymans/eshell-nix-shell")
-  :pin "d9be26f87bbb99faa96c0dd8dada243401820856")
+  :pin "f37381919a64ca775ae7893b6a599b347df82646")
 #+end_src
 #+begin_src elisp :tangle config.el
 (defun eshell/dmesg (&rest args)
