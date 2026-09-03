@@ -942,7 +942,7 @@ Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
 *** ob-gptel
 Use gptel in org-babel source blocks
 #+begin_src elisp :tangle packages.el
-(package! ob-gptel :recipe (:host github :repo "ArthurHeymans/ob-gptel") :pin "def94fe7210a3170dbe2b447454399b610a11787")
+(package! ob-gptel :recipe (:host github :repo "ArthurHeymans/ob-gptel") :pin "793238517d61380f9276c674cd155f4440508fd6")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ob-gptel
