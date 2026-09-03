@@ -1166,7 +1166,7 @@ is used."
 **** Forge
 ***** Packages
 #+begin_src elisp :tangle packages.el
-(package! forge :pin "9628f76740aec9270e9fb31457ff4cb38d9f3f16")
+(package! forge :pin "7dc4855437315cb932cbc1d6a903f7d2de03ec5f")
 #+end_src
 
 ***** Forge settings
