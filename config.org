@@ -1808,7 +1808,7 @@ MicroVM, with the bouncer password stored in auth-source as:
   :recipe (:host github
            :repo "parenworks/clatter.el"
            :files ("*.el"))
-  :pin "cc1fdc014e9421a9c3d96929af7eb6c5149b2281")
+  :pin "9b3533ff48d627442abd9260492d47d7015d6413")
 #+end_src
 
 #+begin_src elisp :tangle config.el
