@@ -2391,6 +2391,9 @@ Set timers
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")) t)
 (add-hook 'eshell-mode-hook #'my/eshell-hook t)
 
+(use-package! eshell-nix-shell
+  :hook (eshell-mode . eshell-nix-shell-mode))
+
 (after! em-hist
   (define-key eshell-hist-mode-map (kbd "M-r") #'my/eshell-consult-history))
 
