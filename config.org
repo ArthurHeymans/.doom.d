@@ -2652,7 +2652,7 @@ This mirrors `+vterm/here'."
            ;; . "integration").  Plain strings naming a directory are
            ;; copied recursively and land at the package root.
            :files (:defaults "integration" "terminfo"))
-  :pin "67f6fb4b92db80b74b038ed51ecbbbb87914b2db")
+  :pin "a5541343272e58519de7e003fb2832d991b1ce79")
 #+end_src
 *** term-sessions
 Persistent terminal sessions both local and remote (with tramp)
