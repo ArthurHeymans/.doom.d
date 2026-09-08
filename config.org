@@ -2208,6 +2208,12 @@ Set timers
 #+end_src
 
 * Terminal & Shell
+** Direnv
+Use a fork of envrc that runs direnv asynchronously by default, so
+visiting a file in a slow Nix/Guix project never blocks Emacs.
+#+begin_src elisp :tangle packages.el
+(package! envrc :recipe (:host github :repo "ArthurHeymans/envrc") :pin "df77305261def2ac54c7363766798316a8a77044")
+#+end_src
 ** Terminal Emulators
 *** eshell
 #+begin_src elisp :tangle packages.el
