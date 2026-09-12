@@ -148,14 +148,15 @@ Display battery and time in the modeline using the common european time notation
         (mapc #'ednc-dismiss-notification (ednc-notifications))
       (user-error "EDNC is not installed; run doom sync")))
 
-  ;; spawn-at-startup equivalent: start awww-daemon and EDNC after compositor is ready
-  ;; ewm-mode-hook fires before the compositor is ready, so advise
-  ;; ewm-start-module instead — it only returns after compositor init succeeds
-  (advice-add 'ewm-start-module :after
-              (defun +ewm-spawn-startup-daemons-a (&rest _)
-                (start-process "awww-daemon" nil "awww-daemon")
-                (when (require 'ednc nil t)
-                  (ednc-mode 1))))
+  ;; spawn-at-startup equivalent: start awww-daemon and EDNC once the
+  ;; compositor is ready. ewm-start-module only publishes ewm-mode (and
+  ;; runs ewm-mode-hook) after the compositor ready event, so a plain
+  ;; hook suffices — no need to advise the startup function.
+  (add-hook 'ewm-mode-hook
+            (defun +ewm-spawn-startup-daemons-h ()
+              (start-process "awww-daemon" nil "awww-daemon")
+              (when (require 'ednc nil t)
+                (ednc-mode 1))))
   (defvar consult-source-xdg-apps
   `(:name "Apps"
           :narrow ?a
