@@ -132,6 +132,7 @@ Display battery and time in the modeline using the common european time notation
          ("<AudioNext>" . (lambda () (interactive) (start-process "next" nil "playerctl" "next")))
          ("<AudioPrev>" . (lambda () (interactive) (start-process "prev" nil "playerctl" "previous")))
          ("C-S-SPC" . +ewm-dismiss-all-notifications)
+         ("s-d" . ewm-launch-app)
          ("s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot" nil "grim ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("S-s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot-region" nil "slurp | grim -g - ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("s-;" . (lambda () (interactive) (start-process "voxtype" nil "voxtype" "record" "toggle"))))
@@ -157,20 +158,10 @@ Display battery and time in the modeline using the common european time notation
               (start-process "awww-daemon" nil "awww-daemon")
               (when (require 'ednc nil t)
                 (ednc-mode 1))))
-  (defvar consult-source-xdg-apps
-  `(:name "Apps"
-          :narrow ?a
-          :category app
-          :items ,(lambda ()
-                    (mapcar #'car (ewm-list-xdg-apps)))
-          :action ,#'ewm-launch-xdg-command))
-  (setq consult-buffer-sources
-      '(
-        consult-source-buffer
-        consult-source-hidden-buffer
-        consult-source-modified-buffer
-        consult-source-recent-file
-        consult-source-xdg-apps))
+  ;; App launching is covered by EWM's built-in `ewm-launch-app'
+  ;; (bound to s-d above), so no custom consult source is needed.
+  ;; The old source also overwrote `consult-buffer-sources' wholesale,
+  ;; dropping Doom's other default sources.
         (setq ewm-idle 600)) ;; blank monitor after 10
 #+end_src
 ** EWM daemon fix
