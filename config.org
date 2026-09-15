@@ -814,7 +814,7 @@ Includes org files with todo filetag and specific additional files."
 Capture into ID-nodes via vanilla =org-capture= with =org-node-capture-target=.
 
 #+begin_src elisp :tangle config.el
-(after! org
+(after! org-capture
   (setq org-capture-templates
         (append org-capture-templates
                 '(("n" "New node" plain (function org-node-capture-target)
@@ -829,7 +829,7 @@ Files land in =~/org/roam/daily/= to keep the existing directory layout.
 New files get an org-id so org-node indexes them automatically.
 
 #+begin_src elisp :tangle config.el
-(after! org
+(after! org-capture
   (defvar my/daily-directory "~/org/roam/daily/"
     "Directory for daily and meeting notes.")
 
