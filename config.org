@@ -2746,7 +2746,10 @@ when resolving remote programs.
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "4576129dcd90c5a74820f526752c0e2b3226226e")
+  :pin "948e42a76a97947fb2a00e2815f958b7e7b40534")
+#+end_src
+#+begin_src elisp :tangle config.el
+(setq tramp-rpc-deploy-git-build-policy 'release)
 #+end_src
 
 * Navigation & Search
