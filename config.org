@@ -1591,7 +1591,7 @@ Emacs interface to opencode
 *** pilish
 #+begin_src elisp :tangle packages.el
 (package! pilish :recipe (:host github :repo "dnouri/pilish")
-  :pin "ef41a0c121cc316d317fac804d7f6808effde90")
+  :pin "ef41a0c121cc316d317fac804d7f6808effde90e")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! pilish
