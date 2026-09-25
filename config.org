@@ -1207,6 +1207,15 @@ Show who posted the PR or issue
   (advice-add 'forge--format-topic-line :override #'my-forge--format-topic-line))
 #+end_src
 
+#+begin_src elisp :tangle config.el
+(use-package! forge-dashboard
+  :load-path ("~/src/forge-dashboard")
+  :commands (forge-dashboard)
+  :init
+  (map! :leader
+    :desc "Forge dashboard" "g f" #'forge-dashboard))
+#+end_src
+
 ***** gptel-forge
 Add package to use LLM to create PR messages
 #+begin_src elisp :tangle packages.el
