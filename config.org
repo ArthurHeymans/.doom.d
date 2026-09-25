@@ -714,6 +714,32 @@ prefix argument CHOOSE, prompt when more than one matching link is present."
 (after! org
   (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
 #+end_src
+*** TRMNL display
+Send the daily agenda and habit graphs to their private plugins.  Webhook
+URLs live in =~/.authinfo.trmnl.gpg=, not in the public configuration.
+#+begin_src emacs-lisp :tangle packages.el
+(package! trmnl :recipe (:host github :repo "ArthurHeymans/trmnl-emacs")
+  :pin "7e6bd9f2893f83ddb693995bba23e7fac7691aa1")
+#+end_src
+#+begin_src elisp :tangle config.el
+(use-package! trmnl
+  :demand t
+  :config
+  (setq trmnl-org-agenda-webhook-url
+        (lambda () (trmnl-auth-source-webhook "trmnl.com" "agenda"))
+        trmnl-org-habits-webhook-url
+        (lambda () (trmnl-auth-source-webhook "trmnl.com" "habits")))
+  (defvar my/trmnl-agenda-timer nil)
+  (defvar my/trmnl-habits-timer nil)
+  (dolist (timer (list my/trmnl-agenda-timer my/trmnl-habits-timer))
+    (when (timerp timer)
+      (cancel-timer timer)))
+  (setq my/trmnl-agenda-timer
+        (run-at-time 120 3600 #'trmnl-org-agenda-send)
+        my/trmnl-habits-timer
+        (run-at-time 150 3600 #'trmnl-org-habits-send)))
+#+end_src
+
 ** Org-roam & Knowledge Management (org-node now...)
 *** files
 Auto-tag org files with =todo= filetag when they contain TODO entries, then
