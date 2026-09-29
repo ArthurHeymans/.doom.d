@@ -2727,6 +2727,10 @@ when resolving remote programs.
 #+end_src
 #+begin_src elisp :tangle config.el
 (setq tramp-rpc-deploy-git-build-policy 'release)
+
+;; Use tramp-rpc instead of ssh for /host:path style remote file names.
+(after! tramp
+  (setq tramp-default-method "rpc"))
 #+end_src
 
 * Navigation & Search
