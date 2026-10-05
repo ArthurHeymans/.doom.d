@@ -1223,6 +1223,9 @@ Show who posted the PR or issue
   :load-path ("~/src/forge-dashboard")
   :commands (forge-dashboard)
   :init
+  ;; Display cached topics immediately; scan the local Forge db in a worker.
+  (setq forge-dashboard-cache-file
+        (expand-file-name "forge-dashboard-cache.el" doom-cache-dir))
   (map! :leader
     :desc "Forge dashboard" "g f" #'forge-dashboard))
 #+end_src
