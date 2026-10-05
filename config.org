@@ -595,7 +595,18 @@ longer than LEN."
 #+end_src
 
 *** Org-gcal
-Google calendars in emacs
+Google calendars in emacs. Pin both forks for asynchronous calendar requests
+and OAuth refreshes; event updates yield between entries so EWM remains
+responsive during sync. Indexing, archiving, and token-store access still run
+on Emacs's main thread.
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-gcal
+  :recipe (:host github :repo "ArthurHeymans/org-gcal.el" :branch "async-oauth")
+  :pin "3727959f1d7e0458b90c33b3d9915cc92af6c547")
+(package! oauth2-auto
+  :recipe (:host github :repo "ArthurHeymans/emacs-oauth2-auto" :branch "async-http")
+  :pin "9b60564b82f325306308bc2b64357182bf770cd8")
+#+end_src
 #+begin_src emacs-lisp :tangle config.el
 (use-package! org-gcal
   :commands (org-gcal-fetch org-gcal-sync)
