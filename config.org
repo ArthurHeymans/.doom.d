@@ -2691,6 +2691,10 @@ This mirrors `+vterm/here'."
            :files (:defaults "integration" "terminfo"))
   :pin "a5541343272e58519de7e003fb2832d991b1ce79")
 #+end_src
+#+begin_src elisp :tangle config.el
+(after! ebb
+  (setq ebb-trust-osc7-remote-hosts t))
+#+end_src
 *** term-sessions
 Persistent terminal sessions both local and remote (with tramp)
 #+begin_src elisp :tangle packages.el
