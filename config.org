@@ -1719,7 +1719,9 @@ The bridge is ~t3 client --stdio~ from the nix-config t3code build, and the
 bearer token lives in ~/.authinfo.gpg~:
 ~machine 127.0.0.1 port 13773 login t3-code password TOKEN~.
 #+begin_src elisp :tangle packages.el
-(package! t3-code :recipe (:host github :repo "ArthurHeymans/emacs-t3-code")
+(package! t3-code
+  :recipe (:host github :repo "ArthurHeymans/emacs-t3-code"
+           :protocol ssh :branch "main")
   :pin "e832efc9ab2b56f151afe0ccbd80f39daff8fd9b")
 #+end_src
 #+begin_src elisp :tangle config.el
