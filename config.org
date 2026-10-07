@@ -1065,31 +1065,29 @@ add a =.dir-locals.el= at the project root:
 #+end_src
 
 ** Development Tools
-*** Unsafe local settings
-This allows us to set cargo lsp features in .dir-locals.el
-#+begin_src elisp :tangle config.el
-(put 'lsp-rust-features 'safe-local-variable #'vectorp)
-(put 'lsp-rust-no-default-features 'safe-local-variable #'booleanp)
-#+end_src
-*** Rust feature setter
-#+begin_src elisp :tangle packages.el
-(package! tomlparse)
-(package! lsp-cargo-feature-switcher :recipe (:host github :repo "ArthurHeymans/lsp-cargo-feature-switcher")
-  :pin "ec9d969cfb9d3c5a34fe0736107bedffb2bbafd6")
-#+end_src
+*** Eglot configuration
+~init.el~ selects Doom's Eglot backend.  Eglot enables inlay hints itself; do
+not install a second LSP client just to configure Rust features.  Set project
+features through Eglot's directory-local configuration, then use
+~M-x eglot-signal-didChangeConfiguration~ to apply changes to a running server:
 
-*** LSP Configuration
-Show types in lsp and allow for larger projects without being bothered all the time about it.
+#+begin_example
+((nil . ((eglot-workspace-configuration
+          . (:rust-analyzer (:cargo (:features ["my-feature"]
+                                    :noDefaultFeatures t)))))))
+#+end_example
+
+Use Taplo for TOML (including Emacs's built-in TOML modes), and raise the watch
+limit for large projects.  Eglot supplies its own safe-local-variable predicate.
 
 #+begin_src elisp :tangle config.el
 (setq max-lisp-eval-depth 16000)
-(after! lsp-mode
-  (setq lsp-inlay-hint-enable t
-        lsp-file-watch-threshold 6000
-        lsp-toml-command "taplo")
-  ;; lsp-mode has both Taplo and Tombi TOML clients; prefer Taplo.
-  (add-to-list 'lsp-disabled-clients 'tombi)
-  )
+(after! eglot
+  (setq eglot-max-file-watches 6000)
+  (add-to-list 'eglot-server-programs
+               '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))))
+(dolist (hook '(toml-mode-hook toml-ts-mode-hook conf-toml-mode-hook))
+  (add-hook hook #'eglot-ensure))
 
 (defun my/disable-c-eglot-on-type-formatting ()
   "Disable Eglot on-type formatting in C/C++ buffers."
