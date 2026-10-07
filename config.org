@@ -26,6 +26,17 @@ Don't do init.el
 Required for using built-in ~auth-source-pick-first-password~
 
 ** Basic Settings
+*** Garbage collection during background updates
+EWM, terminals, and chat streams keep allocating while no Emacs command is
+running. GCMH's 800 KB idle threshold causes repeated stop-the-world collections
+in that situation. Keep Doom's normal allocation threshold after idle GC too;
+GCMH can still collect proactively after commands stop.
+
+#+begin_src elisp :tangle config.el
+(after! gcmh
+  (setq gcmh-low-cons-threshold gcmh-high-cons-threshold
+        gc-cons-threshold gcmh-high-cons-threshold))
+#+end_src
 *** Grep no ask for save
 #+begin_src elisp :tangle config.el
 (setq grep-save-buffers nil)
