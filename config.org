@@ -127,15 +127,12 @@ Display battery and time in the modeline using the common european time notation
             ("HID 04d9:1400" :xkb-layouts "nl"
              :xkb-options "caps:ctrl_modifier,ctrl:swap_lwin_lctl")
             ("tpps/2-ibm-trackpoint" :accel-speed ,trackpoint-accel-speed))))
-  (setq ewm-mouse-follows-focus t)
   (setq ewm-output-config '(("Dell Inc. DELL P3424WE 7DJF6T3" :enabled t :x 0 :y 0)
                              ("Dell Inc. DELL U2312HM KF87Y31VC5AL" :enabled t :x 3440 :y 0)
                              ("InfoVision Optoelectronics (Kunshan) Co.,Ltd China 0x057D Unknown" :scale 1.2)))
+  ;; EWM supplies volume/mute and app-launch bindings.  Keep only overrides
+  ;; and personal commands here (brightness uses 10%, rather than EWM's 5%).
   :bind (:map ewm-mode-map
-         ("<AudioRaiseVolume>" . (lambda () (interactive) (start-process "vol+" nil "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+")))
-         ("<AudioLowerVolume>" . (lambda () (interactive) (start-process "vol-" nil "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-")))
-         ("<AudioMute>" . (lambda () (interactive) (start-process "mute" nil "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle")))
-         ("<AudioMicMute>" . (lambda () (interactive) (start-process "mic-mute" nil "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle")))
          ("<MonBrightnessUp>" . (lambda () (interactive) (start-process "bri+" nil "brightnessctl" "s" "10%+")))
          ("<MonBrightnessDown>" . (lambda () (interactive) (start-process "bri-" nil "brightnessctl" "s" "10%-")))
          ("<AudioPlay>" . (lambda () (interactive) (start-process "play" nil "playerctl" "play-pause")))
@@ -143,15 +140,16 @@ Display battery and time in the modeline using the common european time notation
          ("<AudioNext>" . (lambda () (interactive) (start-process "next" nil "playerctl" "next")))
          ("<AudioPrev>" . (lambda () (interactive) (start-process "prev" nil "playerctl" "previous")))
          ("C-S-SPC" . +ewm-dismiss-all-notifications)
-         ("s-d" . ewm-launch-app)
          ("s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot" nil "grim ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("S-s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot-region" nil "slurp | grim -g - ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("s-;" . (lambda () (interactive) (start-process "voxtype" nil "voxtype" "record" "toggle"))))
   :config
-  (add-to-list 'ewm-intercept-prefixes ?\M-:)
-  (add-to-list 'ewm-intercept-prefixes ?\M-`)
-  (add-to-list 'ewm-intercept-prefixes ?\M-&)
-  (add-to-list 'ewm-intercept-prefixes ?\M-y :fullscreen)
+  ;; `setopt' refreshes interception when this config is reevaluated.  The
+  ;; fullscreen flag belongs to the entry, not `add-to-list's APPEND argument.
+  (setopt ewm-intercept-prefixes
+          (seq-uniq
+           (append '(?\M-: ?\M-` ?\M-& (?\M-y :fullscreen))
+                   (remq ?\M-y ewm-intercept-prefixes))))
 
   (defun +ewm-dismiss-all-notifications ()
     "Dismiss all active EDNC notifications."
@@ -169,11 +167,7 @@ Display battery and time in the modeline using the common european time notation
               (start-process "awww-daemon" nil "awww-daemon")
               (when (require 'ednc nil t)
                 (ednc-mode 1))))
-  ;; App launching is covered by EWM's built-in `ewm-launch-app'
-  ;; (bound to s-d above), so no custom consult source is needed.
-  ;; The old source also overwrote `consult-buffer-sources' wholesale,
-  ;; dropping Doom's other default sources.
-        (setq ewm-idle 600)) ;; blank monitor after 10
+  (setopt ewm-idle 600)) ; blank monitors after 10 minutes
 #+end_src
 ** EWM daemon fix
 EWM creates frames directly via ~make-frame~, not through emacsclient, so
