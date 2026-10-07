@@ -2768,7 +2768,8 @@ when resolving remote programs.
 * Navigation & Search
 ** Popup Management
 *** Popper
-Popup buffer management - toggle and cycle through ephemeral windows like REPLs, help, compilation buffers, etc.
+Doom's popup module owns placement, sizing, and lifetime.  Popper only tracks,
+toggles, and cycles those buffers; it must not install competing display rules.
 
 #+begin_src elisp :tangle packages.el
 (package! popper)
@@ -2777,7 +2778,8 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
 #+begin_src elisp :tangle config.el
 (use-package! popper
   :init
-  (setq popper-reference-buffers
+  (setq popper-display-control nil
+        popper-reference-buffers
         '("\\*Messages\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
