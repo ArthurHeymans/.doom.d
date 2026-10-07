@@ -1310,60 +1310,137 @@ VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+end_src
 
 ** LLM Clients
-*** OpenRouter model cache
-Uses curl (url.el can't reach OpenRouter) and caches models to a file,
-refreshing when the cache is missing or older than a day.
+*** Asynchronous model discovery
+Return cached OpenRouter models immediately and refresh stale data in the
+background.  The public models endpoint needs no API key.  Discover installed
+Ollama models through its local HTTP API, rather than blocking on ~ollama list~.
+Successful refreshes update already-registered GPTel backends; failed requests
+leave the last good lists alone.  ~SPC G r~ explicitly refreshes both lists.
 
 #+begin_src elisp :tangle config.el
 (require 'json)
+(require 'seq)
 
-(defvar my--openrouter-cache-file
-  (expand-file-name "openrouter-models.el" doom-cache-dir)
-  "File cache for OpenRouter model list.")
+(defvar my/model-discovery-updated-hook nil
+  "Hook called with backend NAME and model strings after a successful refresh.")
+(defvar my/openrouter-cache-file
+  (expand-file-name "openrouter-models.el" doom-cache-dir))
+(defvar my/openrouter-process nil)
+(defvar my/ollama-process nil)
+(defvar my/ollama-model-list nil)
 
-(defun my--openrouter-cache-stale-p ()
-  "Return non-nil if the OpenRouter cache is missing or older than 24h."
-  (or (not (file-exists-p my--openrouter-cache-file))
-      (> (float-time (time-subtract
-                      (current-time)
-                      (file-attribute-modification-time
-                       (file-attributes my--openrouter-cache-file))))
-         86400)))
+(defun my/model-discovery-start (name command parse publish)
+  "Run COMMAND asynchronously for NAME, then PARSE and PUBLISH its JSON output."
+  (let ((buffer (generate-new-buffer (format " *%s-models*" name))))
+    (condition-case err
+        (make-process
+         :name (concat name "-models") :buffer buffer :command command
+         :connection-type 'pipe :coding 'utf-8-unix :noquery t
+         :sentinel
+         (lambda (process _event)
+           (when (memq (process-status process) '(exit signal))
+             (unwind-protect
+                 (condition-case err
+                     (when (and (eq (process-status process) 'exit)
+                                (zerop (process-exit-status process))
+                                (buffer-live-p buffer))
+                       (with-current-buffer buffer
+                         (goto-char (point-min))
+                         (funcall publish
+                                  (funcall parse
+                                           (json-parse-buffer :object-type 'alist
+                                                              :array-type 'list)))))
+                   (error (message "%s model refresh failed: %s"
+                                   name (error-message-string err))))
+               (when (buffer-live-p buffer) (kill-buffer buffer))))))
+      (error
+       (kill-buffer buffer)
+       (message "%s model discovery unavailable: %s" name (error-message-string err))
+       nil))))
 
-(defun my--openrouter-fetch-models ()
-  "Fetch model list from OpenRouter using curl and write to cache file.
-Returns the model list, or nil on failure."
-  (condition-case err
-      (let* ((token (auth-source-pick-first-password :host "openrouter.ai" :user "apikey"))
-             (args (append '("--silent" "--max-time" "10"
-                             "https://openrouter.ai/api/v1/models")
-                           (when token
-                             (list "-H" (concat "Authorization: Bearer " token)))))
-             (output (with-temp-buffer
-                       (when (zerop (apply #'call-process "curl" nil t nil args))
-                         (buffer-string)))))
-        (when output
-          (let* ((json-object-type 'alist)
-                 (models (mapcar (lambda (m) (alist-get 'id m))
-                                 (alist-get 'data (json-read-from-string output)))))
-            (when models
-              (with-temp-file my--openrouter-cache-file
-                (prin1 models (current-buffer)))
-              models))))
-    (error
-     (message "Warning: Failed to fetch OpenRouter models: %s"
-              (error-message-string err))
-     nil)))
+(defun my/model-discovery-names (data section key)
+  "Read model names at SECTION/KEY in DATA, rejecting malformed responses."
+  (unless (assq section data) (error "Missing model list"))
+  (let ((models (mapcar (lambda (model) (alist-get key model))
+                        (alist-get section data))))
+    (unless (seq-every-p (lambda (name) (and (stringp name) (not (string-empty-p name))))
+                        models)
+      (error "Invalid model names"))
+    models))
 
-(defun my--openrouter-models ()
-  "Return OpenRouter models from cache, fetching if stale or missing."
-  (when (my--openrouter-cache-stale-p)
-    (my--openrouter-fetch-models))
+(defun my/openrouter-read-cache ()
+  "Read model strings from disk without evaluating cache contents."
   (condition-case nil
       (with-temp-buffer
-        (insert-file-contents my--openrouter-cache-file)
-        (read (current-buffer)))
-    (error '("anthropic/claude-sonnet-4-5-20250929"))))
+        (insert-file-contents my/openrouter-cache-file)
+        (let ((models (read (current-buffer))))
+          (and (consp models) (proper-list-p models)
+               (seq-every-p #'stringp models) models)))
+    (error nil)))
+
+(defun my/openrouter-write-cache (models)
+  "Atomically replace the OpenRouter cache with MODELS."
+  (let ((directory (file-name-directory my/openrouter-cache-file)))
+    (make-directory directory t)
+    (let ((temporary (make-temp-file (expand-file-name ".openrouter-models-" directory))))
+      (unwind-protect
+          (progn
+            (with-temp-file temporary (prin1 models (current-buffer)))
+            (rename-file temporary my/openrouter-cache-file t))
+        (when (file-exists-p temporary) (delete-file temporary))))))
+
+(defun my/openrouter-refresh ()
+  "Refresh OpenRouter models asynchronously, coalescing concurrent requests."
+  (interactive)
+  (unless (process-live-p my/openrouter-process)
+    (setq my/openrouter-process
+          (my/model-discovery-start
+           "OpenRouter"
+           '("curl" "--silent" "--show-error" "--fail" "--max-time" "10"
+             "https://openrouter.ai/api/v1/models")
+           (lambda (data)
+             (or (my/model-discovery-names data 'data 'id)
+                 (error "Empty OpenRouter model list")))
+           (lambda (models)
+             (my/openrouter-write-cache models)
+             (run-hook-with-args 'my/model-discovery-updated-hook "OpenRouter" models))))))
+
+(defun my/openrouter-models ()
+  "Return cached models immediately and schedule any necessary refresh."
+  (let* ((models (my/openrouter-read-cache))
+         (attributes (file-attributes my/openrouter-cache-file)))
+    (when (or (not models) (not attributes)
+              (> (float-time
+                  (time-subtract (current-time)
+                                 (file-attribute-modification-time attributes)))
+                 86400))
+      (my/openrouter-refresh))
+    (or models '("anthropic/claude-sonnet-4-5-20250929"))))
+
+(defun my/ollama-refresh ()
+  "Refresh locally installed Ollama models without blocking Emacs."
+  (interactive)
+  (unless (process-live-p my/ollama-process)
+    (setq my/ollama-process
+          (my/model-discovery-start
+           "Ollama"
+           '("curl" "--silent" "--show-error" "--fail" "--max-time" "3"
+             "http://localhost:11434/api/tags")
+           (lambda (data) (my/model-discovery-names data 'models 'name))
+           (lambda (models)
+             (setq my/ollama-model-list models)
+             (run-hook-with-args 'my/model-discovery-updated-hook "Ollama" models))))))
+
+(defun my/ollama-models ()
+  "Return the last known Ollama models and schedule discovery."
+  (my/ollama-refresh)
+  my/ollama-model-list)
+
+(defun my/refresh-model-lists ()
+  "Refresh both dynamically discovered GPTel model lists."
+  (interactive)
+  (my/openrouter-refresh)
+  (my/ollama-refresh))
 #+end_src
 
 *** Ellama (disabled)
@@ -1411,21 +1488,13 @@ Btw this code is generated by ellama.
 #+end_src
 *** GPTEL
 #+begin_src elisp :tangle config.el
-(defun get-ollama-models ()
-  "Fetch the list of installed Ollama models.
-Returns nil if ollama is not running."
-  (condition-case nil
-      (let* ((output (shell-command-to-string "timeout 3 ollama list"))
-             (lines (split-string output "\n" t))
-             models)
-        (dolist (line (cdr lines))  ; Skip the first line
-          (when (string-match "^\\([^[:space:]]+\\)" line)
-            (push (match-string 1 line) models)))
-        (nreverse models))
-    (error nil)))
-
 (after! gptel
   (require 'gptel-openai-oauth)
+  (defun my/gptel-update-discovered-models-h (name models)
+    "Update the registered backend NAME with discovered model strings."
+    (when-let* ((backend (ignore-errors (gptel-get-backend name))))
+      (setf (gptel-backend-models backend) (mapcar #'intern models))))
+  (add-hook 'my/model-discovery-updated-hook #'my/gptel-update-discovered-models-h)
   (let ((openai-oauth-backend
          (gptel-make-openai-oauth "OpenAI OAuth"
            :stream t
@@ -1449,7 +1518,7 @@ Returns nil if ollama is not running."
     :endpoint "/api/v1/chat/completions"
     :stream t
     :key (auth-source-pick-first-password :host "openrouter.ai")
-    :models (my--openrouter-models))
+    :models (my/openrouter-models))
   (gptel-make-anthropic "Claude Personal"
     :stream t
     :key (auth-source-pick-first-password :host "api.anthropic.com" :user "apikey"))
@@ -1462,12 +1531,13 @@ Returns nil if ollama is not running."
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
-    :models (get-ollama-models)))
+    :models (my/ollama-models)))
 (map! :leader
       (:prefix ("G" . "gptel")
        :desc "Start GPTel" "g" #'gptel
        :desc "GPTel menu" "m" #'gptel-menu
-       :desc "Send to GPTel" "s" #'gptel-send))
+       :desc "Send to GPTel" "s" #'gptel-send
+       :desc "Refresh model lists" "r" #'my/refresh-model-lists))
 
 (require 'gptel-integrations)
 #+end_src
