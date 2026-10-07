@@ -165,13 +165,11 @@ Display battery and time in the modeline using the common european time notation
         (mapc #'ednc-dismiss-notification (ednc-notifications))
       (user-error "EDNC is not installed; run doom sync")))
 
-  ;; spawn-at-startup equivalent: start awww-daemon and EDNC once the
-  ;; compositor is ready. ewm-start-module only publishes ewm-mode (and
-  ;; runs ewm-mode-hook) after the compositor ready event, so a plain
-  ;; hook suffices — no need to advise the startup function.
+  ;; EWM publishes ewm-mode only after compositor readiness.  EDNC must
+  ;; start then, not during package loading in an ordinary editor session.
+  ;; EWM supplies the theme background; no wallpaper service is configured.
   (add-hook 'ewm-mode-hook
-            (defun +ewm-spawn-startup-daemons-h ()
-              (start-process "awww-daemon" nil "awww-daemon")
+            (defun +ewm-start-notifications-h ()
               (when (require 'ednc nil t)
                 (ednc-mode 1))))
   (setopt ewm-idle 600)) ; blank monitors after 10 minutes
