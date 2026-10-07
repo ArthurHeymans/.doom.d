@@ -169,80 +169,57 @@ Display battery and time in the modeline using the common european time notation
                 (ednc-mode 1))))
   (setopt ewm-idle 600)) ; blank monitors after 10 minutes
 #+end_src
-** EWM daemon fix
-EWM creates frames directly via ~make-frame~, not through emacsclient, so
-~server-after-make-frame-hook~ never fires. Doom relies on that hook in daemon
-mode to apply fonts, theme, and run deferred hooks. Fire it once on the first
-graphical frame.
+** Doom graphical-frame initialization
+EWM creates frames with ~make-frame~, bypassing the server hook Doom uses for
+fonts, themes, and deferred package initialization in a daemon.  Bridge that
+hook once, only for EWM output frames.  Initialize their dashboard after Doom's
+UI hook has completed, not after an arbitrary timer.  Later frames and hotplug
+outputs use the same path without replacing a buffer already being edited.
 
-Unlike emacsclient, EWM creates *all* output frames via ~make-frame~, so the
-hook must run for every frame (background color, dashboard), not just the first.
-Server hooks themselves are guarded by a flag to run exactly once.
-
-The dashboard switch is deferred with ~run-at-time~ because frames are created
-before Doom finishes loading (~doom-fallback-buffer~ isn't available yet).
-
-~doom-modeline-update-battery-status~ crashes with ~(args-out-of-range "" 0 -1)~
-when battery data is unavailable during daemon init: the icon is not displayable
-and the text is empty, so ~(substring "" 0 -1)~ is called. This aborts the
-entire ~doom-after-init-hook~ chain, preventing the dashboard from loading.
-Advise it to survive the empty-string edge case.
+EWM startup now returns after compositor readiness.  Emacs starts the daemon
+server after processing command-line arguments; no early ~server-start~ is
+needed.  Named daemons still use Emacs's normal naming, with an optional
+~EMACS_SERVER_NAME~ for unnamed daemons.
 
 #+begin_src elisp :tangle config.el
-(advice-add 'doom-modeline-update-battery-status :around
-            (defun +ewm-safe-battery-update-a (fn &rest args)
-              "Prevent args-out-of-range on empty battery string."
-              (condition-case nil
-                  (apply fn args)
-                (args-out-of-range nil))))
+(defvar +ewm--server-hooks-triggered nil)
+(defvar +ewm--ui-ready nil)
+
+(defun +ewm-initialize-output-frame-h (frame)
+  "Initialize Doom on an EWM output FRAME, without affecting client frames."
+  (when (and (frame-live-p frame)
+             (display-graphic-p frame)
+             (frame-parameter frame 'ewm-output))
+    (with-selected-frame frame
+      (unless +ewm--server-hooks-triggered
+        (setq +ewm--server-hooks-triggered t)
+        (run-hooks 'server-after-make-frame-hook))
+      ;; Keep the white-frame repair for PGTK only.  Native Wayland/Skia and
+      ;; EWM's compositor background updates do not need this parameter fix.
+      (when (eq (window-system frame) 'pgtk)
+        (when-let* ((bg (face-background 'default nil t))
+                    ((not (string-prefix-p "unspecified" bg))))
+          (set-frame-parameter frame 'background-color bg)))
+      (when (and +ewm--ui-ready
+                 (not (frame-parameter frame 'ewm-editor))
+                 (eq (window-buffer (frame-selected-window frame))
+                     (get-buffer "*scratch*")))
+        (switch-to-buffer (doom-fallback-buffer))
+        (when (fboundp '+dashboard-reload)
+          (+dashboard-reload t))))))
+
+(defun +ewm-initialize-output-frames-h ()
+  "Finish initializing existing EWM frames after Doom's UI is ready."
+  (setq +ewm--ui-ready t)
+  (mapc #'+ewm-initialize-output-frame-h (frame-list)))
 
 (when (daemonp)
-  ;; `emacs --fg-daemon --eval "(ewm-start-module)"' enters EWM before
-  ;; Emacs' daemon command-line code gets a chance to create the normal
-  ;; emacsclient socket.  Start it explicitly here so `emacsclient' and the
-  ;; `ewm-editor' wrapper can connect to an EWM session.
-  (require 'server)
-  (when-let* ((name (or (getenv "EMACS_SERVER_NAME")
-                        (and (stringp (daemonp)) (daemonp)))))
+  (when-let* ((name (getenv "EMACS_SERVER_NAME")))
     (setq server-name name))
-  (unless (server-running-p)
-    (server-start))
-
-  ;; Track whether server hooks have been triggered (once-only).
-  (defvar +ewm--server-hooks-triggered nil)
-
-  (add-hook 'after-make-frame-functions
-            (defun +ewm-trigger-server-hooks-h (frame)
-              (when (display-graphic-p frame)
-                (with-selected-frame frame
-                  ;; Run server hooks exactly once (for the first graphic frame).
-                  (unless +ewm--server-hooks-triggered
-                    (setq +ewm--server-hooks-triggered t)
-                    (run-hooks 'server-after-make-frame-hook))
-                  ;; Sync frame background from theme and force pgtk to repaint.
-                  ;; doom-fix-frame-color-parameters-h runs before the theme loads
-                  ;; and only fixes "black" colors, so white persists.
-                  (when-let* ((bg (face-background 'default nil t)))
-                    (set-frame-parameter frame 'background-color bg))
-                  ;; make-frame doesn't consult initial-buffer-choice, so the
-                  ;; frame shows *scratch* instead of the Doom dashboard.
-                  ;; Defer until after Doom is fully loaded so doom-fallback-buffer
-                  ;; and +doom-dashboard-reload are available.
-                  (let ((f frame))
-                    (run-at-time 0.5 nil
-                                 (lambda ()
-                                   (when (frame-live-p f)
-                                     (with-selected-frame f
-                                       (when (and (fboundp 'doom-fallback-buffer)
-                                                  (string= (buffer-name) "*scratch*"))
-                                         (switch-to-buffer (doom-fallback-buffer))
-                                         (when (fboundp '+doom-dashboard-reload)
-                                           (+doom-dashboard-reload t)))
-                                       ;; Force PGTK to flush the buffer switch to the
-                                       ;; Wayland surface.  Without this the frame shows
-                                       ;; *scratch* until an input event triggers a repaint.
-                                       (redisplay t))))))
-                  (redisplay t))))))
+  (add-hook 'after-make-frame-functions #'+ewm-initialize-output-frame-h)
+  ;; Dashboard bootstrap runs earlier in this hook.  New frames can then
+  ;; initialize immediately; frames created during startup are handled here.
+  (add-hook 'doom-init-ui-hook #'+ewm-initialize-output-frames-h 100))
 #+end_src
 
 ** EWM shell editor frames
@@ -268,29 +245,14 @@ Generic emacsclient editor buffers need an EWM-managed frame with an
 `ewm-output' parameter.  Create that frame through EWM, on the currently focused
 output, while package-specific `with-editor' display rules (such as Majutsu's jj
 description buffer rule) can still override `server-window'."
-    (if (and (bound-and-true-p ewm-mode)
-             (fboundp 'ewm--focused-frame)
-             (fboundp 'ewm--create-frame-for-output))
-        (let* ((current-frame (ewm--focused-frame))
-               (output (frame-parameter current-frame 'ewm-output))
-               (frame (if output
-                          (ewm--create-frame-for-output
-                           output current-frame
-                           '((ewm-editor . t)
-                             (ewm-focus-on-create . t)
-                             (name . "EWM Editor")))
-                        (selected-frame)))
+    (if (and (bound-and-true-p ewm-mode) (fboundp 'ewm-frame-new))
+        (let* ((frame (ewm-frame-new))
                (window (frame-selected-window frame)))
+          (modify-frame-parameters frame '((ewm-editor . t) (name . "EWM Editor")))
           (set-window-buffer window buffer)
-          ;; A just-created EWM frame does not have its compositor view id yet.
-          ;; `select-frame-set-input-focus' is overridden by EWM and tries to
-          ;; focus that view id immediately, which fails with
-          ;; "Wrong type argument: integerp, nil" for emacsclient editor frames.
-          ;; `ewm-focus-on-create' above asks the compositor to focus the frame
-          ;; once it is mapped; only force focus when the id already exists.
-          (when (frame-parameter frame 'ewm-surface-id)
-            (select-frame-set-input-focus frame)
-            (select-window window))
+          ;; EWM queues focus itself if this frame has not mapped yet.
+          (select-frame-set-input-focus frame)
+          (select-window window)
           window)
       (pop-to-buffer buffer)))
 
@@ -298,11 +260,15 @@ description buffer rule) can still override `server-window'."
 
   (defun +ewm-delete-editor-frame-after-server-edit-h ()
     "Delete temporary EWM editor frames after `server-edit'."
-    (when (and (display-graphic-p)
-               (frame-parameter nil 'ewm-editor)
-               ;; Do not delete the only remaining frame.
-               (cdr (frame-list)))
-      (delete-frame nil t)))
+    ;; server-done-hook runs in the completed buffer, which need not be in
+    ;; the selected frame.  Close only editor frames displaying that buffer.
+    ;; Do not force deletion: EWM protects the last frame of each output.
+    (dolist (frame (frame-list))
+      (when (and (display-graphic-p frame)
+                 (frame-parameter frame 'ewm-editor)
+                 (eq (window-buffer (frame-selected-window frame))
+                     (current-buffer)))
+        (delete-frame frame))))
 
   (add-hook 'server-done-hook #'+ewm-delete-editor-frame-after-server-edit-h))
 #+end_src
@@ -2853,6 +2819,25 @@ Popup buffer management - toggle and cycle through ephemeral windows like REPLs,
       "gr" #'consult-ripgrep)
 #+end_src
 * Temporary fixes
+** Modeline battery status without displayable text
+The local ~doom-modeline-update-battery-status~ still uses ~substring~ with
+an end index of -1.  During daemon startup both its icon and text can be empty,
+raising ~(args-out-of-range "" 0 -1)~.  Keep protection until the modeline handles
+that case, but do not hide unrelated range errors.
+
+#+begin_src elisp :tangle config.el
+(after! doom-modeline
+  (defun my/modeline-empty-battery-status-a (fn &rest args)
+    "Ignore only the modeline's empty battery-string substring error."
+    (condition-case err
+        (apply fn args)
+      (args-out-of-range
+       (unless (equal (cdr err) '("" 0 -1))
+         (signal (car err) (cdr err))))))
+  (advice-add 'doom-modeline-update-battery-status :around
+              #'my/modeline-empty-battery-status-a))
+#+end_src
+
 ** ibuffer deleting the final line
 Emacs 30.2's ~ibuffer-map-lines~ deletes lines with
 ~(1+ (line-end-position))~.  When the final Ibuffer entry is selected and the
