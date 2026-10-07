@@ -65,7 +65,7 @@ indentation settings instead of consulting ~.editorconfig~ files.
 #+begin_src elisp :tangle config.el
 (setq completion-ignored-extensions
       (delete ".bin" completion-ignored-extensions))
-(after! dired-omit-mode
+(after! dired-x
   (setq dired-omit-extensions
         (delete ".bin" dired-omit-extensions)))
 #+end_src
@@ -391,7 +391,7 @@ hidden; otherwise return OUTPUT."
         (append org-todo-keyword-faces
                 '(("REVIEW" . (:foreground "light blue" :weight bold))
                   ("DONE" . (:foreground "green" :weight bold :strike-through t)))))
-  (custom-set-faces '(org-drawer ((t (:foreground "grey" :weight bold :height: 1.3)))))
+  (custom-set-faces '(org-drawer ((t (:foreground "grey" :weight bold :height 1.3)))))
   
   (setq org-global-properties
         '(("Effort_all" . "0:05 0:10 0:15 0:20 0:30 0:45 1:00 1:30 2:00 3:00 4:00 5:00 6:00 7:00")))
@@ -408,10 +408,11 @@ make "src" blocks look really good.
 #+begin_src emacs-lisp :tangle config.el
 (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
 #+end_src
-*** autorevert for use with remote
+*** Auto-revert
+Enable auto-revert in Org buffers.  Remote-file polling remains controlled by
+Emacs's ~auto-revert-remote-files~ option.
 #+begin_src emacs-lisp :tangle config.el
-(after! org-mode
-  (add-hook 'org-mode-hook #'auto-revert-mode))
+(add-hook 'org-mode-hook #'auto-revert-mode)
 #+end_src
 
 ** Export & Integration
@@ -433,7 +434,7 @@ This allows to index org-mode quickly. Might be a good alternative to org-agenda
 #+begin_src elisp :tangle config.el
 (after! org
   (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-show-all-today t))
+  (setq org-habit-show-all-today nil))
 #+end_src
 *** timer config
 Somehow emacs sound does not work. Use aplay instead.
@@ -551,12 +552,10 @@ longer than LEN."
             (:discard (:todo "HOLD"))
             )
           ))
-  (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height: 1.3)))))
+  (custom-set-faces '(org-super-agenda-header ((t (:foreground "dark orange" :weight bold :height 1.3)))))
   (setq org-super-agenda-header-separator "\n---\n")
   (add-to-list 'warning-suppress-types '(org-element org-element-parser))
   (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-  ;; Hide done habits to not clutter up the view
-  (setq org-habit-show-all-today nil)
   )
 #+end_src
 
