@@ -313,3 +313,206 @@ Show habit consistency in a dedicated window while navigating agenda items.
 (progn (org-window-habit-mode +1))
 (setq org-window-habit-repeat-to-deadline nil)
 #+end_src
+
+* Retired configuration experiments :ARCHIVE:
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-10-07 Wed
+:ARCHIVE_FILE: ~/src/doomconfig/config.org
+:END:
+These blocks were already disabled.  Keep the prototypes here, outside the
+active configuration.  The old XDG launcher was already archived above.
+
+** TODO Shell editors over TRAMP
+Use with-editor's sleeping-editor protocol for shells started in TRAMP
+buffers.  This prototype was never enabled: raw terminal chunks still need
+careful handling before an Eat/Ghostel adapter can be used safely.
+
+#+begin_src elisp :tangle no
+(defconst +with-editor-editor-envvars '("EDITOR" "VISUAL" "GIT_EDITOR" "JJ_EDITOR"))
+
+(defvar with-editor--envvar)
+(defvar with-editor-sleeping-editor-regexp)
+(declare-function with-editor--setup "with-editor")
+(declare-function with-editor-export-editor "with-editor")
+(declare-function with-editor-sleeping-editor-filter "with-editor")
+
+(defun +with-editor--setup-editor-env-vars ()
+  "Add editor environment variables for child processes to `process-environment'."
+  (require 'with-editor)
+  (dolist (envvar +with-editor-editor-envvars)
+    (let ((with-editor--envvar envvar))
+      (with-editor--setup))))
+
+(defun +with-editor-export-editor-vars-h ()
+  "Use this Emacs as editor for commands run in supported shell buffers.
+
+For TRAMP-backed shell buffers, `with-editor' uses its sleeping editor so
+remote commands open files through TRAMP in this Emacs instance."
+  (require 'with-editor)
+  (dolist (envvar +with-editor-editor-envvars)
+    (with-editor-export-editor envvar)))
+
+(defun +with-editor--handle-terminal-output (process output)
+  "Handle sleeping-editor requests in PROCESS OUTPUT.
+
+Return nil only for chunks that contain a with-editor request and should be
+hidden; otherwise return OUTPUT."
+  (require 'with-editor)
+  (when-let ((buffer (process-buffer process)))
+    (with-current-buffer buffer
+      (let ((with-editor-sleeping-editor-regexp
+             ;; Terminal emulator filters receive raw chunks, so the marker can
+             ;; be preceded by prompt text or control sequences.
+             (substring with-editor-sleeping-editor-regexp 1)))
+        (with-editor-sleeping-editor-filter process output))))
+  ;; `with-editor-sleeping-editor-filter' returns nil for incomplete chunks too;
+  ;; those must still be rendered.  Only hide actual editor request lines.
+  (unless (string-match-p "WITH-EDITOR:" output)
+    output))
+
+(dolist (hook '(shell-mode-hook eshell-mode-hook term-exec-hook vterm-mode-hook))
+  (add-hook hook #'+with-editor-export-editor-vars-h))
+
+(with-eval-after-load 'eat
+  (defun +with-editor-eat-make-a (fn &rest args)
+    "Run Eat with this Emacs exported as editor."
+    (let ((process-environment process-environment))
+      (+with-editor--setup-editor-env-vars)
+      (apply fn args)))
+
+  (defun +with-editor-eat-filter-a (fn process output)
+    "Let `with-editor' intercept sleeping-editor requests before Eat renders."
+    (when-let ((output (+with-editor--handle-terminal-output process output)))
+      (funcall fn process output)))
+
+  (unless (advice-member-p #'+with-editor-eat-make-a 'eat-make)
+    (advice-add 'eat-make :around #'+with-editor-eat-make-a))
+  (unless (advice-member-p #'+with-editor-eat-filter-a 'eat--filter)
+    (advice-add 'eat--filter :around #'+with-editor-eat-filter-a)))
+
+(with-eval-after-load 'ghostel
+  (defun +with-editor-ghostel-pre-spawn-h ()
+    "Run Ghostel with this Emacs exported as editor."
+    (+with-editor--setup-editor-env-vars))
+
+  (defun +with-editor-ghostel-filter-a (fn process output)
+    "Let `with-editor' intercept sleeping-editor requests before Ghostel renders."
+    (when-let ((output (+with-editor--handle-terminal-output process output)))
+      (funcall fn process output)))
+
+  (add-hook 'ghostel-pre-spawn-hook #'+with-editor-ghostel-pre-spawn-h)
+  (unless (advice-member-p #'+with-editor-ghostel-filter-a 'ghostel--filter)
+    (advice-add 'ghostel--filter :around #'+with-editor-ghostel-filter-a)))
+#+end_src
+
+** Calendar timeblock experiment
+#+begin_src emacs-lisp :tangle no
+(package! org-timeblock)
+#+end_src
+
+** consult-org-roam (replaced by org-node-grep)
+#+begin_src elisp :tangle no
+(package! consult-org-roam)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(after! org-roam
+  (consult-org-roam-mode 1)
+  (setq consult-org-roam-grep-func #'consult-ripgrep)
+  )
+(use-package! org-roam
+  :bind (("C-c n r c" . consult-org-roam-search)))
+#+end_src
+
+** Ellama
+#+begin_src elisp :tangle no
+(package! ellama)
+#+end_src
+
+#+begin_src elisp :tangle no
+(defmacro add-openai-compatible-model (name id url)
+  `(cons ,name (make-llm-openai-compatible
+                :key (auth-source-pick-first-password
+                      :host (url-host (url-generic-parse-url ,url))
+                      :user "apikey")
+                :url ,url
+                :chat-model ,id)))
+
+(after! ellama
+  (setopt ellama-language "English")
+  (require 'llm-openai)
+  (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
+  (setq llm-warn-on-nonfree nil)
+  (setq ellama-providers
+        `(,@(let ((url "https://api.openai.com/v1"))
+              (mapcar
+               (lambda (model)
+                 (add-openai-compatible-model (concat model " [openai]") model url))
+               (or (fetch-openai-compatible-models url) '())))
+          ,@(let ((url "https://openrouter.ai/api/v1"))
+              (mapcar
+               (lambda (model)
+                 (add-openai-compatible-model (concat model " [openrouter]") model url))
+               (or (fetch-openai-compatible-models url) '())))
+          ,@(let ((url "https://api.deepseek.com"))
+              (mapcar
+               (lambda (model)
+                 (add-openai-compatible-model (concat model " [deepseek]") model url))
+               (or (fetch-openai-compatible-models url) '())))))
+  (setq ellama-auto-scroll t)
+  (setopt ellama-provider (eval (cdr (assoc "DeepSeek: DeepSeek V3 0324 [openrouter]" ellama-providers))))
+  (setopt ellama-keymap-prefix "C-c z"))
+#+end_src
+
+** jcode
+https://github.com/1jehuang/jcode
+#+begin_src elisp :tangle no
+(package! jcode :recipe (:host github :repo "ArthurHeymans/emacs-jcode")
+  :pin "8bdfbe2d013947f2873a437cf2efd713e9120de6")
+#+end_src
+
+** Spotify (not reliable enough)
+#+begin_src elisp :tangle no
+;; https://github.com/danielfm/smudge/pull/106/commits
+(package! smudge :recipe (:host github :repo "JoaoZPalma/smudge") :pin "6be8d1eaa800200f2547c90844e5c198b22277e9")
+#+end_src
+
+#+begin_src elisp :tangle no
+(map! :leader :desc "Spotify" "S" #'smudge-command-map)
+(use-package! smudge
+  :custom
+  (smudge-oauth2-client-secret (auth-source-pick-first-password :host "spotify" :user "secret"))
+  (smudge-oauth2-client-id (auth-source-pick-first-password :host "spotify" :user "id"))
+  (smudge-player-use-transient-map t)
+  (smudge-transport 'connect)
+  (defhydra hydra-spotify (:hint nil)
+    "
+^Search^                  ^Control^               ^Manage^
+^^^^^^^^-----------------------------------------------------------------
+_t_: Track               _SPC_: Play/Pause        _+_: Volume up
+_m_: My Playlists        _n_  : Next Track        _-_: Volume down
+_f_: Featured Playlists  _p_  : Previous Track    _x_: Mute
+_u_: User Playlists      _r_  : Repeat            _d_: Device
+^^                       _s_  : Shuffle           _q_: Quit
+"
+    ("t" smudge-track-search :exit t)
+    ("m" smudge-my-playlists :exit t)
+    ("f" smudge-featured-playlists :exit t)
+    ("u" smudge-user-playlists :exit t)
+    ("SPC" smudge-controller-toggle-play :exit nil)
+    ("n" smudge-controller-next-track :exit nil)
+    ("p" smudge-controller-previous-track :exit nil)
+    ("r" smudge-controller-toggle-repeat :exit nil)
+    ("s" smudge-controller-toggle-shuffle :exit nil)
+    ("+" smudge-controller-volume-up :exit nil)
+    ("-" smudge-controller-volume-down :exit nil)
+    ("x" smudge-controller-volume-mute-unmute :exit nil)
+    ("d" smudge-select-device :exit nil)
+    ("q" quit-window "quit" :color blue))
+  (bind-key "a" #'hydra-spotify/body smudge-command-map))
+#+end_src
+
+** authinfo sources experiment
+#+begin_src elisp :tangle no
+(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
+#+end_src

@@ -99,6 +99,13 @@ Week starts at monday here, despite what the Bible says.
    indent-bars-display-on-blank-lines t)
   )
 #+end_src
+** Centered editing
+Keep the optional centered-window command available; it is not a compatibility
+patch and is not enabled automatically.
+#+begin_src elisp :tangle packages.el
+(package! centered-window)
+#+end_src
+
 ** Modeline config
 Display battery and time in the modeline using the common european time notation
 
@@ -271,97 +278,6 @@ description buffer rule) can still override `server-window'."
         (delete-frame frame))))
 
   (add-hook 'server-done-hook #'+ewm-delete-editor-frame-after-server-edit-h))
-#+end_src
-
-** TODO Shell editors over TRAMP
-When a shell is started from an Emacs buffer whose ~default-directory~ is a
-TRAMP path, ~with-editor~ can make remote commands use this Emacs as their
-editor.  It does not rely on a remote ~emacsclient~ socket; for remote
-processes it installs the "sleeping editor" protocol and opens requested files
-through TRAMP.
-
-Export the common editor variables so tools with their own priority order, such
-as Git and Jujutsu, do not bypass ~with-editor~ via ~VISUAL~, ~GIT_EDITOR~, or
-~JJ_EDITOR~.  ~with-editor~ knows about ~shell~, ~eshell~, ~term~, and ~vterm~;
-~eat~ and ~ghostel~ need small adapters to inject the same environment before
-spawning and to catch the sleeping-editor marker in terminal output.
-
-#+begin_src elisp :tangle no
-(defconst +with-editor-editor-envvars '("EDITOR" "VISUAL" "GIT_EDITOR" "JJ_EDITOR"))
-
-(defvar with-editor--envvar)
-(defvar with-editor-sleeping-editor-regexp)
-(declare-function with-editor--setup "with-editor")
-(declare-function with-editor-export-editor "with-editor")
-(declare-function with-editor-sleeping-editor-filter "with-editor")
-
-(defun +with-editor--setup-editor-env-vars ()
-  "Add editor environment variables for child processes to `process-environment'."
-  (require 'with-editor)
-  (dolist (envvar +with-editor-editor-envvars)
-    (let ((with-editor--envvar envvar))
-      (with-editor--setup))))
-
-(defun +with-editor-export-editor-vars-h ()
-  "Use this Emacs as editor for commands run in supported shell buffers.
-
-For TRAMP-backed shell buffers, `with-editor' uses its sleeping editor so
-remote commands open files through TRAMP in this Emacs instance."
-  (require 'with-editor)
-  (dolist (envvar +with-editor-editor-envvars)
-    (with-editor-export-editor envvar)))
-
-(defun +with-editor--handle-terminal-output (process output)
-  "Handle sleeping-editor requests in PROCESS OUTPUT.
-
-Return nil only for chunks that contain a with-editor request and should be
-hidden; otherwise return OUTPUT."
-  (require 'with-editor)
-  (when-let ((buffer (process-buffer process)))
-    (with-current-buffer buffer
-      (let ((with-editor-sleeping-editor-regexp
-             ;; Terminal emulator filters receive raw chunks, so the marker can
-             ;; be preceded by prompt text or control sequences.
-             (substring with-editor-sleeping-editor-regexp 1)))
-        (with-editor-sleeping-editor-filter process output))))
-  ;; `with-editor-sleeping-editor-filter' returns nil for incomplete chunks too;
-  ;; those must still be rendered.  Only hide actual editor request lines.
-  (unless (string-match-p "WITH-EDITOR:" output)
-    output))
-
-(dolist (hook '(shell-mode-hook eshell-mode-hook term-exec-hook vterm-mode-hook))
-  (add-hook hook #'+with-editor-export-editor-vars-h))
-
-(with-eval-after-load 'eat
-  (defun +with-editor-eat-make-a (fn &rest args)
-    "Run Eat with this Emacs exported as editor."
-    (let ((process-environment process-environment))
-      (+with-editor--setup-editor-env-vars)
-      (apply fn args)))
-
-  (defun +with-editor-eat-filter-a (fn process output)
-    "Let `with-editor' intercept sleeping-editor requests before Eat renders."
-    (when-let ((output (+with-editor--handle-terminal-output process output)))
-      (funcall fn process output)))
-
-  (unless (advice-member-p #'+with-editor-eat-make-a 'eat-make)
-    (advice-add 'eat-make :around #'+with-editor-eat-make-a))
-  (unless (advice-member-p #'+with-editor-eat-filter-a 'eat--filter)
-    (advice-add 'eat--filter :around #'+with-editor-eat-filter-a)))
-
-(with-eval-after-load 'ghostel
-  (defun +with-editor-ghostel-pre-spawn-h ()
-    "Run Ghostel with this Emacs exported as editor."
-    (+with-editor--setup-editor-env-vars))
-
-  (defun +with-editor-ghostel-filter-a (fn process output)
-    "Let `with-editor' intercept sleeping-editor requests before Ghostel renders."
-    (when-let ((output (+with-editor--handle-terminal-output process output)))
-      (funcall fn process output)))
-
-  (add-hook 'ghostel-pre-spawn-hook #'+with-editor-ghostel-pre-spawn-h)
-  (unless (advice-member-p #'+with-editor-ghostel-filter-a 'ghostel--filter)
-    (advice-add 'ghostel--filter :around #'+with-editor-ghostel-filter-a)))
 #+end_src
 
 * Org Mode
@@ -559,11 +475,6 @@ longer than LEN."
   )
 #+end_src
 
-*** calendar (WIP)
-#+begin_src emacs-lisp :tangle no
-(package! org-timeblock)
-#+end_src
-
 *** Org-gcal
 Google calendars in emacs. Pin both forks for asynchronous calendar requests
 and OAuth refreshes; event updates yield between entries so EWM remains
@@ -721,7 +632,7 @@ URLs live in =~/.authinfo.trmnl.gpg=, not in the public configuration.
         (run-at-time 150 3600 #'trmnl-org-habits-send)))
 #+end_src
 
-** Org-roam & Knowledge Management (org-node now...)
+** Knowledge management and agenda files
 *** files
 Auto-tag org files with =todo= filetag when they contain TODO entries, then
 use those tags to build =org-agenda-files= dynamically.  No org-roam
@@ -876,19 +787,6 @@ and uses it in the filename."
                   ("m" "Meeting note" plain (function my/meeting-capture-target)
                    "* Meeting: %(or my/meeting-title \"\")\n:PROPERTIES:\n:Date: %U\n:Participants: %^{Participants|Arthur Heymans}\n:END:\n** Agenda\n-\n\n** Notes\n- %?\n\n** Action Items\n- [ ]\n"
                    :unnarrowed t)))))
-#+end_src
-** consult-org-roam (disabled, replaced by org-node-grep)
-#+begin_src elisp :tangle no
-(package! consult-org-roam)
-#+end_src
-
-#+begin_src emacs-lisp :tangle no
-(after! org-roam
-  (consult-org-roam-mode 1)
-  (setq consult-org-roam-grep-func #'consult-ripgrep)
-  )
-(use-package! org-roam
-  :bind (("C-c n r c" . consult-org-roam-search)))
 #+end_src
 ** org-node
 Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
@@ -1250,8 +1148,6 @@ VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+begin_src elisp :tangle packages.el
 ;; vc-jj's generated autoloads modify a variable from project.el before
 ;; project.el is loaded, so load vc-jj explicitly instead.
-;; TODO remove when merged
-;(package! vc-jj :recipe (:build (:not autoloads)))
 (package! vc-jj :recipe (:host codeberg :repo "avph/vc-jj.el") :pin "5033704035ba77f41b0d245821cd5da4c2f107a4")
 #+end_src
 
@@ -1442,49 +1338,6 @@ leave the last good lists alone.  ~SPC G r~ explicitly refreshes both lists.
   (my/ollama-refresh))
 #+end_src
 
-*** Ellama (disabled)
-#+begin_src elisp :tangle no
-(package! ellama)
-#+end_src
-
-This gets all the models from openrouter and passes them to ellama.
-Btw this code is generated by ellama.
-#+begin_src elisp :tangle no
-(defmacro add-openai-compatible-model (name id url)
-  `(cons ,name  (make-llm-openai-compatible
-                     :key (auth-source-pick-first-password
-                           :host (url-host (url-generic-parse-url ,url))
-                           :user "apikey")
-                     :url ,url
-                     :chat-model ,id)))
-
-(after! ellama
-  (setopt ellama-language "English")
-  (require 'llm-openai)
-  (setq ellama-sessions-directory "~/.emacs.d/.local/cache/ellama-sessions")
-  (setq llm-warn-on-nonfree nil)
-  (setq ellama-providers
-        `(,@(let ((url "https://api.openai.com/v1"))
-              (mapcar
-               (lambda (model)
-                 (add-openai-compatible-model (concat model " [openai]") model url))
-               (or (fetch-openai-compatible-models url) '())))
-          ,@(let ((url "https://openrouter.ai/api/v1"))
-              (mapcar
-               (lambda (model)
-                 (add-openai-compatible-model (concat model " [openrouter]") model url))
-               (or (fetch-openai-compatible-models url) '())))
-          ,@(let ((url "https://api.deepseek.com"))
-              (mapcar
-               (lambda (model)
-                 (add-openai-compatible-model (concat model " [deepseek]") model url))
-               (or (fetch-openai-compatible-models url) '())))))
-  (setq ellama-auto-scroll t)
-  (setopt ellama-provider (eval (cdr (assoc "DeepSeek: DeepSeek V3 0324 [openrouter]" ellama-providers))))
-  (setopt ellama-keymap-prefix "C-c z")
-)
-
-#+end_src
 *** GPTEL
 #+begin_src elisp :tangle config.el
 (after! gptel
@@ -1597,7 +1450,7 @@ The commit message should be structured as follows:
 (with-eval-after-load 'eat
   (define-key eat-mode-map (kbd "C-c C-g") #'my-gptel-eat-command))
 #+end_src
-*** Agent-shell (disabled)
+*** Agent-shell
 A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Protocol).
 #+begin_src elisp :tangle packages.el
 (package! shell-maker)
@@ -1627,7 +1480,6 @@ A native Emacs shell to interact with LLM agents powered by ACP (Agent Client Pr
 *** OpenCode
 Emacs interface to opencode
 #+begin_src elisp :tangle packages.el
-;(package! opencode :recipe (:host codeberg :repo "sczi/opencode.el") :pin "0b6d1ad49ed061d69deef50663715ae3a93d69ac")
 (package! opencode
   :recipe (:host codeberg
            :repo "sczi/opencode.el"
@@ -1769,13 +1621,6 @@ bearer token lives in ~/.authinfo.gpg~:
   :init (defalias 't3 't3-code)
   :config
   (setq t3-code-default-endpoint "http://127.0.0.1:13773"))
-#+end_src
-*** jcode (UNUSED)
-
-My own integration to jcode: https://github.com/1jehuang/jcode
-#+begin_src elisp :tangle no
-(package! jcode :recipe (:host github :repo "ArthurHeymans/emacs-jcode")
-  :pin "8bdfbe2d013947f2873a437cf2efd713e9120de6")
 #+end_src
 * Communication & Social
 ** Email
@@ -2084,52 +1929,6 @@ Slack client for Emacs
         gif-screencast-args '()))
 #+end_src
 
-*** Spotify (disabled, does not work well enough)
-Do spotify from emacs
-#+begin_src elisp :tangle no
-;; Override for oauth fix, keep track of https://github.com/danielfm/smudge/pull/106/commits
-(package! smudge :recipe (:host github :repo "JoaoZPalma/smudge") :pin "6be8d1eaa800200f2547c90844e5c198b22277e9")
-#+end_src
-
-#+begin_src elisp :tangle no
-(map! :leader
-      :desc "Spotify" "S" #'smudge-command-map)
-(use-package! smudge
-  :custom
-  (smudge-oauth2-client-secret (auth-source-pick-first-password :host "spotify" :user "secret"))
-  (smudge-oauth2-client-id (auth-source-pick-first-password :host "spotify" :user "id"))
-  ;; optional: enable transient map for frequent commands
-  (smudge-player-use-transient-map t)
-  (smudge-transport 'connect)
-  (defhydra hydra-spotify (:hint nil)
-    "
-^Search^                  ^Control^               ^Manage^
-^^^^^^^^-----------------------------------------------------------------
-_t_: Track               _SPC_: Play/Pause        _+_: Volume up
-_m_: My Playlists        _n_  : Next Track        _-_: Volume down
-_f_: Featured Playlists  _p_  : Previous Track    _x_: Mute
-_u_: User Playlists      _r_  : Repeat            _d_: Device
-^^                       _s_  : Shuffle           _q_: Quit
-"
-    ("t" smudge-track-search :exit t)
-    ("m" smudge-my-playlists :exit t)
-    ("f" smudge-featured-playlists :exit t)
-    ("u" smudge-user-playlists :exit t)
-    ("SPC" smudge-controller-toggle-play :exit nil)
-    ("n" smudge-controller-next-track :exit nil)
-    ("p" smudge-controller-previous-track :exit nil)
-    ("r" smudge-controller-toggle-repeat :exit nil)
-    ("s" smudge-controller-toggle-shuffle :exit nil)
-    ("+" smudge-controller-volume-up :exit nil)
-    ("-" smudge-controller-volume-down :exit nil)
-    ("x" smudge-controller-volume-mute-unmute :exit nil)
-    ("d" smudge-select-device :exit nil)
-    ("q" quit-window "quit" :color blue))
-
-  (bind-key "a" #'hydra-spotify/body smudge-command-map)
-  )
-#+end_src
-
 ** Torrent: transmission
 #+begin_src elisp :tangle packages.el
 (package! transmission)
@@ -2166,12 +1965,6 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 #+begin_src elisp :tangle packages.el
 (package! pinentry)
 #+end_src
-*** authinfo sources (does not work yet)
-Set the first one to a local .authinfo.gpg
-#+begin_src elisp :tangle no
-(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
-#+end_src
-
 *** SOPS
 #+begin_src elisp :tangle packages.el
 (package! sops :recipe (:host github :repo "ArthurHeymans/sops") :pin "d58e6c39e54ed1483d92c937ab91ce266eabd0f6")
@@ -2267,10 +2060,6 @@ Don't use htop
    'proced-format-alist
    '(custom user pid ppid sess tree pcpu pmem rss start time state (args comm)))
   (setq-default proced-format 'custom))
-#+end_src
-** App launcher in OS :ARCHIVE:
-#+begin_src emacs-lisp :tangle packages.el
-(package! xdg-launcher :recipe (:host github :repo "emacs-exwm/xdg-launcher") :pin "78c591df0a87cbabcfd65788546233dca6f2018d")
 #+end_src
 ** tmr
 Set timers
@@ -3046,8 +2835,4 @@ upstream nil check is not enough and ~with-current-buffer~ signals
                  " "))
             (error ""))
         ""))))
-#+end_src
-
-#+begin_src elisp :tangle packages.el
-(package! centered-window)
 #+end_src
