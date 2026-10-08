@@ -1511,8 +1511,7 @@ bearer token lives in ~/.authinfo.gpg~:
 ~machine 127.0.0.1 port 13773 login t3-code password TOKEN~.
 #+begin_src elisp :tangle packages.el
 (package! t3-code
-  :recipe (:host github :repo "ArthurHeymans/emacs-t3-code"
-           :protocol ssh :branch "main")
+  :recipe (:host github :repo "ArthurHeymans/emacs-t3-code")
   :pin "d90226f041369cf1a432335aa7082ff6849e4716")
 #+end_src
 #+begin_src elisp :tangle config.el
