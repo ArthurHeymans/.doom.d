@@ -2408,7 +2408,7 @@ This mirrors `+vterm/here'."
            ;; . "integration").  Plain strings naming a directory are
            ;; copied recursively and land at the package root.
            :files (:defaults "integration" "terminfo"))
-  :pin "fb1530cfedeb9e07083b8b42d971cffd874964f1")
+  :pin "e61698d0e2eb6928bf4e60064fcd947cfeded2c4")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! ebb
