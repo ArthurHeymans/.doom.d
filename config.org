@@ -120,7 +120,7 @@ Display battery and time in the modeline using the common european time notation
 #+end_src
 * ewm
 #+begin_src elisp :tangle packages.el
-(package! ednc :recipe (:host github :repo "ArthurHeymans/ednc") :pin "4003122b267483ac62e148a81cf423bd46313f3a")
+(package! ednc :recipe (:host github :repo "ArthurHeymans/ednc") :pin "638d73e7c3fe4ffe86199e33fb85fbaa4cf1ab7f")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ewm
@@ -833,7 +833,7 @@ Replacement for org-roam: faster node indexing, no SQLite DB, Syncthing-safe.
 *** ob-gptel
 Use gptel in org-babel source blocks
 #+begin_src elisp :tangle packages.el
-(package! ob-gptel :recipe (:host github :repo "ArthurHeymans/ob-gptel") :pin "793238517d61380f9276c674cd155f4440508fd6")
+(package! ob-gptel :recipe (:host github :repo "ArthurHeymans/ob-gptel") :pin "60e704a390d767a7d06c8d3845ba8786b75f7da3")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! ob-gptel
@@ -1004,7 +1004,7 @@ limit for large projects.  Eglot supplies its own safe-local-variable predicate.
 **** Magit
 ***** Packages
 #+begin_src elisp :tangle packages.el
-(package! magit :pin "659f89955cf60fe3d4326d881c412df06c69680d")
+(package! magit :pin "65232f488caae960029cc68bcc607aea340fa3b1")
 (package! gptel-magit :recipe (:host github :repo "ArthurHeymans/gptel-magit") :pin "fc55c36d5b7d26104358021fe802cc338ddbdff4")
 (package! gptel-commit)
 #+end_src
@@ -1046,7 +1046,7 @@ is used."
 **** Forge
 ***** Packages
 #+begin_src elisp :tangle packages.el
-(package! forge :pin "7dc4855437315cb932cbc1d6a903f7d2de03ec5f")
+(package! forge :pin "19083d38c8ca559dd761c8032cb46ca306de96d0")
 #+end_src
 
 ***** Forge settings
@@ -1104,7 +1104,7 @@ Add package to use LLM to create PR messages
 ***** Majutsu
 #+begin_src elisp :tangle packages.el
 ;(package! majutsu :recipe (:host github :repo "0WD0/majutsu") :pin "2e1861745a954446eb310209d34fba3b5ae37ea1")
-(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "f76c4c6c85b317e16f758561d43a667bcd2a13ec")
+(package! majutsu :recipe (:host github :repo "ArthurHeymans/majutsu") :pin "5d1de143c22b494797cce92176f0068c819137e4")
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -1139,7 +1139,7 @@ VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+begin_src elisp :tangle packages.el
 ;; vc-jj's generated autoloads modify a variable from project.el before
 ;; project.el is loaded, so load vc-jj explicitly instead.
-(package! vc-jj :recipe (:host codeberg :repo "avph/vc-jj.el") :pin "5033704035ba77f41b0d245821cd5da4c2f107a4")
+(package! vc-jj :recipe (:host codeberg :repo "avph/vc-jj.el") :pin "5a0c11cfc13d97cc8fdf23f9c6e0d9b483211a87")
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -1476,7 +1476,7 @@ Emacs interface to opencode
            :repo "sczi/opencode.el"
            :branch "main"
            :files ("*.el"))
-  :pin "4fcfef79e4536a9d609a99171bd4058cb0c61f20")
+  :pin "b72351311909e4614a67ecf36dd5e32da850c775")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! opencode
@@ -1486,7 +1486,7 @@ Emacs interface to opencode
 *** Whisper
 #+begin_src elisp :tangle packages.el
 (package! whisper :recipe (:host github :repo "natrys/whisper.el" :files ("whisper.el" "whisper-languages.el"))
-  :pin "d09b23d999ee120e98adf50fa809f8b8a5c165e6")
+  :pin "dfec03903fe57a99e9e1df3bb0d67395e7a53b8d")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! whisper
@@ -1498,7 +1498,7 @@ Emacs interface to opencode
 *** pilish
 #+begin_src elisp :tangle packages.el
 (package! pilish :recipe (:host github :repo "dnouri/pilish")
-  :pin "ef41a0c121cc316d317fac804d7f6808effde90e")
+  :pin "d19416529bc9e81b6c28edd65971901edd368c91")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! pilish
@@ -1624,7 +1624,7 @@ MicroVM, with the bouncer password stored in auth-source as:
   :recipe (:host github
            :repo "parenworks/clatter.el"
            :files ("*.el"))
-  :pin "9b3533ff48d627442abd9260492d47d7015d6413")
+  :pin "cb4147f2f2a59a252bf8982600ecaf3c730a567c")
 #+end_src
 
 #+begin_src elisp :tangle config.el
@@ -1868,7 +1868,7 @@ Use emacs epg for gpg pinentry. Make sure allow-emacs-pinentry is not set.
 #+end_src
 *** SOPS
 #+begin_src elisp :tangle packages.el
-(package! sops :recipe (:host github :repo "ArthurHeymans/sops") :pin "d58e6c39e54ed1483d92c937ab91ce266eabd0f6")
+(package! sops :recipe (:host github :repo "ArthurHeymans/sops") :pin "95b2178a71dcbf3e69729c52cba2bc23171e059d")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! sops
@@ -1973,7 +1973,7 @@ Set timers
 Use a fork of envrc that runs direnv asynchronously by default, so
 visiting a file in a slow Nix/Guix project never blocks Emacs.
 #+begin_src elisp :tangle packages.el
-(package! envrc :recipe (:host github :repo "ArthurHeymans/envrc") :pin "df77305261def2ac54c7363766798316a8a77044")
+(package! envrc :recipe (:host github :repo "ArthurHeymans/envrc") :pin "55a69ae6325c06fdde9a94b55c8f3dbc901686ff")
 #+end_src
 ** Terminal Emulators
 *** eshell
@@ -1981,7 +1981,7 @@ visiting a file in a slow Nix/Guix project never blocks Emacs.
 (package! capf-autosuggest)
 (package! eshell-nix-shell
   :recipe (:host github :repo "ArthurHeymans/eshell-nix-shell")
-  :pin "f37381919a64ca775ae7893b6a599b347df82646")
+  :pin "11756726ab8891af0eab490a3fab77c195c44c99")
 #+end_src
 #+begin_src elisp :tangle config.el
 (defun eshell/dmesg (&rest args)
@@ -2409,7 +2409,7 @@ This mirrors `+vterm/here'."
            ;; . "integration").  Plain strings naming a directory are
            ;; copied recursively and land at the package root.
            :files (:defaults "integration" "terminfo"))
-  :pin "e61698d0e2eb6928bf4e60064fcd947cfeded2c4")
+  :pin "f87d6e4c4a522f974aad83be2d209ad7d5072af6")
 #+end_src
 #+begin_src elisp :tangle config.el
 (after! ebb
@@ -2419,7 +2419,7 @@ This mirrors `+vterm/here'."
 Persistent terminal sessions both local and remote (with tramp)
 #+begin_src elisp :tangle packages.el
 (package! term-sessions :recipe (:host github :repo "ArthurHeymans/emacs-term-sessions")
-                                 :pin "0815dbea006128df1d61e9d29e5a8ada53b349c1")
+                                 :pin "9c5e726dea26765fe409f262d5474ffa7ac6b379")
 #+end_src
 #+begin_src elisp :tangle config.el
 (setq term-sessions-preferred-frontend 'ghostel)
@@ -2514,7 +2514,7 @@ when resolving remote programs.
   :recipe (:host github
            :repo "ArthurHeymans/emacs-tramp-rpc"
            :files ("lisp/*.el"))
-  :pin "c9cb8bfc0bd7f4e2c49245902fefa49fbe6ac8b4")
+  :pin "c00e7171cb390a8bf53ec818ea95167a0d8b7945")
 #+end_src
 #+begin_src elisp :tangle config.el
 (setq tramp-rpc-deploy-git-build-policy 'release)
