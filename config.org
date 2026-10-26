@@ -154,12 +154,10 @@ Display battery and time in the modeline using the common european time notation
          ("S-s-<print>" . (lambda () (interactive) (start-process-shell-command "screenshot-region" nil "slurp | grim -g - ~/Pictures/Screenshots/scrn-$(date +'%Y-%m-%d-%H-%M-%S').png")))
          ("s-;" . (lambda () (interactive) (start-process "voxtype" nil "voxtype" "record" "toggle"))))
   :config
-  ;; `setopt' refreshes interception when this config is reevaluated.  The
-  ;; fullscreen flag belongs to the entry, not `add-to-list's APPEND argument.
-  (setopt ewm-intercept-prefixes
-          (seq-uniq
-           (append '(?\M-: ?\M-` ?\M-& (?\M-y :fullscreen))
-                   (remq ?\M-y ewm-intercept-prefixes))))
+  (keymap-set ewm-mode-map "M-:" (ewm-key :intercept))
+  (keymap-set ewm-mode-map "M-`" (ewm-key :intercept))
+  (keymap-set ewm-mode-map "M-&" (ewm-key :intercept))
+  (keymap-set ewm-mode-map "M-y" (ewm-key :intercept :fullscreen))
 
   (defun +ewm-dismiss-all-notifications ()
     "Dismiss all active EDNC notifications."
