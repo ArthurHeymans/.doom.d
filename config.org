@@ -1513,7 +1513,7 @@ bearer token lives in ~/.authinfo.gpg~:
 #+begin_src elisp :tangle packages.el
 (package! t3-code
   :recipe (:host github :repo "ArthurHeymans/emacs-t3-code")
-  :pin "d90226f041369cf1a432335aa7082ff6849e4716")
+  :pin "f0845bc9d02a40a261eb54b1d51f11e81f4ecab0")
 #+end_src
 #+begin_src elisp :tangle config.el
 (use-package! t3-code
