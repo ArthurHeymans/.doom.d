@@ -1137,9 +1137,13 @@ Add package to use LLM to create PR messages
 ***** vc-jj
 VC backend for Jujutsu, from GNU ELPA: https://elpa.gnu.org/packages/vc-jj.html
 #+begin_src elisp :tangle packages.el
-;; vc-jj's generated autoloads modify a variable from project.el before
-;; project.el is loaded, so load vc-jj explicitly instead.
-(package! vc-jj :recipe (:host codeberg :repo "avph/vc-jj.el") :pin "5a0c11cfc13d97cc8fdf23f9c6e0d9b483211a87")
+;; vc-jj's autoloads access project.el before it is loaded during startup.
+;; Load project for existing autoloads during sync, but disable their generation
+;; for startup and load vc-jj explicitly after vc below.
+(require 'project)
+(package! vc-jj
+  :recipe (:host codeberg :repo "avph/vc-jj.el" :build (:not autoloads))
+  :pin "5a0c11cfc13d97cc8fdf23f9c6e0d9b483211a87")
 #+end_src
 
 #+begin_src elisp :tangle config.el
