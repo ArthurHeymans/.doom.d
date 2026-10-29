@@ -29,16 +29,19 @@ Required for using built-in ~auth-source-pick-first-password~
 *** Garbage collection during background updates
 GCMH's forced collections after short typing pauses cause visible stalls.
 Disable it and retain Doom's 64 MiB threshold for automatic collection.
+Set GCMH's low threshold too: disabling the mode again restores that value,
+even when the mode is already off.
 
 #+begin_src elisp :tangle config.el
 (remove-hook 'doom-first-buffer-hook #'gcmh-mode)
 (setq gc-cons-threshold (* 64 1024 1024))
 (after! gcmh
+  ;; Disabling the mode resets gc-cons-threshold to this value.
+  (setq gcmh-low-cons-threshold (* 64 1024 1024))
   ;; Disabling GCMH forgets its timer without cancelling it.
   (when (timerp gcmh-idle-timer)
     (cancel-timer gcmh-idle-timer))
-  (gcmh-mode -1)
-  (setq gc-cons-threshold (* 64 1024 1024)))
+  (gcmh-mode -1))
 #+end_src
 *** Grep no ask for save
 #+begin_src elisp :tangle config.el
